@@ -1,0 +1,54 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "AgentOps: Health",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "agentops.cli",
+        "health",
+        "--strict"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "AgentOps: Scan Path",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "agentops.cli",
+        "scan",
+        "--path",
+        "${input:agentopsScanPath}",
+        "--source",
+        "repo",
+        "--fail-on-block"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "AgentOps: Test",
+      "type": "shell",
+      "command": "pytest",
+      "args": [
+        "tests",
+        "-q"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "agentopsScanPath",
+      "type": "promptString",
+      "description": "Path to scan with AgentOps",
+      "default": "adversarial_cases"
+    }
+  ]
+}

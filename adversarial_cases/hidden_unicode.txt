@@ -1,0 +1,10 @@
+This is a benign defensive fixture.
+
+Visible text looks normal, but the next word contains a zero-width marker:
+
+safe​word
+
+Expected result:
+
+- detect hidden unicode marker
+- require review before using as trusted context

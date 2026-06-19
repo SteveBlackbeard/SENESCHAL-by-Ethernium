@@ -1,0 +1,72 @@
+{
+  "name": "robin-hood-by-ethernium",
+  "status": "prototype",
+  "extractable": true,
+  "relationship_to_continuity": "none",
+  "purpose": "Provider-neutral AI agent token frugality, context, and routing optimization.",
+  "usage_modes": ["standalone", "with-continuity-legacy"],
+  "governance": {
+    "rulebook": "GOVERNANCE.md",
+    "maturity": "prototype",
+    "health_gate": [
+      "valid manifest JSON",
+      "explicit Continuity Legacy boundary",
+      "clean-room policy",
+      "extractable directory",
+      "frugality gate",
+      "threat model"
+    ]
+  },
+  "clean_room_policy": {
+    "copy_leaked_prompts": false,
+    "study_public_behavior": true,
+    "extract_control_patterns": true,
+    "provider_neutral_rebuild": true
+  },
+  "documents": [
+    "README.md",
+    "BLUEPRINT.md",
+    "GOVERNANCE.md",
+    "RULEBOOK.md",
+    "FRUGALITY.md",
+    "THREAT_MODEL.md",
+    "EXTRACTION_CONTRACT.md",
+    "ROADMAP.md",
+    "PENDING.md",
+    "INTEGRATIONS.md",
+    "STANDALONE_USAGE.md",
+    "CONTINUITY_USAGE.md",
+    "MITIGATION_MATRIX.md",
+    "PRIOR_ART.md"
+  ],
+  "planned_modules": [
+    "router",
+    "adversarial_corpus",
+    "usage_log",
+    "provider_profiles",
+    "templates",
+    "token_budget",
+    "context_packer",
+    "vscode_integration",
+    "cursor_integration",
+    "mcp_server"
+  ],
+  "implemented_modules": [
+    "health_guard",
+    "context_packet",
+    "prompt_firewall",
+    "frugality_ledger",
+    "capability_broker",
+    "cli",
+    "recursive_scan",
+    "basic_secret_detection",
+    "integration_contracts",
+    "mcp_server"
+  ],
+  "acceptance_metrics": {
+    "must_reduce_one_of": ["cost", "risk", "drift"],
+    "default_storage": "jsonl",
+    "default_runtime": "local_first",
+    "no_dashboard_before": "prototype"
+  }
+}

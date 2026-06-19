@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=77.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robin-hood-by-ethernium"
+version = "0.1.0"
+authors = [
+  { name = "SteveBlackbeard" },
+]
+description = "Provider-neutral, local-first operations layer for token frugality and safer AI-agent work."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = ["ai", "agents", "prompt-injection", "llmops", "security", "frugality"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Security",
+  "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.optional-dependencies]
+mcp = ["mcp>=1.0.0"]
+
+[project.scripts]
+agentops = "agentops.cli:main"
+agentops-mcp = "agentops.mcp_server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agentops*"]

@@ -1,0 +1,133 @@
+"""Optional MCP server for AgentOps local controls."""
+
+from __future__ import annotations
+
+import argparse
+import contextlib
+import sys
+from pathlib import Path
+from typing import Any
+
+from .capability_broker import CapabilityGrant, check_action
+from .context_packet import ContextPacket
+from .health_guard import check_forbidden_text, check_manifest, check_required_docs
+from .prompt_firewall import classify_text, scan_path
+
+
+def health_tool(*, strict: bool = False) -> dict[str, Any]:
+    findings = check_required_docs() + check_manifest() + check_forbidden_text()
+    payload = {
+        "ok": not findings or (not strict and all(finding.severity != "error" for finding in findings)),
+        "strict": strict,
+        "findings": [
+            {"severity": finding.severity, "message": finding.message}
+            for finding in findings
+        ],
+    }
+    return payload
+
+
+def scan_text_tool(text: str, *, source: str = "external") -> dict[str, Any]:
+    risk = classify_text(text, source=source)
+    return {
+        "source": risk.source,
+        "trust": risk.trust,
+        "score": risk.score,
+        "severity": risk.severity,
+        "blocked": risk.blocked,
+        "findings": list(risk.findings),
+    }
+
+
+def scan_path_tool(path: str, *, source: str = "external") -> dict[str, Any]:
+    summary = scan_path(Path(path), source=source)
+    return {
+        "files_scanned": summary.files_scanned,
+        "blocked": summary.blocked,
+        "warnings": summary.warnings,
+        "findings": [
+            {
+                "path": finding.path,
+                "severity": finding.risk.severity,
+                "score": finding.risk.score,
+                "blocked": finding.risk.blocked,
+                "findings": list(finding.risk.findings),
+            }
+            for finding in summary.findings
+        ],
+    }
+
+
+def make_packet_tool(
+    objective: str,
+    *,
+    allowed_files: list[str] | None = None,
+    constraints: list[str] | None = None,
+    verification: list[str] | None = None,
+    rollback: str = "Revert the scoped change and rerun verification.",
+    expected_output: str = "A concise implementation or review result.",
+) -> str:
+    return ContextPacket(
+        objective=objective,
+        allowed_files=allowed_files or [],
+        constraints=constraints or [],
+        verification=verification or [],
+        rollback=rollback,
+        expected_output=expected_output,
+    ).render()
+
+
+def check_capability_tool(
+    task_id: str,
+    capabilities: list[str],
+    action: str,
+    *,
+    path: str | None = None,
+    allowed_paths: list[str] | None = None,
+    denied_paths: list[str] | None = None,
+) -> dict[str, Any]:
+    grant = CapabilityGrant(
+        task_id=task_id,
+        capabilities=set(capabilities),
+        allowed_paths=tuple(allowed_paths or []),
+        denied_paths=tuple(denied_paths or []),
+    )
+    decision = check_action(grant, capability=action, path=path)
+    return {"allowed": decision.allowed, "reason": decision.reason}
+
+
+def build_mcp_server() -> Any:
+    try:
+        from mcp.server.fastmcp import FastMCP
+    except ImportError as exc:  # pragma: no cover - depends on optional package
+        raise RuntimeError("Install the optional MCP extra first: pip install -e .[mcp]") from exc
+
+    server = FastMCP("ethernium-agentops")
+
+    server.tool(name="agentops.health")(health_tool)
+    server.tool(name="agentops.scan_text")(scan_text_tool)
+    server.tool(name="agentops.scan_path")(scan_path_tool)
+    server.tool(name="agentops.make_packet")(make_packet_tool)
+    server.tool(name="agentops.check_capability")(check_capability_tool)
+    return server
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Run the optional AgentOps MCP server.")
+    parser.add_argument("--stdio", action="store_true", help="Run over stdio. This is the default MCP transport.")
+    parser.parse_args(argv)
+
+    try:
+        server = build_mcp_server()
+    except RuntimeError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    with contextlib.redirect_stdout(sys.stderr):
+        print("agentops-mcp: starting stdio server")
+    server.run()
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
