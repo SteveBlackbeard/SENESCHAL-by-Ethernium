@@ -1,17 +1,17 @@
-# Robin Hood by Ethernium
+# ROBIN HOOD
 
-Robin Hood by Ethernium is intentionally separate from Continuity Legacy.
+ROBIN HOOD is intentionally separate from Continuity Legacy.
 
 It started as the AgentOps incubation layer and is now its own tool/repository.
 
-Robin Hood can be used in two modes:
+ROBIN HOOD can be used in two modes:
 
 - **Standalone**: as an independent local-first tool for any AI-assisted project.
 - **With Continuity Legacy**: as an optional operations layer beside Continuity governance.
 
 ## What This Tool Is
 
-Robin Hood by Ethernium is a provider-neutral operating layer for reducing AI agent cost, context waste, retries, and coordination drift.
+ROBIN HOOD is a provider-neutral operating layer for reducing AI agent cost, context waste, retries, and coordination drift.
 
 It focuses on:
 
