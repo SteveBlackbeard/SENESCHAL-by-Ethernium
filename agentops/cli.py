@@ -8,10 +8,13 @@ import sys
 from pathlib import Path
 
 from .capability_broker import CapabilityGrant, check_action
+from .context_packer import pack_context, render_pack
 from .context_packet import ContextPacket
 from .frugality_ledger import append_entry, new_entry, read_entries, summarize_entries
 from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
+from .provider_profiles import load_profiles
+from .token_budget import budget_for_file, budget_for_text
 
 
 def cmd_health(args: argparse.Namespace) -> int:
@@ -102,8 +105,42 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_models(args: argparse.Namespace) -> int:
+    profiles = [profile.to_dict() for profile in load_profiles(Path(args.profiles) if args.profiles else None)]
+    print(json.dumps({"profiles": profiles}, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_budget(args: argparse.Namespace) -> int:
+    if args.text is not None:
+        budget = budget_for_text(args.text, model_id=args.model, reserve_output_tokens=args.reserve_output)
+    elif args.file is not None:
+        budget = budget_for_file(Path(args.file), model_id=args.model, reserve_output_tokens=args.reserve_output)
+    else:
+        print("ERROR: budget requires --text or --file", file=sys.stderr)
+        return 2
+    print(json.dumps(budget.to_dict(), indent=2, sort_keys=True))
+    return 0 if budget.fits else 1
+
+
+def cmd_pack(args: argparse.Namespace) -> int:
+    root = Path(args.path)
+    pack = pack_context(
+        root,
+        model_id=args.model,
+        max_tokens=args.max_tokens,
+        reserve_output_tokens=args.reserve_output,
+        source=args.source,
+    )
+    if args.render:
+        print(render_pack(pack, root.resolve()))
+    else:
+        print(json.dumps(pack.to_dict(), indent=2, sort_keys=True))
+    return 0 if pack.estimated_packed_tokens <= pack.max_input_tokens else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="agentops", description="Frugal operations for AI-agent work.")
+    parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     health = subparsers.add_parser("health", help="Run ROBIN HOOD health checks.")
@@ -149,6 +186,26 @@ def build_parser() -> argparse.ArgumentParser:
     report = subparsers.add_parser("report", help="Summarize a JSONL frugality ledger.")
     report.add_argument("--ledger", default="agentops-usage.jsonl")
     report.set_defaults(func=cmd_report)
+
+    models = subparsers.add_parser("models", help="List model/provider profiles.")
+    models.add_argument("--profiles", help="Optional custom provider_profiles.json path.")
+    models.set_defaults(func=cmd_models)
+
+    budget = subparsers.add_parser("budget", help="Estimate whether text or a file fits a model budget.")
+    budget.add_argument("--model", default="local-small")
+    budget.add_argument("--reserve-output", type=int, default=1024)
+    budget.add_argument("--text")
+    budget.add_argument("--file")
+    budget.set_defaults(func=cmd_budget)
+
+    pack = subparsers.add_parser("pack", help="Pack a file or directory under a token budget.")
+    pack.add_argument("--path", required=True)
+    pack.add_argument("--model", default="local-long")
+    pack.add_argument("--max-tokens", type=int)
+    pack.add_argument("--reserve-output", type=int, default=1024)
+    pack.add_argument("--source", default="internal")
+    pack.add_argument("--render", action="store_true", help="Render included files as a text packet.")
+    pack.set_defaults(func=cmd_pack)
     return parser
 
 

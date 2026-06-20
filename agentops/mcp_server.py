@@ -9,9 +9,12 @@ from pathlib import Path
 from typing import Any
 
 from .capability_broker import CapabilityGrant, check_action
+from .context_packer import pack_context
 from .context_packet import ContextPacket
 from .health_guard import check_forbidden_text, check_manifest, check_required_docs
 from .prompt_firewall import classify_text, scan_path
+from .provider_profiles import load_profiles
+from .token_budget import budget_for_file, budget_for_text
 
 
 def health_tool(*, strict: bool = False) -> dict[str, Any]:
@@ -96,6 +99,41 @@ def check_capability_tool(
     return {"allowed": decision.allowed, "reason": decision.reason}
 
 
+def models_tool() -> dict[str, Any]:
+    return {"profiles": [profile.to_dict() for profile in load_profiles()]}
+
+
+def budget_tool(
+    *,
+    model_id: str = "local-small",
+    text: str | None = None,
+    file: str | None = None,
+    reserve_output_tokens: int = 1024,
+) -> dict[str, Any]:
+    if text is not None:
+        return budget_for_text(text, model_id=model_id, reserve_output_tokens=reserve_output_tokens).to_dict()
+    if file is not None:
+        return budget_for_file(Path(file), model_id=model_id, reserve_output_tokens=reserve_output_tokens).to_dict()
+    raise ValueError("budget_tool requires text or file")
+
+
+def pack_tool(
+    path: str,
+    *,
+    model_id: str = "local-long",
+    max_tokens: int | None = None,
+    reserve_output_tokens: int = 1024,
+    source: str = "internal",
+) -> dict[str, Any]:
+    return pack_context(
+        Path(path),
+        model_id=model_id,
+        max_tokens=max_tokens,
+        reserve_output_tokens=reserve_output_tokens,
+        source=source,
+    ).to_dict()
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -109,6 +147,9 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.scan_path")(scan_path_tool)
     server.tool(name="robinhood.make_packet")(make_packet_tool)
     server.tool(name="robinhood.check_capability")(check_capability_tool)
+    server.tool(name="robinhood.models")(models_tool)
+    server.tool(name="robinhood.budget")(budget_tool)
+    server.tool(name="robinhood.pack")(pack_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -116,6 +157,9 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.scan_path")(scan_path_tool)
     server.tool(name="agentops.make_packet")(make_packet_tool)
     server.tool(name="agentops.check_capability")(check_capability_tool)
+    server.tool(name="agentops.models")(models_tool)
+    server.tool(name="agentops.budget")(budget_tool)
+    server.tool(name="agentops.pack")(pack_tool)
     return server
 
 

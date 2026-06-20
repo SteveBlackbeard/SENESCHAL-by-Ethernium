@@ -1,6 +1,6 @@
 {
   "name": "robin-hood-mcp",
-  "status": "planned",
+  "status": "implemented-local-controls",
   "transport": ["stdio"],
   "default_network": "disabled",
   "tools": [
@@ -35,14 +35,20 @@
       "description": "Validate a requested capability and optional path."
     },
     {
-      "name": "robinhood.estimate_budget",
-      "implemented": false,
+      "name": "robinhood.models",
+      "implemented": true,
+      "risk": "low",
+      "description": "List provider-neutral model profiles."
+    },
+    {
+      "name": "robinhood.budget",
+      "implemented": true,
       "risk": "low",
       "description": "Estimate token usage against a selected model profile."
     },
     {
-      "name": "robinhood.pack_context",
-      "implemented": false,
+      "name": "robinhood.pack",
+      "implemented": true,
       "risk": "medium",
       "description": "Create a compact context bundle under a token budget."
     },
@@ -56,7 +62,7 @@
   "forbidden": [
     "store provider secrets",
     "copy leaked prompts",
-    "invoke models before scan and budget controls exist",
+    "invoke models before scan and budget controls are explicitly enabled",
     "depend on Continuity Legacy runtime"
   ]
 }

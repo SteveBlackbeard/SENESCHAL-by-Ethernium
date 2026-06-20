@@ -32,6 +32,24 @@
       "problemMatcher": []
     },
     {
+      "label": "ROBIN HOOD: Pack Context",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "agentops.cli",
+        "pack",
+        "--path",
+        "${input:robinHoodPackPath}",
+        "--model",
+        "local-long",
+        "--max-tokens",
+        "12000"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
       "label": "ROBIN HOOD: Test",
       "type": "shell",
       "command": "pytest",
@@ -49,6 +67,12 @@
       "type": "promptString",
       "description": "Path to scan with ROBIN HOOD",
       "default": "adversarial_cases"
+    },
+    {
+      "id": "robinHoodPackPath",
+      "type": "promptString",
+      "description": "Path to pack with ROBIN HOOD",
+      "default": "."
     }
   ]
 }

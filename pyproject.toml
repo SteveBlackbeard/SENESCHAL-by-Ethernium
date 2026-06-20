@@ -37,3 +37,6 @@ robinhood-mcp = "agentops.mcp_server:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["agentops*"]
+
+[tool.setuptools.package-data]
+agentops = ["provider_profiles.json"]

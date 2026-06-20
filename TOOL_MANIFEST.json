@@ -61,7 +61,10 @@
     "recursive_scan",
     "basic_secret_detection",
     "integration_contracts",
-    "mcp_server"
+    "mcp_server",
+    "provider_profiles",
+    "token_budget",
+    "context_packer"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

@@ -1,0 +1,60 @@
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "local-small",
+      "provider": "local",
+      "context_window": 8192,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "low",
+      "strengths": ["cheap", "private", "fast", "small-edits"],
+      "tokenizer": "estimate"
+    },
+    {
+      "id": "local-long",
+      "provider": "local",
+      "context_window": 32768,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["private", "repository-context", "drafting"],
+      "tokenizer": "estimate"
+    },
+    {
+      "id": "openai-compatible-balanced",
+      "provider": "openai-compatible",
+      "context_window": 128000,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["tool-use", "coding", "review", "release"],
+      "tokenizer": "estimate"
+    },
+    {
+      "id": "anthropic-compatible-long",
+      "provider": "anthropic-compatible",
+      "context_window": 200000,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["long-context", "analysis", "synthesis"],
+      "tokenizer": "estimate"
+    },
+    {
+      "id": "generic-local-lora",
+      "provider": "local",
+      "context_window": 16384,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "variable",
+      "strengths": ["adapter-specific", "private", "specialized"],
+      "tokenizer": "estimate"
+    }
+  ]
+}

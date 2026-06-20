@@ -18,20 +18,22 @@ Implemented:
 - prompt firewall
 - recursive prompt and secret-like material scanner
 - capability broker
-- CLI commands for health, packet, scan, grant, log, and report
+- model/provider profile registry
+- tokenizer-free budget estimator
+- context packer with ignored-directory filtering
+- CLI commands for health, models, budget, pack, packet, scan, grant, log, and report
+- optional MCP server with local control tools
 - clean-room governance and extraction docs
 
 Not implemented yet:
 
-- measured token accounting per model
-- tokenizer-aware context packing
-- model/provider profile registry
 - API adapters
 - routing recommendations based on task class
 - VS Code integration package
 - Cursor integration package
-- MCP server
 - standalone repository CI
+- measured tokenizer integrations for specific providers
+- provider invocation layer
 
 ## Phase 2.5: Token Core
 
@@ -39,14 +41,14 @@ Goal: turn frugality from an estimate into a measurable control.
 
 Build:
 
-- `ROBIN HOOD/provider_profiles.py`
-- `ROBIN HOOD/provider_profiles.json`
-- `ROBIN HOOD/token_budget.py`
-- `ROBIN HOOD/context_packer.py`
+- `agentops/provider_profiles.py`
+- `agentops/provider_profiles.json`
+- `agentops/token_budget.py`
+- `agentops/context_packer.py`
 - CLI commands:
-  - `ROBIN HOOD models`
-  - `ROBIN HOOD budget`
-  - `ROBIN HOOD pack`
+  - `robinhood models`
+  - `robinhood budget`
+  - `robinhood pack`
 
 Acceptance:
 
@@ -56,6 +58,8 @@ Acceptance:
 - ranks files by relevance and risk
 - emits a compact context packet under a token budget
 - reports before/after token reduction
+
+Status: implemented with fallback token estimates. Provider-specific measured tokenizers remain deferred.
 
 ## Phase 3: Provider-Neutral Router
 
@@ -133,13 +137,12 @@ Acceptance:
 - no editor config becomes required for the package
 - no integration bypasses prompt scanning or capability checks
 
-## Phase 6: Standalone Release
+## Phase 6: Standalone Release Hardening
 
-Goal: extract ROBIN HOOD cleanly from Continuity Legacy.
+Goal: make ROBIN HOOD releasable as its own package and repository without depending on Continuity Legacy.
 
 Build:
 
-- own repository
 - CI
 - release notes
 - package metadata

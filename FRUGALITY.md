@@ -100,3 +100,15 @@ Minimum metrics for prototype:
 - percent of tasks solved locally
 - number of blocked unsafe inputs
 - number of avoided whole-repo context loads
+
+## Executable Controls
+
+ROBIN HOOD now includes a small token core:
+
+```powershell
+robinhood models
+robinhood budget --file README.md --model local-small
+robinhood pack --path . --model local-long --max-tokens 12000
+```
+
+The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.

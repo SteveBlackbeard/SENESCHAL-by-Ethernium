@@ -26,12 +26,12 @@ Status: complete.
 
 Build:
 
-- `ROBIN HOOD/health_guard.py`
-- `ROBIN HOOD/context_packet.py`
-- `ROBIN HOOD/frugality_ledger.py`
-- `ROBIN HOOD/prompt_firewall.py`
-- `ROBIN HOOD/capability_broker.py`
-- `ROBIN HOOD/cli.py`
+- `agentops/health_guard.py`
+- `agentops/context_packet.py`
+- `agentops/frugality_ledger.py`
+- `agentops/prompt_firewall.py`
+- `agentops/capability_broker.py`
+- `agentops/cli.py`
 - `tests/`
 
 Acceptance:
@@ -63,7 +63,7 @@ Acceptance:
 
 ## Phase 3: Provider-Neutral Scorecard
 
-Status: planned.
+Status: partially implemented.
 
 Build:
 
@@ -74,9 +74,9 @@ Build:
 - scorecard command
 - routing recommendations
 - CLI commands:
-  - `ROBIN HOOD models`
-  - `ROBIN HOOD budget`
-  - `ROBIN HOOD pack`
+  - `robinhood models`
+  - `robinhood budget`
+  - `robinhood pack`
 
 Acceptance:
 
@@ -86,6 +86,20 @@ Acceptance:
 - packs context under a budget
 - stores observations without proprietary prompts
 - recommends local/cloud routing
+
+Implemented now:
+
+- provider profile registry
+- fallback token budget estimator
+- context packer under explicit token budget
+- CLI and MCP surfaces for models, budget, and pack
+
+Still planned:
+
+- measured tokenizer plugins
+- task classifier
+- routing recommendations
+- provider adapter dry-runs
 
 ## Phase 3.5: Editor And MCP Integration
 
@@ -106,7 +120,7 @@ Acceptance:
 - MCP exposes health, scan, packet, capability, budget, pack, and route tools
 - model invocation stays deferred until scan and budget controls are stable
 
-## Phase 4: Standalone Repository
+## Phase 4: Standalone Release Hardening
 
 Build:
 
@@ -117,7 +131,7 @@ Build:
 
 Acceptance:
 
-- ROBIN HOOD is extracted from Continuity Legacy
+- ROBIN HOOD stays independent from Continuity Legacy
 - tests pass in its own repo
 - no private Continuity file is required
 

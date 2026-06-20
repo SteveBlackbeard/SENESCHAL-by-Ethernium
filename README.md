@@ -1,144 +1,74 @@
 # ROBIN HOOD
 
-ROBIN HOOD is intentionally separate from Continuity Legacy.
+ROBIN HOOD is a local-first control layer for cheaper, safer AI-assisted work.
 
-It started as an agent-operations incubation layer and is now its own tool/repository.
+It helps decide what context to send, what to keep local, what to block, and whether a task deserves a stronger model. The goal is practical token economy: fewer whole-repo dumps, fewer retries, smaller prompts, safer tool scope, and clearer task packets.
 
-ROBIN HOOD can be used in two modes:
+## What It Does
 
-- **Standalone**: as an independent local-first tool for any AI-assisted project.
-- **With Continuity Legacy**: as an optional operations layer beside Continuity governance.
+- estimates token budgets without locking into one provider
+- packs repository context under an explicit model budget
+- scans untrusted text/files for prompt-injection and secret-like material
+- creates scoped context packets for agents
+- checks least-privilege capability grants
+- records cost/retry/outcome data in a JSONL frugality ledger
+- exposes terminal and optional MCP controls
 
-## What This Tool Is
+## What It Is Not
 
-ROBIN HOOD is a provider-neutral operating layer for reducing AI agent cost, context waste, retries, and coordination drift.
+ROBIN HOOD is not:
 
-It focuses on:
-
-- model routing
-- local/cloud task splitting
-- task packet templates
-- context compaction
-- credit usage tracking
-- batch workflows
-- clean-room reverse engineering of agent control patterns
-
-## What This Tool Is Not
-
-It is not:
-
-- part of the Continuity Legacy runtime
-- part of the PyPI package
-- part of Continuity governance
-- a copy of leaked prompts
+- a leaked-prompt archive
+- a jailbreak toolkit
 - a provider bypass tool
-- a storage place for proprietary hidden instructions
+- a dashboard
+- a database-backed agent platform
+- a dependency of another project
 
-## Compatibility Rule
+The clean-room rule is simple: study economics and control patterns, then rebuild provider-neutral primitives. Do not copy proprietary prompts or hidden policies.
 
-The internal Python package is still named `agentops` for compatibility with the incubation prototype. The public product name is ROBIN HOOD.
-
-## Clean-Room Rule
-
-Reverse engineer the economics and control system, not proprietary text.
-
-Allowed:
-
-- study public behavior
-- identify reusable control patterns
-- rebuild them as local, provider-neutral primitives
-- measure cost, retries, and context size
-
-Not allowed:
-
-- copying leaked prompts
-- using hidden vendor policies as source material
-- impersonating another provider's model behavior
-- adding jailbreak collections
-
-## Current Status
-
-```text
-status: prototype
-relationship_to_continuity: none
-safe_to_extract: true
-```
-
-## Governance
-
-The local governance seed is in `GOVERNANCE.md`.
-
-ROBIN HOOD should adopt Continuity-style discipline only where it adds leverage:
-
-- clear boundary
-- explicit health gate
-- clean-room policy
-- extraction contract
-- measurable value
-
-It should not inherit the full Continuity Legacy baseline system until it becomes a real standalone tool with executable code.
-
-## Frugal Build Path
-
-ROBIN HOOD should grow only through modules that reduce one of three things:
-
-- cost
-- risk
-- drift
-
-The first standalone version should be small:
-
-- `RULEBOOK.md`: operating rules and clean-room limits
-- `FRUGALITY.md`: token, retry, model, and context economy
-- `THREAT_MODEL.md`: defensive model for prompt injection, tool hijack, memory poisoning, and secret leakage
-- `EXTRACTION_CONTRACT.md`: guarantee that this folder can become its own repository
-- `ROADMAP.md`: phased path from incubation to product
-- `PENDING.md`: unfinished work before standalone release
-- `INTEGRATIONS.md`: VS Code, Cursor, MCP, and future editor integration boundary
-
-Executable code now starts with the local-first prototype:
-
-```text
-agentops/health_guard.py
-agentops/context_packet.py
-agentops/prompt_firewall.py
-agentops/frugality_ledger.py
-tests/
-```
-
-## Design Principle
-
-ROBIN HOOD is a small immune system for AI-agent work: observe, classify, constrain, measure, and improve.
-
-It should not become a lore archive or a leaked-prompt archive.
-
-## Standalone Use
-
-ROBIN HOOD does not require Continuity Legacy.
-
-Minimal standalone loop:
+## Quick Start
 
 ```powershell
-$env:PYTHONPATH="."
-python agentops\health_guard.py --strict
-pytest tests -q
+cd D:\Experimentos\ROBIN-HOOD
+pip install -e .
+robinhood health --strict
+pytest -q
 ```
 
-Operational loop:
+Inspect available model profiles:
 
-1. Create a context packet.
-2. Classify external content with the prompt firewall.
-3. Grant only the capabilities needed for the task.
-4. Execute locally.
-5. Log cost, retries, and outcome in the frugality ledger.
-6. Review whether the task reduced cost, risk, or drift.
+```powershell
+robinhood models
+```
 
-## CLI Prototype
+Estimate whether a file fits a model profile:
+
+```powershell
+robinhood budget --file README.md --model local-small
+```
+
+Pack a project into a smaller context budget:
+
+```powershell
+robinhood pack --path . --model local-long --max-tokens 12000
+```
+
+Render the included files as a text packet:
+
+```powershell
+robinhood pack --path . --model local-long --max-tokens 12000 --render
+```
+
+## CLI
 
 Current commands:
 
 ```text
 robinhood health
+robinhood models
+robinhood budget
+robinhood pack
 robinhood packet
 robinhood scan
 robinhood grant
@@ -146,18 +76,41 @@ robinhood log
 robinhood report
 ```
 
-Install locally:
+Examples:
 
 ```powershell
-cd D:\Experimentos\ROBIN-HOOD
-pip install -e .
-robinhood health --strict
 robinhood scan --path adversarial_cases --source web --fail-on-block
+robinhood packet --objective "Fix release docs" --allowed-file README.md --verify "pytest -q"
+robinhood grant --task-id RH-001 --capability read --capability edit --allowed-path ROBIN-HOOD/ --action edit --path ROBIN-HOOD/README.md
+robinhood log --task-id RH-002 --model local-small --tokens-estimated 900 --outcome pass --reduced cost
+robinhood report
 ```
 
-## Integration Scaffolds
+## Frugality Core
 
-ROBIN HOOD now includes thin integration templates:
+ROBIN HOOD currently uses explicit provider profiles:
+
+```text
+local-small
+local-long
+openai-compatible-balanced
+anthropic-compatible-long
+generic-local-lora
+```
+
+The default tokenizer is an honest fallback estimate. That is deliberate: the tool should work before provider SDKs, API keys, local servers, or tokenizer packages are installed. Later adapters can add measured tokenizers without changing the command surface.
+
+## Integration
+
+ROBIN HOOD can run from:
+
+- terminal
+- VS Code tasks
+- Cursor rules
+- MCP clients
+- any workflow that can call a Python CLI
+
+Integration scaffolds live in:
 
 ```text
 integrations/vscode/tasks.json
@@ -165,14 +118,51 @@ integrations/cursor/rules/agentops.mdc
 integrations/mcp/server_contract.json
 ```
 
-These are contracts and starter templates, not editor dependencies.
-
 Optional MCP server:
 
 ```powershell
-cd D:\Experimentos\ROBIN-HOOD
 pip install -e .[mcp]
 robinhood-mcp
 ```
 
-The MCP server exposes local controls only: health, scan text, scan path, context packet generation, and capability checks.
+MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, token budgets, and context packing.
+
+## Compatibility With Continuity Legacy
+
+ROBIN HOOD is compatible with Continuity Legacy, but does not require it.
+
+The intended relationship is:
+
+- Continuity Legacy governs repository integrity, baselines, release gates, and handoff discipline.
+- ROBIN HOOD governs token economy, context packing, prompt-risk scanning, model selection, and agent operations.
+
+They are designed to work beside each other. Neither should be embedded inside the other.
+
+## Compatibility Note
+
+The internal Python package is still named `agentops` for compatibility with the incubation prototype. The public product name is ROBIN HOOD.
+
+Backward-compatible console aliases remain available:
+
+```text
+agentops
+agentops-mcp
+```
+
+Prefer the public commands:
+
+```text
+robinhood
+robinhood-mcp
+```
+
+## Status
+
+```text
+status: prototype
+safe_to_extract: true
+runtime_dependencies: none
+optional_dependencies: mcp
+```
+
+ROBIN HOOD is useful today as a local frugality and safety tool. It is not yet a provider router or model invocation layer.
