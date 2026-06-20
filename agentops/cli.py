@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .capability_broker import CapabilityGrant, check_action
 from .context_packer import pack_context, render_pack
+from .context_cache import DEFAULT_CACHE, create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packet import ContextPacket
 from .frugality_ledger import append_entry, new_entry, read_entries, summarize_entries
 from .health_guard import main as health_main
@@ -158,6 +159,28 @@ def cmd_route(args: argparse.Namespace) -> int:
     return 0 if recommendation.fits else 1
 
 
+def cmd_snapshot(args: argparse.Namespace) -> int:
+    cache_path = Path(args.cache)
+    current = create_snapshot(Path(args.path))
+    payload = {"snapshot": current.to_dict()}
+    if cache_path.exists() and not args.no_diff:
+        payload["diff"] = diff_snapshot(read_snapshot(cache_path), current)
+    write_snapshot(current, cache_path)
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_reuse(args: argparse.Namespace) -> int:
+    system_prompt = args.system or ""
+    user_prompt = args.user or ""
+    if args.system_file:
+        system_prompt = Path(args.system_file).read_text(encoding="utf-8", errors="replace")
+    if args.user_file:
+        user_prompt = Path(args.user_file).read_text(encoding="utf-8", errors="replace")
+    print(json.dumps(estimate_prompt_reuse(system_prompt, user_prompt), indent=2, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -235,6 +258,19 @@ def build_parser() -> argparse.ArgumentParser:
     route.add_argument("--max-escalation", choices=["local", "balanced", "strong"], default="balanced")
     route.add_argument("--reserve-output", type=int, default=1024)
     route.set_defaults(func=cmd_route)
+
+    snapshot = subparsers.add_parser("snapshot", help="Create a context snapshot and estimate changed-only savings.")
+    snapshot.add_argument("--path", default=".")
+    snapshot.add_argument("--cache", default=DEFAULT_CACHE)
+    snapshot.add_argument("--no-diff", action="store_true")
+    snapshot.set_defaults(func=cmd_snapshot)
+
+    reuse = subparsers.add_parser("reuse", help="Estimate reusable prompt/cacheable token share.")
+    reuse.add_argument("--system")
+    reuse.add_argument("--user")
+    reuse.add_argument("--system-file")
+    reuse.add_argument("--user-file")
+    reuse.set_defaults(func=cmd_reuse)
     return parser
 
 

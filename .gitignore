@@ -6,3 +6,4 @@ build/
 dist/
 *.pyc
 agentops-usage.jsonl
+.robinhood/

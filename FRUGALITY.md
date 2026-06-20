@@ -110,6 +110,8 @@ robinhood models
 robinhood budget --file README.md --model local-small
 robinhood pack --path . --model local-long --max-tokens 12000
 robinhood route --objective "Security review before release" --privacy cloud-allowed
+robinhood snapshot --path .
+robinhood reuse --system "stable operating rules" --user "task-specific request"
 ```
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
@@ -124,3 +126,17 @@ The router follows a cheap-first ladder:
 4. Long-context cloud profile only when context size or synthesis demands it and escalation is explicitly allowed.
 
 This mirrors a defensive biological pattern: cheap reflex first, stronger immune response only when the signal crosses a threshold.
+
+## Context Memory
+
+Most teams waste tokens by resending unchanged files.
+
+`robinhood snapshot` creates a local hash/token cache under `.robinhood/`. The next run reports added, changed, deleted and unchanged files, plus an estimated changed-only token cost.
+
+This is useful for:
+
+- Cursor sessions
+- VS Code tasks
+- terminal workflows
+- API clients that want to send only changed context
+- CI checks that need a compact task packet

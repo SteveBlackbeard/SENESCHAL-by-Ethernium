@@ -1,4 +1,4 @@
-# ROBIN HOOD Optimization Model
+# ROBIN HOOD by Ethernium Optimization Model
 
 ROBIN HOOD minimizes spend by treating model power as an escalation resource, not the default path.
 

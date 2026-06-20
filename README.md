@@ -1,6 +1,6 @@
-# ROBIN HOOD
+# ROBIN HOOD by Ethernium
 
-ROBIN HOOD is a local-first control layer for cheaper, safer AI-assisted work.
+ROBIN HOOD by Ethernium is a local-first control layer for cheaper, safer AI-assisted work.
 
 It helps decide what context to send, what to keep local, what to block, and whether a task deserves a stronger model. The goal is practical token economy: fewer whole-repo dumps, fewer retries, smaller prompts, safer tool scope, and clearer task packets.
 
@@ -9,6 +9,7 @@ It helps decide what context to send, what to keep local, what to block, and whe
 - estimates token budgets without locking into one provider
 - packs repository context under an explicit model budget
 - recommends the cheapest sufficient model path for a task
+- snapshots context so unchanged files do not need to be resent
 - scans untrusted text/files for prompt-injection and secret-like material
 - creates scoped context packets for agents
 - checks least-privilege capability grants
@@ -67,6 +68,18 @@ Recommend a route before spending stronger model budget:
 robinhood route --objective "Security review before release" --privacy cloud-allowed --max-escalation strong
 ```
 
+Create a context cache and measure changed-only savings:
+
+```powershell
+robinhood snapshot --path .
+```
+
+Estimate how much of a prompt can be reused as stable/cacheable context:
+
+```powershell
+robinhood reuse --system "stable operating rules" --user "specific task"
+```
+
 ## CLI
 
 Current commands:
@@ -77,6 +90,8 @@ robinhood models
 robinhood budget
 robinhood pack
 robinhood route
+robinhood snapshot
+robinhood reuse
 robinhood packet
 robinhood scan
 robinhood grant
@@ -89,6 +104,7 @@ Examples:
 ```powershell
 robinhood scan --path adversarial_cases --source web --fail-on-block
 robinhood route --objective "Fix typo in docs" --context "small task"
+robinhood snapshot --path .
 robinhood packet --objective "Fix release docs" --allowed-file README.md --verify "pytest -q"
 robinhood grant --task-id RH-001 --capability read --capability edit --allowed-path ROBIN-HOOD/ --action edit --path ROBIN-HOOD/README.md
 robinhood log --task-id RH-002 --model local-small --tokens-estimated 900 --outcome pass --reduced cost
@@ -134,7 +150,7 @@ pip install -e .[mcp]
 robinhood-mcp
 ```
 
-MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, token budgets, and context packing.
+MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, token budgets, context packing, context snapshots, prompt reuse estimates, and routing.
 Routing is exposed as a recommendation only; ROBIN HOOD still does not invoke models.
 
 ## Compatibility With Continuity Legacy

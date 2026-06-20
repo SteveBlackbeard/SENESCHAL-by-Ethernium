@@ -1,5 +1,5 @@
 {
-  "name": "robin-hood",
+  "name": "robin-hood-by-ethernium",
   "status": "prototype",
   "extractable": true,
   "relationship_to_continuity": "none",
@@ -47,6 +47,7 @@
     "templates",
     "token_budget",
     "context_packer",
+    "context_cache",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -65,7 +66,8 @@
     "provider_profiles",
     "token_budget",
     "context_packer",
-    "router"
+    "router",
+    "context_cache"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

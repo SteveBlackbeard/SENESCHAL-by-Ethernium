@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .capability_broker import CapabilityGrant, check_action
+from .context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packer import pack_context
 from .context_packet import ContextPacket
 from .health_guard import check_forbidden_text, check_manifest, check_required_docs
@@ -154,6 +155,20 @@ def route_tool(
     ).to_dict()
 
 
+def snapshot_tool(path: str, *, cache: str = ".robinhood/context-cache.json", no_diff: bool = False) -> dict[str, Any]:
+    cache_path = Path(cache)
+    current = create_snapshot(Path(path))
+    payload: dict[str, Any] = {"snapshot": current.to_dict()}
+    if cache_path.exists() and not no_diff:
+        payload["diff"] = diff_snapshot(read_snapshot(cache_path), current)
+    write_snapshot(current, cache_path)
+    return payload
+
+
+def reuse_tool(*, system_prompt: str = "", user_prompt: str = "") -> dict[str, Any]:
+    return estimate_prompt_reuse(system_prompt, user_prompt)
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -171,6 +186,8 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.budget")(budget_tool)
     server.tool(name="robinhood.pack")(pack_tool)
     server.tool(name="robinhood.route")(route_tool)
+    server.tool(name="robinhood.snapshot")(snapshot_tool)
+    server.tool(name="robinhood.reuse")(reuse_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -182,6 +199,8 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.budget")(budget_tool)
     server.tool(name="agentops.pack")(pack_tool)
     server.tool(name="agentops.route")(route_tool)
+    server.tool(name="agentops.snapshot")(snapshot_tool)
+    server.tool(name="agentops.reuse")(reuse_tool)
     return server
 
 

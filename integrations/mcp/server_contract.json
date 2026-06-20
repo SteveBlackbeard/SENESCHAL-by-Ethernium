@@ -57,6 +57,18 @@
       "implemented": true,
       "risk": "medium",
       "description": "Recommend a model/provider path without invoking the model."
+    },
+    {
+      "name": "robinhood.snapshot",
+      "implemented": true,
+      "risk": "low",
+      "description": "Snapshot context and estimate changed-only token savings."
+    },
+    {
+      "name": "robinhood.reuse",
+      "implemented": true,
+      "risk": "low",
+      "description": "Estimate stable/cacheable prompt token share."
     }
   ],
   "forbidden": [

@@ -20,6 +20,8 @@ MCP should expose local controls first:
 - token budgeting
 - context packing
 - routing recommendations
+- context snapshots
+- prompt reuse estimates
 
 Provider calls should stay deferred until the defensive controls are stable.
 
@@ -36,6 +38,8 @@ Provider calls should stay deferred until the defensive controls are stable.
 | `robinhood.budget` | Estimate token budget | Low |
 | `robinhood.pack` | Build compact context under budget | Medium |
 | `robinhood.route` | Recommend model/provider path | Medium |
+| `robinhood.snapshot` | Snapshot context and estimate changed-only savings | Low |
+| `robinhood.reuse` | Estimate reusable/cacheable prompt share | Low |
 
 ## Constraints
 

@@ -29,7 +29,17 @@ INJECTION_MARKERS = (
 
 ZERO_WIDTH = ("\u200b", "\u200c", "\u200d", "\ufeff")
 TEXT_SUFFIXES = {".md", ".txt", ".json", ".toml", ".yaml", ".yml", ".py", ".ts", ".tsx", ".js", ".jsx", ".css"}
-IGNORED_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules", "dist", "build", ".next"}
+IGNORED_DIRS = {
+    ".git",
+    ".venv",
+    ".robinhood",
+    "__pycache__",
+    ".pytest_cache",
+    "node_modules",
+    "dist",
+    "build",
+    ".next",
+}
 SECRET_PATTERNS = (
     ("private key block", re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----")),
     ("openai-like key", re.compile(r"\bsk-[A-Za-z0-9_-]{20,}\b")),
