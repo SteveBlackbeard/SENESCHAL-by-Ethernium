@@ -14,6 +14,7 @@ from .context_packet import ContextPacket
 from .health_guard import check_forbidden_text, check_manifest, check_required_docs
 from .prompt_firewall import classify_text, scan_path
 from .provider_profiles import load_profiles
+from .router import recommend_route
 from .token_budget import budget_for_file, budget_for_text
 
 
@@ -134,6 +135,25 @@ def pack_tool(
     ).to_dict()
 
 
+def route_tool(
+    objective: str,
+    *,
+    context: str = "",
+    task_class: str | None = None,
+    privacy: str = "local-first",
+    max_escalation: str = "balanced",
+    reserve_output_tokens: int = 1024,
+) -> dict[str, Any]:
+    return recommend_route(
+        objective,
+        context=context,
+        task_class=task_class,
+        privacy=privacy,
+        max_escalation=max_escalation,
+        reserve_output_tokens=reserve_output_tokens,
+    ).to_dict()
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -150,6 +170,7 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.models")(models_tool)
     server.tool(name="robinhood.budget")(budget_tool)
     server.tool(name="robinhood.pack")(pack_tool)
+    server.tool(name="robinhood.route")(route_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -160,6 +181,7 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.models")(models_tool)
     server.tool(name="agentops.budget")(budget_tool)
     server.tool(name="agentops.pack")(pack_tool)
+    server.tool(name="agentops.route")(route_tool)
     return server
 
 

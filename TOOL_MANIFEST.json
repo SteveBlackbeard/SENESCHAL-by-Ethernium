@@ -37,10 +37,10 @@
     "STANDALONE_USAGE.md",
     "CONTINUITY_USAGE.md",
     "MITIGATION_MATRIX.md",
-    "PRIOR_ART.md"
+    "PRIOR_ART.md",
+    "OPTIMIZATION_MODEL.md"
   ],
   "planned_modules": [
-    "router",
     "adversarial_corpus",
     "usage_log",
     "provider_profiles",
@@ -64,7 +64,8 @@
     "mcp_server",
     "provider_profiles",
     "token_budget",
-    "context_packer"
+    "context_packer",
+    "router"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

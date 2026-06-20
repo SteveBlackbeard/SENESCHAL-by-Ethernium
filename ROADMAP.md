@@ -92,13 +92,13 @@ Implemented now:
 - provider profile registry
 - fallback token budget estimator
 - context packer under explicit token budget
-- CLI and MCP surfaces for models, budget, and pack
+- frugal route recommendations
+- CLI and MCP surfaces for models, budget, pack, and route
 
 Still planned:
 
 - measured tokenizer plugins
 - task classifier
-- routing recommendations
 - provider adapter dry-runs
 
 ## Phase 3.5: Editor And MCP Integration

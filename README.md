@@ -8,6 +8,7 @@ It helps decide what context to send, what to keep local, what to block, and whe
 
 - estimates token budgets without locking into one provider
 - packs repository context under an explicit model budget
+- recommends the cheapest sufficient model path for a task
 - scans untrusted text/files for prompt-injection and secret-like material
 - creates scoped context packets for agents
 - checks least-privilege capability grants
@@ -60,6 +61,12 @@ Render the included files as a text packet:
 robinhood pack --path . --model local-long --max-tokens 12000 --render
 ```
 
+Recommend a route before spending stronger model budget:
+
+```powershell
+robinhood route --objective "Security review before release" --privacy cloud-allowed --max-escalation strong
+```
+
 ## CLI
 
 Current commands:
@@ -69,6 +76,7 @@ robinhood health
 robinhood models
 robinhood budget
 robinhood pack
+robinhood route
 robinhood packet
 robinhood scan
 robinhood grant
@@ -80,6 +88,7 @@ Examples:
 
 ```powershell
 robinhood scan --path adversarial_cases --source web --fail-on-block
+robinhood route --objective "Fix typo in docs" --context "small task"
 robinhood packet --objective "Fix release docs" --allowed-file README.md --verify "pytest -q"
 robinhood grant --task-id RH-001 --capability read --capability edit --allowed-path ROBIN-HOOD/ --action edit --path ROBIN-HOOD/README.md
 robinhood log --task-id RH-002 --model local-small --tokens-estimated 900 --outcome pass --reduced cost
@@ -126,6 +135,7 @@ robinhood-mcp
 ```
 
 MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, token budgets, and context packing.
+Routing is exposed as a recommendation only; ROBIN HOOD still does not invoke models.
 
 ## Compatibility With Continuity Legacy
 

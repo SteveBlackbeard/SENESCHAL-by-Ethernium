@@ -14,6 +14,7 @@ from .frugality_ledger import append_entry, new_entry, read_entries, summarize_e
 from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
 from .provider_profiles import load_profiles
+from .router import recommend_route
 from .token_budget import budget_for_file, budget_for_text
 
 
@@ -139,6 +140,24 @@ def cmd_pack(args: argparse.Namespace) -> int:
     return 0 if pack.estimated_packed_tokens <= pack.max_input_tokens else 1
 
 
+def cmd_route(args: argparse.Namespace) -> int:
+    context = ""
+    if args.context is not None:
+        context = args.context
+    elif args.context_file is not None:
+        context = Path(args.context_file).read_text(encoding="utf-8", errors="replace")
+    recommendation = recommend_route(
+        args.objective,
+        context=context,
+        task_class=args.task_class,
+        privacy=args.privacy,
+        max_escalation=args.max_escalation,
+        reserve_output_tokens=args.reserve_output,
+    )
+    print(json.dumps(recommendation.to_dict(), indent=2, sort_keys=True))
+    return 0 if recommendation.fits else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -206,6 +225,16 @@ def build_parser() -> argparse.ArgumentParser:
     pack.add_argument("--source", default="internal")
     pack.add_argument("--render", action="store_true", help="Render included files as a text packet.")
     pack.set_defaults(func=cmd_pack)
+
+    route = subparsers.add_parser("route", help="Recommend the cheapest sufficient model path.")
+    route.add_argument("--objective", required=True)
+    route.add_argument("--context")
+    route.add_argument("--context-file")
+    route.add_argument("--task-class")
+    route.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    route.add_argument("--max-escalation", choices=["local", "balanced", "strong"], default="balanced")
+    route.add_argument("--reserve-output", type=int, default=1024)
+    route.set_defaults(func=cmd_route)
     return parser
 
 

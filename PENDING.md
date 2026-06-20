@@ -21,6 +21,7 @@ Implemented:
 - model/provider profile registry
 - tokenizer-free budget estimator
 - context packer with ignored-directory filtering
+- frugal router recommendation engine
 - CLI commands for health, models, budget, pack, packet, scan, grant, log, and report
 - optional MCP server with local control tools
 - clean-room governance and extraction docs
@@ -28,12 +29,12 @@ Implemented:
 Not implemented yet:
 
 - API adapters
-- routing recommendations based on task class
 - VS Code integration package
 - Cursor integration package
 - standalone repository CI
 - measured tokenizer integrations for specific providers
 - provider invocation layer
+- historical routing optimization from ledger data
 
 ## Phase 2.5: Token Core
 
@@ -82,7 +83,7 @@ Build:
   - approximate latency
   - approximate cost
 - routing command:
-  - `ROBIN HOOD route --task release --privacy local-first`
+  - `robinhood route --objective "release readiness" --privacy local-first`
 
 Acceptance:
 
@@ -90,6 +91,8 @@ Acceptance:
 - recommends stronger models only when needed
 - explains the routing decision
 - never requires provider secrets in config files
+
+Status: first router implemented as recommendation-only. Ledger-based learning remains deferred.
 
 ## Phase 4: API Adapter Layer
 

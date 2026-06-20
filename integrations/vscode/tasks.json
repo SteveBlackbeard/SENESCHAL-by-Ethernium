@@ -50,6 +50,22 @@
       "problemMatcher": []
     },
     {
+      "label": "ROBIN HOOD: Route",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "agentops.cli",
+        "route",
+        "--objective",
+        "${input:robinHoodRouteObjective}",
+        "--privacy",
+        "local-first"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
       "label": "ROBIN HOOD: Test",
       "type": "shell",
       "command": "pytest",
@@ -73,6 +89,12 @@
       "type": "promptString",
       "description": "Path to pack with ROBIN HOOD",
       "default": "."
+    },
+    {
+      "id": "robinHoodRouteObjective",
+      "type": "promptString",
+      "description": "Task objective to route with ROBIN HOOD",
+      "default": "Fix typo in docs"
     }
   ]
 }

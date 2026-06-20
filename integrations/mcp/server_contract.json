@@ -53,8 +53,8 @@
       "description": "Create a compact context bundle under a token budget."
     },
     {
-      "name": "robinhood.route_model",
-      "implemented": false,
+      "name": "robinhood.route",
+      "implemented": true,
       "risk": "medium",
       "description": "Recommend a model/provider path without invoking the model."
     }

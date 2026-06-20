@@ -35,7 +35,7 @@ Provider calls should stay deferred until the defensive controls are stable.
 | `robinhood.models` | List model profiles | Low |
 | `robinhood.budget` | Estimate token budget | Low |
 | `robinhood.pack` | Build compact context under budget | Medium |
-| `robinhood.route_model` | Recommend model/provider path | Medium, planned |
+| `robinhood.route` | Recommend model/provider path | Medium |
 
 ## Constraints
 
