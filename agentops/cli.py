@@ -165,7 +165,15 @@ def cmd_snapshot(args: argparse.Namespace) -> int:
     current = create_snapshot(Path(args.path))
     payload = {"snapshot": current.to_dict()}
     if cache_path.exists() and not args.no_diff:
-        payload["diff"] = diff_snapshot(read_snapshot(cache_path), current)
+        diff = diff_snapshot(read_snapshot(cache_path), current)
+        payload["diff"] = diff
+        if args.input_cost_per_million is not None:
+            payload["savings"] = estimate_savings(
+                full_context_tokens=diff["full_context_tokens"],
+                optimized_context_tokens=diff["delta_context_tokens"],
+                input_cost_per_million=args.input_cost_per_million,
+                runs=args.runs,
+            ).to_dict()
     write_snapshot(current, cache_path)
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
@@ -275,6 +283,8 @@ def build_parser() -> argparse.ArgumentParser:
     snapshot.add_argument("--path", default=".")
     snapshot.add_argument("--cache", default=DEFAULT_CACHE)
     snapshot.add_argument("--no-diff", action="store_true")
+    snapshot.add_argument("--input-cost-per-million", type=float)
+    snapshot.add_argument("--runs", type=int, default=1)
     snapshot.set_defaults(func=cmd_snapshot)
 
     reuse = subparsers.add_parser("reuse", help="Estimate reusable prompt/cacheable token share.")

@@ -87,6 +87,12 @@ Convert token savings into money:
 robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
 ```
 
+Or combine snapshot and ROI in one command:
+
+```powershell
+robinhood snapshot --path . --input-cost-per-million 2 --runs 100
+```
+
 ## CLI
 
 Current commands:

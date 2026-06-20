@@ -253,10 +253,26 @@ def test_cli_snapshot_and_reuse(tmp_path: Path, capsys):
     cache = tmp_path / ".robinhood" / "context-cache.json"
     assert cli_main(["snapshot", "--path", str(tmp_path), "--cache", str(cache)]) == 0
     (tmp_path / "README.md").write_text("hello changed", encoding="utf-8")
-    assert cli_main(["snapshot", "--path", str(tmp_path), "--cache", str(cache)]) == 0
+    assert (
+        cli_main(
+            [
+                "snapshot",
+                "--path",
+                str(tmp_path),
+                "--cache",
+                str(cache),
+                "--input-cost-per-million",
+                "2",
+                "--runs",
+                "10",
+            ]
+        )
+        == 0
+    )
     assert cli_main(["reuse", "--system", "stable system prompt", "--user", "short task"]) == 0
     captured = capsys.readouterr()
     assert '"estimated_saved_tokens":' in captured.out
+    assert '"estimated_saved_cost":' in captured.out
     assert '"cacheable_ratio":' in captured.out
 
 
@@ -337,9 +353,10 @@ def test_mcp_snapshot_and_reuse_tools(tmp_path: Path):
     (tmp_path / "README.md").write_text("hello", encoding="utf-8")
     cache = tmp_path / ".robinhood" / "context-cache.json"
     first = snapshot_tool(str(tmp_path), cache=str(cache))
-    second = snapshot_tool(str(tmp_path), cache=str(cache))
+    second = snapshot_tool(str(tmp_path), cache=str(cache), input_cost_per_million=2.0, runs=10)
     assert first["snapshot"]["files"]
     assert second["diff"]["unchanged_count"] == 1
+    assert "savings" in second
     assert all(".robinhood" not in item["path"] for item in second["snapshot"]["files"])
     assert reuse_tool(system_prompt="stable", user_prompt="task")["cacheable_tokens"] > 0
 

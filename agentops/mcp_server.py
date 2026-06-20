@@ -156,12 +156,27 @@ def route_tool(
     ).to_dict()
 
 
-def snapshot_tool(path: str, *, cache: str = ".robinhood/context-cache.json", no_diff: bool = False) -> dict[str, Any]:
+def snapshot_tool(
+    path: str,
+    *,
+    cache: str = ".robinhood/context-cache.json",
+    no_diff: bool = False,
+    input_cost_per_million: float | None = None,
+    runs: int = 1,
+) -> dict[str, Any]:
     cache_path = Path(cache)
     current = create_snapshot(Path(path))
     payload: dict[str, Any] = {"snapshot": current.to_dict()}
     if cache_path.exists() and not no_diff:
-        payload["diff"] = diff_snapshot(read_snapshot(cache_path), current)
+        diff = diff_snapshot(read_snapshot(cache_path), current)
+        payload["diff"] = diff
+        if input_cost_per_million is not None:
+            payload["savings"] = estimate_savings(
+                full_context_tokens=diff["full_context_tokens"],
+                optimized_context_tokens=diff["delta_context_tokens"],
+                input_cost_per_million=input_cost_per_million,
+                runs=runs,
+            ).to_dict()
     write_snapshot(current, cache_path)
     return payload
 
