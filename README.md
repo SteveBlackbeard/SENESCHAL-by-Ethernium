@@ -10,6 +10,7 @@ It helps decide what context to send, what to keep local, what to block, and whe
 - packs repository context under an explicit model budget
 - recommends the cheapest sufficient model path for a task
 - snapshots context so unchanged files do not need to be resent
+- estimates token-cost savings across repeated runs
 - scans untrusted text/files for prompt-injection and secret-like material
 - creates scoped context packets for agents
 - checks least-privilege capability grants
@@ -80,6 +81,12 @@ Estimate how much of a prompt can be reused as stable/cacheable context:
 robinhood reuse --system "stable operating rules" --user "specific task"
 ```
 
+Convert token savings into money:
+
+```powershell
+robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
+```
+
 ## CLI
 
 Current commands:
@@ -92,6 +99,7 @@ robinhood pack
 robinhood route
 robinhood snapshot
 robinhood reuse
+robinhood savings
 robinhood packet
 robinhood scan
 robinhood grant

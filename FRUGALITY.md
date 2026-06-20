@@ -112,6 +112,7 @@ robinhood pack --path . --model local-long --max-tokens 12000
 robinhood route --objective "Security review before release" --privacy cloud-allowed
 robinhood snapshot --path .
 robinhood reuse --system "stable operating rules" --user "task-specific request"
+robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
 ```
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.

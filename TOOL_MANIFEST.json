@@ -48,6 +48,7 @@
     "token_budget",
     "context_packer",
     "context_cache",
+    "savings",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -67,7 +68,8 @@
     "token_budget",
     "context_packer",
     "router",
-    "context_cache"
+    "context_cache",
+    "savings"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

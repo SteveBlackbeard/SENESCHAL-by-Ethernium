@@ -16,6 +16,7 @@ from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
 from .provider_profiles import load_profiles
 from .router import recommend_route
+from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
 
 
@@ -181,6 +182,17 @@ def cmd_reuse(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_savings(args: argparse.Namespace) -> int:
+    estimate = estimate_savings(
+        full_context_tokens=args.full_tokens,
+        optimized_context_tokens=args.optimized_tokens,
+        input_cost_per_million=args.input_cost_per_million,
+        runs=args.runs,
+    )
+    print(json.dumps(estimate.to_dict(), indent=2, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -271,6 +283,13 @@ def build_parser() -> argparse.ArgumentParser:
     reuse.add_argument("--system-file")
     reuse.add_argument("--user-file")
     reuse.set_defaults(func=cmd_reuse)
+
+    savings = subparsers.add_parser("savings", help="Estimate token and cost savings across repeated runs.")
+    savings.add_argument("--full-tokens", type=int, required=True)
+    savings.add_argument("--optimized-tokens", type=int, required=True)
+    savings.add_argument("--input-cost-per-million", type=float, required=True)
+    savings.add_argument("--runs", type=int, default=1)
+    savings.set_defaults(func=cmd_savings)
     return parser
 
 

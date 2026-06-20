@@ -16,6 +16,7 @@ from .health_guard import check_forbidden_text, check_manifest, check_required_d
 from .prompt_firewall import classify_text, scan_path
 from .provider_profiles import load_profiles
 from .router import recommend_route
+from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
 
 
@@ -169,6 +170,21 @@ def reuse_tool(*, system_prompt: str = "", user_prompt: str = "") -> dict[str, A
     return estimate_prompt_reuse(system_prompt, user_prompt)
 
 
+def savings_tool(
+    *,
+    full_context_tokens: int,
+    optimized_context_tokens: int,
+    input_cost_per_million: float,
+    runs: int = 1,
+) -> dict[str, Any]:
+    return estimate_savings(
+        full_context_tokens=full_context_tokens,
+        optimized_context_tokens=optimized_context_tokens,
+        input_cost_per_million=input_cost_per_million,
+        runs=runs,
+    ).to_dict()
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -188,6 +204,7 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.route")(route_tool)
     server.tool(name="robinhood.snapshot")(snapshot_tool)
     server.tool(name="robinhood.reuse")(reuse_tool)
+    server.tool(name="robinhood.savings")(savings_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -201,6 +218,7 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.route")(route_tool)
     server.tool(name="agentops.snapshot")(snapshot_tool)
     server.tool(name="agentops.reuse")(reuse_tool)
+    server.tool(name="agentops.savings")(savings_tool)
     return server
 
 
