@@ -1,10 +1,10 @@
-# AgentOps Frugality Doctrine
+# ROBIN HOOD Frugality Doctrine
 
 Frugality is not cheapness. It is disciplined allocation of model power, context, time, and human attention.
 
 ## Core Question
 
-Every AgentOps feature must answer:
+Every ROBIN HOOD feature must answer:
 
 ```text
 Does this reduce cost, risk, or drift?

@@ -1,10 +1,10 @@
-# AgentOps Mitigation Matrix
+# ROBIN HOOD Mitigation Matrix
 
 This matrix turns known GenAI/agent risks into local, frugal controls.
 
 ## Risk To Control Map
 
-| Risk | AgentOps Control | Continuity Control | Status |
+| Risk | ROBIN HOOD Control | Continuity Control | Status |
 | --- | --- | --- | --- |
 | Prompt injection | `prompt_firewall.py`, adversarial cases | health guard after edits | prototype |
 | Indirect prompt injection | source labels, trust zones, context packet | handoff provenance | documented |
@@ -22,13 +22,13 @@ This matrix turns known GenAI/agent risks into local, frugal controls.
 
 ### OWASP GenAI Top 10
 
-AgentOps should map every feature to a concrete risk class. The most important classes for local agent work are prompt injection, sensitive data leakage, supply chain, excessive agency, system prompt leakage, and unbounded consumption.
+ROBIN HOOD should map every feature to a concrete risk class. The most important classes for local agent work are prompt injection, sensitive data leakage, supply chain, excessive agency, system prompt leakage, and unbounded consumption.
 
 ### garak
 
 Useful pattern: probes, targets, detectors, reports.
 
-AgentOps adaptation:
+ROBIN HOOD adaptation:
 
 - probes become benign adversarial cases
 - target is the local agent workflow
@@ -39,7 +39,7 @@ AgentOps adaptation:
 
 Useful pattern: declarative tests, local/private evaluation, CI integration, model comparison.
 
-AgentOps adaptation:
+ROBIN HOOD adaptation:
 
 - keep provider-neutral scorecards
 - compare cost and failure rate, not personality
@@ -49,7 +49,7 @@ AgentOps adaptation:
 
 Useful pattern: security professionals need repeatable risk identification, not ad hoc prompt games.
 
-AgentOps adaptation:
+ROBIN HOOD adaptation:
 
 - keep clean-room tests
 - store results as JSONL
@@ -59,7 +59,7 @@ AgentOps adaptation:
 
 Useful pattern: programmable runtime rails independent of the base model.
 
-AgentOps adaptation:
+ROBIN HOOD adaptation:
 
 - use explicit capability checks
 - avoid trusting system prompts as the only control
@@ -68,7 +68,7 @@ AgentOps adaptation:
 
 Useful pattern: agent security depends on tool-use context and attribution, not just input strings.
 
-AgentOps adaptation:
+ROBIN HOOD adaptation:
 
 - future version should attribute risky actions to context segments
 - long context must be reduced before classification

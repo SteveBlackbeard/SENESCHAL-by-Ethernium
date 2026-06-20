@@ -1,13 +1,13 @@
-# AgentOps MCP Integration
+# ROBIN HOOD MCP Integration
 
-This folder defines the future MCP surface for AgentOps.
+This folder defines the future MCP surface for ROBIN HOOD.
 
 The current codebase includes an optional local MCP server:
 
 ```powershell
-cd AGENTOPS_TOOL
+cd D:\Experimentos\ROBIN-HOOD
 pip install -e .[mcp]
-agentops-mcp
+robinhood-mcp
 ```
 
 MCP should expose local controls first:
@@ -26,14 +26,14 @@ Provider calls should stay deferred until the defensive controls are stable.
 
 | Tool | Purpose | Risk |
 | --- | --- | --- |
-| `agentops.health` | Run local health checks | Low |
-| `agentops.scan_text` | Classify untrusted text | Low |
-| `agentops.scan_path` | Scan files or directories | Medium |
-| `agentops.make_packet` | Build a context packet | Low |
-| `agentops.check_capability` | Validate requested capability and path | Low |
-| `agentops.estimate_budget` | Estimate token budget | Low, planned |
-| `agentops.pack_context` | Build compact context under budget | Medium, planned |
-| `agentops.route_model` | Recommend model/provider path | Medium, planned |
+| `robinhood.health` | Run local health checks | Low |
+| `robinhood.scan_text` | Classify untrusted text | Low |
+| `robinhood.scan_path` | Scan files or directories | Medium |
+| `robinhood.make_packet` | Build a context packet | Low |
+| `robinhood.check_capability` | Validate requested capability and path | Low |
+| `robinhood.estimate_budget` | Estimate token budget | Low, planned |
+| `robinhood.pack_context` | Build compact context under budget | Medium, planned |
+| `robinhood.route_model` | Recommend model/provider path | Medium, planned |
 
 ## Constraints
 

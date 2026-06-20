@@ -75,12 +75,12 @@ def test_capability_broker_allows_scoped_edit():
     grant = CapabilityGrant(
         task_id="AOP-002",
         capabilities={"read", "edit", "test"},
-        allowed_paths=("AGENTOPS_TOOL/",),
-        denied_paths=("AGENTOPS_TOOL/.secrets",),
+        allowed_paths=("ROBIN-HOOD/",),
+        denied_paths=("ROBIN-HOOD/.secrets",),
     )
-    assert check_action(grant, capability="edit", path="AGENTOPS_TOOL/README.md").allowed
+    assert check_action(grant, capability="edit", path="ROBIN-HOOD/README.md").allowed
     assert not check_action(grant, capability="edit", path="README.md").allowed
-    assert not check_action(grant, capability="edit", path="AGENTOPS_TOOL/../README.md").allowed
+    assert not check_action(grant, capability="edit", path="ROBIN-HOOD/../README.md").allowed
     assert not check_action(grant, capability="edit", path="D:/secrets.txt").allowed
     assert not check_action(grant, capability="publish").allowed
 
@@ -92,7 +92,7 @@ def test_cli_packet_outputs_scope(capsys):
             "--objective",
             "Measure task.",
             "--allowed-file",
-            "AGENTOPS_TOOL/README.md",
+            "ROBIN-HOOD/README.md",
             "--verify",
             "pytest -q",
         ]
@@ -100,7 +100,7 @@ def test_cli_packet_outputs_scope(capsys):
     captured = capsys.readouterr()
     assert result == 0
     assert "Measure task." in captured.out
-    assert "AGENTOPS_TOOL/README.md" in captured.out
+    assert "ROBIN-HOOD/README.md" in captured.out
 
 
 def test_cli_scan_blocks_injection(capsys):
@@ -156,11 +156,11 @@ def test_mcp_scan_text_tool_blocks_injection():
 def test_mcp_make_packet_tool_renders_packet():
     rendered = make_packet_tool(
         "Keep the edit scoped.",
-        allowed_files=["AGENTOPS_TOOL/README.md"],
-        verification=["pytest AGENTOPS_TOOL/tests -q"],
+        allowed_files=["ROBIN-HOOD/README.md"],
+        verification=["pytest ROBIN-HOOD/tests -q"],
     )
     assert "Keep the edit scoped." in rendered
-    assert "AGENTOPS_TOOL/README.md" in rendered
+    assert "ROBIN-HOOD/README.md" in rendered
 
 
 def test_mcp_check_capability_tool_denies_out_of_scope_path():
@@ -169,6 +169,6 @@ def test_mcp_check_capability_tool_denies_out_of_scope_path():
         ["read", "edit"],
         "edit",
         path="README.md",
-        allowed_paths=["AGENTOPS_TOOL/"],
+        allowed_paths=["ROBIN-HOOD/"],
     )
     assert payload["allowed"] is False

@@ -2,7 +2,7 @@
 
 ROBIN HOOD is intentionally separate from Continuity Legacy.
 
-It started as the AgentOps incubation layer and is now its own tool/repository.
+It started as an agent-operations incubation layer and is now its own tool/repository.
 
 ROBIN HOOD can be used in two modes:
 
@@ -34,13 +34,9 @@ It is not:
 - a provider bypass tool
 - a storage place for proprietary hidden instructions
 
-## Extraction Rule
+## Compatibility Rule
 
-This folder should be removable without breaking Continuity:
-
-```text
-AGENTOPS_TOOL/
-```
+The internal Python package is still named `agentops` for compatibility with the incubation prototype. The public product name is ROBIN HOOD.
 
 ## Clean-Room Rule
 
@@ -72,7 +68,7 @@ safe_to_extract: true
 
 The local governance seed is in `GOVERNANCE.md`.
 
-AgentOps should adopt Continuity-style discipline only where it adds leverage:
+ROBIN HOOD should adopt Continuity-style discipline only where it adds leverage:
 
 - clear boundary
 - explicit health gate
@@ -84,7 +80,7 @@ It should not inherit the full Continuity Legacy baseline system until it become
 
 ## Frugal Build Path
 
-AgentOps should grow only through modules that reduce one of three things:
+ROBIN HOOD should grow only through modules that reduce one of three things:
 
 - cost
 - risk
@@ -112,13 +108,13 @@ tests/
 
 ## Design Principle
 
-AgentOps is a small immune system for AI-agent work: observe, classify, constrain, measure, and improve.
+ROBIN HOOD is a small immune system for AI-agent work: observe, classify, constrain, measure, and improve.
 
 It should not become a lore archive or a leaked-prompt archive.
 
 ## Standalone Use
 
-AgentOps does not require Continuity Legacy.
+ROBIN HOOD does not require Continuity Legacy.
 
 Minimal standalone loop:
 
@@ -142,26 +138,26 @@ Operational loop:
 Current commands:
 
 ```text
-agentops health
-agentops packet
-agentops scan
-agentops grant
-agentops log
-agentops report
+robinhood health
+robinhood packet
+robinhood scan
+robinhood grant
+robinhood log
+robinhood report
 ```
 
 Install locally:
 
 ```powershell
-cd AGENTOPS_TOOL
+cd D:\Experimentos\ROBIN-HOOD
 pip install -e .
-agentops health --strict
-agentops scan --path adversarial_cases --source web --fail-on-block
+robinhood health --strict
+robinhood scan --path adversarial_cases --source web --fail-on-block
 ```
 
 ## Integration Scaffolds
 
-AgentOps now includes thin integration templates:
+ROBIN HOOD now includes thin integration templates:
 
 ```text
 integrations/vscode/tasks.json
@@ -174,9 +170,9 @@ These are contracts and starter templates, not editor dependencies.
 Optional MCP server:
 
 ```powershell
-cd AGENTOPS_TOOL
+cd D:\Experimentos\ROBIN-HOOD
 pip install -e .[mcp]
-agentops-mcp
+robinhood-mcp
 ```
 
 The MCP server exposes local controls only: health, scan text, scan path, context packet generation, and capability checks.

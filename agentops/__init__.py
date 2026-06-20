@@ -1,4 +1,4 @@
-"""Ethernium AgentOps incubation package."""
+"""ROBIN HOOD local-first agent operations package."""
 
 __all__ = [
     "capability_broker",

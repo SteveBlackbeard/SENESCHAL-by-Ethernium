@@ -1,4 +1,4 @@
-"""Command-line interface for the AgentOps prototype."""
+"""Command-line interface for ROBIN HOOD."""
 
 from __future__ import annotations
 
@@ -106,7 +106,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="agentops", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    health = subparsers.add_parser("health", help="Run AgentOps health checks.")
+    health = subparsers.add_parser("health", help="Run ROBIN HOOD health checks.")
     health.add_argument("--strict", action="store_true", help="Treat warnings as errors.")
     health.set_defaults(func=cmd_health)
 

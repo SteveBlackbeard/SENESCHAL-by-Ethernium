@@ -1,4 +1,4 @@
-# AgentOps Roadmap
+# ROBIN HOOD Roadmap
 
 ## Phase 0: Incubation
 
@@ -26,12 +26,12 @@ Status: complete.
 
 Build:
 
-- `agentops/health_guard.py`
-- `agentops/context_packet.py`
-- `agentops/frugality_ledger.py`
-- `agentops/prompt_firewall.py`
-- `agentops/capability_broker.py`
-- `agentops/cli.py`
+- `ROBIN HOOD/health_guard.py`
+- `ROBIN HOOD/context_packet.py`
+- `ROBIN HOOD/frugality_ledger.py`
+- `ROBIN HOOD/prompt_firewall.py`
+- `ROBIN HOOD/capability_broker.py`
+- `ROBIN HOOD/cli.py`
 - `tests/`
 
 Acceptance:
@@ -74,9 +74,9 @@ Build:
 - scorecard command
 - routing recommendations
 - CLI commands:
-  - `agentops models`
-  - `agentops budget`
-  - `agentops pack`
+  - `ROBIN HOOD models`
+  - `ROBIN HOOD budget`
+  - `ROBIN HOOD pack`
 
 Acceptance:
 
@@ -100,8 +100,8 @@ Build:
 
 Acceptance:
 
-- integrations call AgentOps CLI or MCP
-- AgentOps remains standalone
+- integrations call ROBIN HOOD CLI or MCP
+- ROBIN HOOD remains standalone
 - no editor-specific integration becomes required
 - MCP exposes health, scan, packet, capability, budget, pack, and route tools
 - model invocation stays deferred until scan and budget controls are stable
@@ -117,7 +117,7 @@ Build:
 
 Acceptance:
 
-- AgentOps is extracted from Continuity Legacy
+- ROBIN HOOD is extracted from Continuity Legacy
 - tests pass in its own repo
 - no private Continuity file is required
 

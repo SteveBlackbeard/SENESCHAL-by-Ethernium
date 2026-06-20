@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "AgentOps: Health",
+      "label": "ROBIN HOOD: Health",
       "type": "shell",
       "command": "python",
       "args": [
@@ -15,7 +15,7 @@
       "problemMatcher": []
     },
     {
-      "label": "AgentOps: Scan Path",
+      "label": "ROBIN HOOD: Scan Path",
       "type": "shell",
       "command": "python",
       "args": [
@@ -23,7 +23,7 @@
         "agentops.cli",
         "scan",
         "--path",
-        "${input:agentopsScanPath}",
+        "${input:robinHoodScanPath}",
         "--source",
         "repo",
         "--fail-on-block"
@@ -32,7 +32,7 @@
       "problemMatcher": []
     },
     {
-      "label": "AgentOps: Test",
+      "label": "ROBIN HOOD: Test",
       "type": "shell",
       "command": "pytest",
       "args": [
@@ -45,9 +45,9 @@
   ],
   "inputs": [
     {
-      "id": "agentopsScanPath",
+      "id": "robinHoodScanPath",
       "type": "promptString",
-      "description": "Path to scan with AgentOps",
+      "description": "Path to scan with ROBIN HOOD",
       "default": "adversarial_cases"
     }
   ]

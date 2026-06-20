@@ -1,10 +1,10 @@
 # Prior Art And Clean-Room Inspiration
 
-AgentOps is not trying to clone existing tools. It borrows proven shapes and rebuilds a small local-first workflow for coding agents.
+ROBIN HOOD is not trying to clone existing tools. It borrows proven shapes and rebuilds a small local-first workflow for coding agents.
 
 ## Similar Projects
 
-| Project | What It Does | What AgentOps Should Learn | What AgentOps Should Avoid |
+| Project | What It Does | What ROBIN HOOD Should Learn | What ROBIN HOOD Should Avoid |
 | --- | --- | --- | --- |
 | OWASP GenAI Top 10 | Risk taxonomy for LLM apps | map controls to named risks | becoming compliance theater |
 | garak | LLM vulnerability scanner | probes + detectors + reports | broad offensive probe library in v1 |
@@ -14,9 +14,9 @@ AgentOps is not trying to clone existing tools. It borrows proven shapes and reb
 | AgentDojo | evaluates tool-use agents under prompt injection | task + tool + adversarial environment | large benchmark before local use |
 | AgentWatcher | rule-based prompt-injection monitor with attribution | explainable rules and segment attribution | opaque “AI judge says no” decisions |
 
-## AgentOps Differentiator
+## ROBIN HOOD Differentiator
 
-AgentOps should be narrower and more practical:
+ROBIN HOOD should be narrower and more practical:
 
 - local-first
 - repo-aware
@@ -77,4 +77,4 @@ Security:
 - provenance
 - secrets hygiene
 
-AgentOps should combine these into small checks, not grand abstractions.
+ROBIN HOOD should combine these into small checks, not grand abstractions.

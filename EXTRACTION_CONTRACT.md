@@ -1,13 +1,13 @@
-# AgentOps Extraction Contract
+# ROBIN HOOD Extraction Contract
 
-AgentOps is temporarily incubated inside Continuity Legacy, but it must remain removable.
+ROBIN HOOD is temporarily incubated inside Continuity Legacy, but it must remain removable.
 
 ## Removal Guarantee
 
 This directory can be deleted:
 
 ```text
-AGENTOPS_TOOL/
+ROBIN-HOOD/
 ```
 
 Deletion must not break:
@@ -21,16 +21,16 @@ Deletion must not break:
 
 ## Dependency Rule
 
-Continuity Legacy may mention AgentOps in documentation, but runtime code must not import it.
+Continuity Legacy may mention ROBIN HOOD in documentation, but runtime code must not import it.
 
-AgentOps may reference Continuity as inspiration, but must not depend on Continuity internals unless a future standalone adapter is explicitly designed.
+ROBIN HOOD may reference Continuity as inspiration, but must not depend on Continuity internals unless a future standalone adapter is explicitly designed.
 
 ## Future Repository Shape
 
 Target standalone layout:
 
 ```text
-agentops/
+ROBIN HOOD/
   __init__.py
   health_guard.py
   context_packet.py
@@ -49,7 +49,7 @@ pyproject.toml
 
 ## Standalone Guarantee
 
-AgentOps must be useful without Continuity Legacy.
+ROBIN HOOD must be useful without Continuity Legacy.
 
 Standalone usage must support:
 
@@ -70,7 +70,7 @@ No standalone command may require:
 
 ## Release Rule
 
-AgentOps should not be released until it has:
+ROBIN HOOD should not be released until it has:
 
 - executable code
 - tests
@@ -84,5 +84,5 @@ AgentOps should not be released until it has:
 Recommended package name:
 
 ```text
-ethernium-agentops
+ethernium-ROBIN HOOD
 ```

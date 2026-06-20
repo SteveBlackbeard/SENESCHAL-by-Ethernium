@@ -1,53 +1,53 @@
 {
-  "name": "ethernium-agentops-mcp",
+  "name": "robin-hood-mcp",
   "status": "planned",
   "transport": ["stdio"],
   "default_network": "disabled",
   "tools": [
     {
-      "name": "agentops.health",
+      "name": "robinhood.health",
       "implemented": true,
       "risk": "low",
-      "description": "Run AgentOps health checks."
+      "description": "Run robinhood health checks."
     },
     {
-      "name": "agentops.scan_text",
+      "name": "robinhood.scan_text",
       "implemented": true,
       "risk": "low",
       "description": "Classify untrusted text for prompt and secret-like risk."
     },
     {
-      "name": "agentops.scan_path",
+      "name": "robinhood.scan_path",
       "implemented": true,
       "risk": "medium",
-      "description": "Recursively scan a file or directory using AgentOps ignore rules."
+      "description": "Recursively scan a file or directory using ROBIN HOOD ignore rules."
     },
     {
-      "name": "agentops.make_packet",
+      "name": "robinhood.make_packet",
       "implemented": true,
       "risk": "low",
       "description": "Render a scoped context packet."
     },
     {
-      "name": "agentops.check_capability",
+      "name": "robinhood.check_capability",
       "implemented": true,
       "risk": "low",
       "description": "Validate a requested capability and optional path."
     },
     {
-      "name": "agentops.estimate_budget",
+      "name": "robinhood.estimate_budget",
       "implemented": false,
       "risk": "low",
       "description": "Estimate token usage against a selected model profile."
     },
     {
-      "name": "agentops.pack_context",
+      "name": "robinhood.pack_context",
       "implemented": false,
       "risk": "medium",
       "description": "Create a compact context bundle under a token budget."
     },
     {
-      "name": "agentops.route_model",
+      "name": "robinhood.route_model",
       "implemented": false,
       "risk": "medium",
       "description": "Recommend a model/provider path without invoking the model."

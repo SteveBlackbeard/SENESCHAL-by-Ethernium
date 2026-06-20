@@ -1,10 +1,10 @@
-# AgentOps Pending Work
+# ROBIN HOOD Pending Work
 
-This file tracks what remains before AgentOps becomes a finished standalone tool.
+This file tracks what remains before ROBIN HOOD becomes a finished standalone tool.
 
 ## Mission
 
-AgentOps exists to reduce wasted tokens, retries, unsafe tool use, and context drift across AI-assisted work.
+ROBIN HOOD exists to reduce wasted tokens, retries, unsafe tool use, and context drift across AI-assisted work.
 
 The target is not a generic agent framework. The target is a small local-first control layer that can work with cloud LLM APIs, local LLM servers, LoRA-backed model variants, IDE agents, and repository governance tools without becoming locked to any provider.
 
@@ -39,14 +39,14 @@ Goal: turn frugality from an estimate into a measurable control.
 
 Build:
 
-- `agentops/provider_profiles.py`
-- `agentops/provider_profiles.json`
-- `agentops/token_budget.py`
-- `agentops/context_packer.py`
+- `ROBIN HOOD/provider_profiles.py`
+- `ROBIN HOOD/provider_profiles.json`
+- `ROBIN HOOD/token_budget.py`
+- `ROBIN HOOD/context_packer.py`
 - CLI commands:
-  - `agentops models`
-  - `agentops budget`
-  - `agentops pack`
+  - `ROBIN HOOD models`
+  - `ROBIN HOOD budget`
+  - `ROBIN HOOD pack`
 
 Acceptance:
 
@@ -78,7 +78,7 @@ Build:
   - approximate latency
   - approximate cost
 - routing command:
-  - `agentops route --task release --privacy local-first`
+  - `ROBIN HOOD route --task release --privacy local-first`
 
 Acceptance:
 
@@ -89,7 +89,7 @@ Acceptance:
 
 ## Phase 4: API Adapter Layer
 
-Goal: connect to model providers without coupling AgentOps to one vendor.
+Goal: connect to model providers without coupling ROBIN HOOD to one vendor.
 
 Planned adapters:
 
@@ -116,7 +116,7 @@ Acceptance:
 
 ## Phase 5: Editor And Agent Integrations
 
-Goal: make AgentOps usable from coding environments without becoming editor-specific.
+Goal: make ROBIN HOOD usable from coding environments without becoming editor-specific.
 
 Build:
 
@@ -129,13 +129,13 @@ Build:
 Acceptance:
 
 - editor integrations call the same CLI
-- AgentOps remains usable from terminal
+- ROBIN HOOD remains usable from terminal
 - no editor config becomes required for the package
 - no integration bypasses prompt scanning or capability checks
 
 ## Phase 6: Standalone Release
 
-Goal: extract AgentOps cleanly from Continuity Legacy.
+Goal: extract ROBIN HOOD cleanly from Continuity Legacy.
 
 Build:
 

@@ -31,6 +31,8 @@ mcp = ["mcp>=1.0.0"]
 [project.scripts]
 agentops = "agentops.cli:main"
 agentops-mcp = "agentops.mcp_server:main"
+robinhood = "agentops.cli:main"
+robinhood-mcp = "agentops.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]

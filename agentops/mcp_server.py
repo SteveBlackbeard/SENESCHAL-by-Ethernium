@@ -1,4 +1,4 @@
-"""Optional MCP server for AgentOps local controls."""
+"""Optional MCP server for ROBIN HOOD local controls."""
 
 from __future__ import annotations
 
@@ -102,8 +102,15 @@ def build_mcp_server() -> Any:
     except ImportError as exc:  # pragma: no cover - depends on optional package
         raise RuntimeError("Install the optional MCP extra first: pip install -e .[mcp]") from exc
 
-    server = FastMCP("ethernium-agentops")
+    server = FastMCP("robin-hood")
 
+    server.tool(name="robinhood.health")(health_tool)
+    server.tool(name="robinhood.scan_text")(scan_text_tool)
+    server.tool(name="robinhood.scan_path")(scan_path_tool)
+    server.tool(name="robinhood.make_packet")(make_packet_tool)
+    server.tool(name="robinhood.check_capability")(check_capability_tool)
+
+    # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
     server.tool(name="agentops.scan_text")(scan_text_tool)
     server.tool(name="agentops.scan_path")(scan_path_tool)
@@ -113,7 +120,7 @@ def build_mcp_server() -> Any:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the optional AgentOps MCP server.")
+    parser = argparse.ArgumentParser(description="Run the optional ROBIN HOOD MCP server.")
     parser.add_argument("--stdio", action="store_true", help="Run over stdio. This is the default MCP transport.")
     parser.parse_args(argv)
 
@@ -124,7 +131,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     with contextlib.redirect_stdout(sys.stderr):
-        print("agentops-mcp: starting stdio server")
+        print("robinhood-mcp: starting stdio server")
     server.run()
     return 0
 

@@ -1,4 +1,4 @@
-"""Health guard for the incubated AgentOps tool."""
+"""Health guard for ROBIN HOOD."""
 
 from __future__ import annotations
 
@@ -60,7 +60,7 @@ def check_manifest() -> list[Finding]:
     if data.get("extractable") is not True:
         return [Finding("error", "manifest must declare extractable=true")]
     if data.get("relationship_to_continuity") != "none":
-        return [Finding("error", "AgentOps must remain independent from Continuity runtime")]
+        return [Finding("error", "ROBIN HOOD must remain independent from Continuity runtime")]
     return []
 
 
@@ -79,7 +79,7 @@ def check_forbidden_text() -> list[Finding]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="AgentOps incubation health guard.")
+    parser = argparse.ArgumentParser(description="ROBIN HOOD health guard.")
     parser.add_argument("--strict", action="store_true", help="Treat warnings as errors.")
     args = parser.parse_args(argv)
 
@@ -88,7 +88,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"{finding.severity.upper()}: {finding.message}")
 
     if not findings:
-        print("agentops-health: ok")
+        print("robinhood-health: ok")
         return 0
     if any(f.severity == "error" for f in findings):
         return 1

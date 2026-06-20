@@ -1,14 +1,14 @@
-# Low-Credit AgentOps Blueprint
+# Low-Credit ROBIN HOOD Blueprint
 
 ## Purpose
 
-Ethernium AgentOps optimizes how AI agents consume paid model credits, context windows, and human attention.
+ROBIN HOOD optimizes how AI agents consume paid model credits, context windows, and human attention.
 
 It is a separate tool from Continuity Legacy.
 
 ## Boundary
 
-AgentOps owns:
+ROBIN HOOD owns:
 
 - model routing strategy
 - prompt packet design
@@ -19,7 +19,7 @@ AgentOps owns:
 - daily agent budget planning
 - provider-neutral operational playbooks
 
-AgentOps does not own:
+ROBIN HOOD does not own:
 
 - Continuity runtime integrity
 - Merkle or DNA hashes
@@ -103,7 +103,7 @@ Before using paid review:
 
 ## Clean-Room Innovation Method
 
-AgentOps should use deep reverse engineering without copying.
+ROBIN HOOD should use deep reverse engineering without copying.
 
 The method:
 
@@ -124,10 +124,10 @@ The rule:
 Possible future files if this becomes a real tool:
 
 ```text
-agentops/router.py
-agentops/usage_log.py
-agentops/context_packet.py
-agentops/provider_profiles.json
-agentops/templates/task_packet.md
-agentops/templates/final_review.md
+ROBIN HOOD/router.py
+ROBIN HOOD/usage_log.py
+ROBIN HOOD/context_packet.py
+ROBIN HOOD/provider_profiles.json
+ROBIN HOOD/templates/task_packet.md
+ROBIN HOOD/templates/final_review.md
 ```

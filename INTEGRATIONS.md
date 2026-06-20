@@ -1,14 +1,14 @@
-# AgentOps Integrations
+# ROBIN HOOD Integrations
 
-AgentOps integrations must be thin wrappers around the CLI and future MCP server.
+ROBIN HOOD integrations must be thin wrappers around the CLI and future MCP server.
 
-The rule is simple: editors consume AgentOps; AgentOps does not become dependent on editors.
+The rule is simple: editors consume ROBIN HOOD; ROBIN HOOD does not become dependent on editors.
 
 ## Integration Architecture
 
 ```text
 VS Code / Cursor / Antigravity / other agents
-  -> AgentOps CLI or MCP server
+  -> ROBIN HOOD CLI or MCP server
   -> prompt firewall, token budget, capability broker, context packer
   -> optional model/provider adapter
 ```
@@ -21,11 +21,11 @@ Use VS Code tasks for the first integration layer.
 
 Recommended commands:
 
-- `agentops health --strict`
-- `agentops scan --path . --source repo --fail-on-block`
-- `agentops packet`
-- future: `agentops pack --path . --max-tokens 32000`
-- future: `agentops route --task code-review`
+- `robinhood health --strict`
+- `robinhood scan --path . --source repo --fail-on-block`
+- `robinhood packet`
+- future: `ROBIN HOOD pack --path . --max-tokens 32000`
+- future: `ROBIN HOOD route --task code-review`
 
 The template lives in:
 
@@ -33,7 +33,7 @@ The template lives in:
 integrations/vscode/tasks.json
 ```
 
-Copy it into a standalone repo as `.vscode/tasks.json` when AgentOps is extracted.
+Copy it into a standalone repo as `.vscode/tasks.json` when ROBIN HOOD is extracted.
 
 ## Cursor
 
@@ -41,11 +41,11 @@ Use Cursor rules for the first integration layer.
 
 The rule should tell the agent to:
 
-- use AgentOps before ingesting external content
+- use ROBIN HOOD before ingesting external content
 - create small context packets instead of pasting whole repos
 - request only the capabilities needed
 - prefer local/cheap models when the task permits it
-- keep Continuity Legacy separate from AgentOps runtime
+- keep Continuity Legacy separate from ROBIN HOOD runtime
 
 The template lives in:
 
@@ -59,14 +59,14 @@ MCP is the preferred long-term integration because it gives editors and agents a
 
 Initial MCP tools should expose only local, low-risk operations:
 
-- `agentops.health`
-- `agentops.scan_text`
-- `agentops.scan_path`
-- `agentops.make_packet`
-- `agentops.check_capability`
-- future: `agentops.estimate_budget`
-- future: `agentops.pack_context`
-- future: `agentops.route_model`
+- `robinhood.health`
+- `robinhood.scan_text`
+- `robinhood.scan_path`
+- `robinhood.make_packet`
+- `robinhood.check_capability`
+- future: `robinhood.estimate_budget`
+- future: `robinhood.pack_context`
+- future: `robinhood.route_model`
 
 The contract lives in:
 
@@ -90,8 +90,8 @@ For now, compatibility means:
 
 An integration is accepted only when:
 
-- it runs through AgentOps CLI or MCP
-- it keeps AgentOps standalone
+- it runs through ROBIN HOOD CLI or MCP
+- it keeps ROBIN HOOD standalone
 - it avoids provider-specific hidden prompts
 - it can be removed without breaking Continuity Legacy
 - it reduces cost, risk, drift, or manual handoff time

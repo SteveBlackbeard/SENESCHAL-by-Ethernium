@@ -1,6 +1,6 @@
-# AgentOps Threat Model
+# ROBIN HOOD Threat Model
 
-AgentOps is defensive infrastructure for AI-agent workflows.
+ROBIN HOOD is defensive infrastructure for AI-agent workflows.
 
 ## Assets
 
@@ -111,4 +111,4 @@ Study known incidents only to extract defensive classes:
 - reasoning attacks show outputs need validation
 - deepfake/content failures show policy must be enforced outside generation
 
-AgentOps must convert incidents into tests, not into exploit recipes.
+ROBIN HOOD must convert incidents into tests, not into exploit recipes.
