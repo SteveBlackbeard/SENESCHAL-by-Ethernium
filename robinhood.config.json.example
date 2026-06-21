@@ -1,0 +1,9 @@
+{
+  "providers": "providers.local.json.example",
+  "state": ".robinhood/provider-state.json",
+  "privacy": "local-first",
+  "max_cost": 0.0,
+  "model": "llama3.1",
+  "ledger": ".robinhood/usage.jsonl",
+  "estimated_output_tokens": 1024
+}

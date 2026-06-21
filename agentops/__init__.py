@@ -2,6 +2,7 @@
 
 __all__ = [
     "capability_broker",
+    "config",
     "context_packet",
     "frugality_ledger",
     "health_guard",

@@ -9,6 +9,7 @@ from pathlib import Path
 
 from .capability_broker import CapabilityGrant, check_action
 from .capacity_broker import broker_dry_run
+from .config import load_config
 from .context_packer import pack_context, render_pack
 from .context_cache import DEFAULT_CACHE, create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packet import ContextPacket
@@ -260,14 +261,15 @@ def cmd_broker_dry_run(args: argparse.Namespace) -> int:
 
 
 def cmd_plan_request(args: argparse.Namespace) -> int:
+    config = load_config(Path(args.config) if args.config else None)
     plan = plan_request(
         args.objective,
         estimated_input_tokens=args.estimated_input_tokens,
-        estimated_output_tokens=args.estimated_output_tokens,
-        privacy=args.privacy,
-        max_cost=args.max_cost,
-        providers_path=Path(args.providers) if args.providers else None,
-        state_path=Path(args.state) if args.state else None,
+        estimated_output_tokens=args.estimated_output_tokens or config.estimated_output_tokens or 1024,
+        privacy=args.privacy or config.privacy or "local-first",
+        max_cost=args.max_cost if args.max_cost is not None else config.max_cost,
+        providers_path=Path(args.providers or config.providers) if (args.providers or config.providers) else None,
+        state_path=Path(args.state or config.state) if (args.state or config.state) else None,
         task_class=args.task_class,
     )
     print(json.dumps(plan.to_dict(), indent=2, sort_keys=True))
@@ -275,17 +277,18 @@ def cmd_plan_request(args: argparse.Namespace) -> int:
 
 
 def cmd_run(args: argparse.Namespace) -> int:
+    config = load_config(Path(args.config) if args.config else None)
     result = run_request(
         objective=args.objective,
         prompt=args.prompt or "",
         path=Path(args.path) if args.path else None,
-        providers_path=Path(args.providers) if args.providers else None,
-        state_path=Path(args.state) if args.state else None,
-        privacy=args.privacy,
-        max_cost=args.max_cost,
-        estimated_output_tokens=args.estimated_output_tokens,
-        model_override=args.model,
-        ledger_path=Path(args.ledger) if args.ledger else None,
+        providers_path=Path(args.providers or config.providers) if (args.providers or config.providers) else None,
+        state_path=Path(args.state or config.state) if (args.state or config.state) else None,
+        privacy=args.privacy or config.privacy or "local-first",
+        max_cost=args.max_cost if args.max_cost is not None else config.max_cost,
+        estimated_output_tokens=args.estimated_output_tokens or config.estimated_output_tokens or 1024,
+        model_override=args.model or config.model,
+        ledger_path=Path(args.ledger or config.ledger) if (args.ledger or config.ledger) else None,
         timeout=args.timeout,
     )
     print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
@@ -432,10 +435,11 @@ def build_parser() -> argparse.ArgumentParser:
     broker.set_defaults(func=cmd_broker_dry_run)
 
     plan = subparsers.add_parser("plan-request", help="Plan a model request before any API call.")
+    plan.add_argument("--config", help="Optional robinhood.config.json path.")
     plan.add_argument("--objective", required=True)
     plan.add_argument("--estimated-input-tokens", type=int, required=True)
-    plan.add_argument("--estimated-output-tokens", type=int, default=1024)
-    plan.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    plan.add_argument("--estimated-output-tokens", type=int)
+    plan.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"])
     plan.add_argument("--max-cost", type=float)
     plan.add_argument("--task-class")
     plan.add_argument("--providers", help="Optional providers.local.json path.")
@@ -443,14 +447,15 @@ def build_parser() -> argparse.ArgumentParser:
     plan.set_defaults(func=cmd_plan_request)
 
     run = subparsers.add_parser("run", help="Run a planned model request through a supported local adapter.")
+    run.add_argument("--config", help="Optional robinhood.config.json path.")
     run.add_argument("--objective", required=True)
     run.add_argument("--prompt")
     run.add_argument("--path")
     run.add_argument("--providers", help="Optional providers.local.json path.")
-    run.add_argument("--state", default=DEFAULT_PROVIDER_STATE)
-    run.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    run.add_argument("--state")
+    run.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"])
     run.add_argument("--max-cost", type=float)
-    run.add_argument("--estimated-output-tokens", type=int, default=1024)
+    run.add_argument("--estimated-output-tokens", type=int)
     run.add_argument("--model", help="Concrete Ollama model name override.")
     run.add_argument("--ledger", help="Optional JSONL ledger path.")
     run.add_argument("--timeout", type=int, default=120)

@@ -121,6 +121,7 @@ robinhood provider-mark --provider openai-compatible-free-tier --status quota_ex
 robinhood broker-dry-run --providers providers.local.json --objective "release review" --estimated-input-tokens 12000
 robinhood broker-dry-run --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000
 robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000 --estimated-output-tokens 2000
+robinhood plan-request --config robinhood.config.json --objective "release review" --estimated-input-tokens 12000
 robinhood run --providers providers.local.json --objective "release review" --path . --model llama3.1
 ```
 
@@ -159,6 +160,8 @@ Provider catalogs:
 
 - `providers.local.json.example` is safe to commit.
 - `providers.local.json` is ignored by Git.
+- `robinhood.config.json.example` is safe to commit.
+- `robinhood.config.json` is ignored by Git.
 - real API keys must be referenced by environment variable names only.
 - disabled providers stay visible for planning but cannot be selected.
 

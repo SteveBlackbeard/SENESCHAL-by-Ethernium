@@ -8,3 +8,4 @@ dist/
 agentops-usage.jsonl
 .robinhood/
 providers.local.json
+robinhood.config.json

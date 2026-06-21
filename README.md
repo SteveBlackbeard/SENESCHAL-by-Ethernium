@@ -60,6 +60,12 @@ copy providers.local.json.example providers.local.json
 robinhood providers --providers providers.local.json
 ```
 
+Create optional project defaults:
+
+```powershell
+copy robinhood.config.json.example robinhood.config.json
+```
+
 Check provider configuration without spending tokens:
 
 ```powershell
@@ -151,6 +157,12 @@ Plan the request before any API call:
 robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000 --estimated-output-tokens 1200
 ```
 
+Or use project defaults:
+
+```powershell
+robinhood plan-request --config robinhood.config.json --objective "Analyze repo" --estimated-input-tokens 8000
+```
+
 Run through the local Ollama adapter after planning:
 
 ```powershell
@@ -212,6 +224,8 @@ generic-local-lora
 The default tokenizer is an honest fallback estimate. That is deliberate: the tool should work before provider SDKs, API keys, local servers, or tokenizer packages are installed. Later adapters can add measured tokenizers without changing the command surface.
 
 Private provider catalogs should live in `providers.local.json`. That file is ignored by Git. Use `providers.local.json.example` as a safe template and keep real endpoints, key names, quotas, and enabled providers local.
+
+Project defaults can live in `robinhood.config.json`. That file is ignored by Git. Use `robinhood.config.json.example` as the safe template.
 
 Experimental local models, including abliterated variants, can be represented as disabled provider profiles in `providers.local.json`. ROBIN HOOD treats them as local compute, not as privileged bypass tools. Keep them disabled until you explicitly need them, run `robinhood scan` on external prompts, run `robinhood plan-request` before use, and keep human review on outputs that affect code, security, legal, medical, finance, or public release decisions.
 

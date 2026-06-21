@@ -3,6 +3,7 @@ from pathlib import Path
 from agentops.capability_broker import CapabilityGrant, check_action
 from agentops.capacity_broker import broker_dry_run
 from agentops.cli import main as cli_main
+from agentops.config import load_config
 from agentops.context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse
 from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
@@ -876,3 +877,52 @@ def test_mcp_run_tool_reports_missing_model_without_network(tmp_path: Path):
     )
     assert payload["response"]["ok"] is False
     assert payload["response"]["error"] == "missing-model"
+
+
+def test_config_loads_project_defaults(tmp_path: Path):
+    config_path = tmp_path / "robinhood.config.json"
+    config_path.write_text(
+        """
+{
+  "providers": "providers.local.json",
+  "state": ".robinhood/provider-state.json",
+  "privacy": "local-first",
+  "model": "llama3.1",
+  "ledger": ".robinhood/usage.jsonl",
+  "estimated_output_tokens": 2048
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    config = load_config(config_path)
+    assert config.providers == "providers.local.json"
+    assert config.model == "llama3.1"
+    assert config.estimated_output_tokens == 2048
+
+
+def test_cli_plan_request_uses_config(tmp_path: Path, capsys):
+    config_path = tmp_path / "robinhood.config.json"
+    config_path.write_text(
+        """
+{
+  "providers": "providers.local.json.example",
+  "state": ".robinhood/provider-state.json",
+  "privacy": "local-first",
+  "estimated_output_tokens": 333
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    assert cli_main(
+        [
+            "plan-request",
+            "--config",
+            str(config_path),
+            "--objective",
+            "Analyze repo architecture",
+            "--estimated-input-tokens",
+            "8000",
+        ]
+    ) == 0
+    captured = capsys.readouterr()
+    assert '"estimated_output_tokens": 333' in captured.out
