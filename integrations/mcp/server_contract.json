@@ -69,6 +69,18 @@
       "implemented": true,
       "risk": "low",
       "description": "Estimate stable/cacheable prompt token share."
+    },
+    {
+      "name": "robinhood.savings",
+      "implemented": true,
+      "risk": "low",
+      "description": "Estimate token and cost savings across repeated runs."
+    },
+    {
+      "name": "robinhood.select",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Select changed files and useful neighboring context under a token budget."
     }
   ],
   "forbidden": [

@@ -11,6 +11,7 @@ from typing import Any
 from .capability_broker import CapabilityGrant, check_action
 from .context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packer import pack_context
+from .context_select import select_context
 from .context_packet import ContextPacket
 from .health_guard import check_forbidden_text, check_manifest, check_required_docs
 from .prompt_firewall import classify_text, scan_path
@@ -200,6 +201,23 @@ def savings_tool(
     ).to_dict()
 
 
+def select_tool(
+    path: str,
+    *,
+    changed_paths: list[str],
+    max_tokens: int,
+    source: str = "internal",
+    min_score: int = 30,
+) -> dict[str, Any]:
+    return select_context(
+        Path(path),
+        changed_paths=changed_paths,
+        max_tokens=max_tokens,
+        source=source,
+        min_score=min_score,
+    ).to_dict()
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -220,6 +238,7 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.snapshot")(snapshot_tool)
     server.tool(name="robinhood.reuse")(reuse_tool)
     server.tool(name="robinhood.savings")(savings_tool)
+    server.tool(name="robinhood.select")(select_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -234,6 +253,7 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.snapshot")(snapshot_tool)
     server.tool(name="agentops.reuse")(reuse_tool)
     server.tool(name="agentops.savings")(savings_tool)
+    server.tool(name="agentops.select")(select_tool)
     return server
 
 

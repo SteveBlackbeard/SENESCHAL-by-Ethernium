@@ -11,6 +11,7 @@ It helps decide what context to send, what to keep local, what to block, and whe
 - recommends the cheapest sufficient model path for a task
 - snapshots context so unchanged files do not need to be resent
 - estimates token-cost savings across repeated runs
+- selects the most relevant neighboring context under a token budget
 - scans untrusted text/files for prompt-injection and secret-like material
 - creates scoped context packets for agents
 - checks least-privilege capability grants
@@ -93,6 +94,12 @@ Or combine snapshot and ROI in one command:
 robinhood snapshot --path . --input-cost-per-million 2 --runs 100
 ```
 
+Select changed files plus useful neighbors under a strict budget:
+
+```powershell
+robinhood select --path . --changed agentops/cli.py --max-tokens 4000
+```
+
 ## CLI
 
 Current commands:
@@ -106,6 +113,7 @@ robinhood route
 robinhood snapshot
 robinhood reuse
 robinhood savings
+robinhood select
 robinhood packet
 robinhood scan
 robinhood grant

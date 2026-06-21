@@ -5,8 +5,9 @@ from agentops.cli import main as cli_main
 from agentops.context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse
 from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
+from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import budget_tool, check_capability_tool, make_packet_tool, pack_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, snapshot_tool
+from agentops.mcp_server import budget_tool, check_capability_tool, make_packet_tool, pack_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from agentops.prompt_firewall import scan_path, classify_text
 from agentops.provider_profiles import get_profile, load_profiles
 from agentops.router import classify_task, recommend_route
@@ -369,3 +370,36 @@ def test_mcp_savings_tool():
         runs=10,
     )
     assert payload["estimated_saved_cost"] == 1.5
+
+
+def test_context_select_prioritizes_changed_and_neighbors(tmp_path: Path):
+    package = tmp_path / "agentops"
+    package.mkdir()
+    changed = package / "cli.py"
+    neighbor = package / "router.py"
+    unrelated = tmp_path / "docs.md"
+    changed.write_text("from . import router\nprint('cli')\n", encoding="utf-8")
+    neighbor.write_text("def route():\n    return 'ok'\n", encoding="utf-8")
+    unrelated.write_text("unrelated notes\n" * 100, encoding="utf-8")
+    selection = select_context(tmp_path, changed_paths=["agentops/cli.py"], max_tokens=300)
+    selected = {item.path for item in selection.selected}
+    assert "agentops/cli.py" in selected
+    assert "agentops/router.py" in selected
+    assert selection.estimated_selected_tokens <= 300
+
+
+def test_cli_select_reports_selected_context(tmp_path: Path, capsys):
+    target = tmp_path / "README.md"
+    target.write_text("hello", encoding="utf-8")
+    result = cli_main(["select", "--path", str(tmp_path), "--changed", "README.md", "--max-tokens", "100"])
+    captured = capsys.readouterr()
+    assert result == 0
+    assert '"changed_paths":' in captured.out
+    assert '"README.md"' in captured.out
+
+
+def test_mcp_select_tool(tmp_path: Path):
+    target = tmp_path / "README.md"
+    target.write_text("hello", encoding="utf-8")
+    payload = select_tool(str(tmp_path), changed_paths=["README.md"], max_tokens=100)
+    assert payload["selected"][0]["path"] == "README.md"

@@ -22,6 +22,7 @@ MCP should expose local controls first:
 - routing recommendations
 - context snapshots
 - prompt reuse estimates
+- relevance selection
 
 Provider calls should stay deferred until the defensive controls are stable.
 
@@ -40,6 +41,8 @@ Provider calls should stay deferred until the defensive controls are stable.
 | `robinhood.route` | Recommend model/provider path | Medium |
 | `robinhood.snapshot` | Snapshot context and estimate changed-only savings | Low |
 | `robinhood.reuse` | Estimate reusable/cacheable prompt share | Low |
+| `robinhood.savings` | Estimate token/cost savings | Low |
+| `robinhood.select` | Select useful neighboring context under budget | Medium |
 
 ## Constraints
 

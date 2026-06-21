@@ -11,6 +11,7 @@ from .capability_broker import CapabilityGrant, check_action
 from .context_packer import pack_context, render_pack
 from .context_cache import DEFAULT_CACHE, create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packet import ContextPacket
+from .context_select import select_context
 from .frugality_ledger import append_entry, new_entry, read_entries, summarize_entries
 from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
@@ -201,6 +202,18 @@ def cmd_savings(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_select(args: argparse.Namespace) -> int:
+    selection = select_context(
+        Path(args.path),
+        changed_paths=args.changed,
+        max_tokens=args.max_tokens,
+        source=args.source,
+        min_score=args.min_score,
+    )
+    print(json.dumps(selection.to_dict(), indent=2, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -300,6 +313,14 @@ def build_parser() -> argparse.ArgumentParser:
     savings.add_argument("--input-cost-per-million", type=float, required=True)
     savings.add_argument("--runs", type=int, default=1)
     savings.set_defaults(func=cmd_savings)
+
+    select = subparsers.add_parser("select", help="Select relevant neighboring context under a token budget.")
+    select.add_argument("--path", default=".")
+    select.add_argument("--changed", action="append", required=True)
+    select.add_argument("--max-tokens", type=int, required=True)
+    select.add_argument("--source", default="internal")
+    select.add_argument("--min-score", type=int, default=30)
+    select.set_defaults(func=cmd_select)
     return parser
 
 

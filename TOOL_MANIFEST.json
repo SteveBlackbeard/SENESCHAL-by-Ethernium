@@ -49,6 +49,7 @@
     "context_packer",
     "context_cache",
     "savings",
+    "context_select",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -69,7 +70,8 @@
     "context_packer",
     "router",
     "context_cache",
-    "savings"
+    "savings",
+    "context_select"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

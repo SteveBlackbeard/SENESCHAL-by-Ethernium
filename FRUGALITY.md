@@ -114,7 +114,24 @@ robinhood snapshot --path .
 robinhood snapshot --path . --input-cost-per-million 2 --runs 100
 robinhood reuse --system "stable operating rules" --user "task-specific request"
 robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
+robinhood select --path . --changed agentops/cli.py --max-tokens 4000
 ```
+
+## Relevance Selection
+
+Changed-only context is cheap, but it may be too thin.
+
+`robinhood select` adds mathematical triage:
+
+- changed files get first priority
+- files in the same directory get extra weight
+- same-stem files get extra weight
+- simple Python import neighbors get extra weight
+- selection is sorted by value-per-token density
+- low-relevance files are filtered by a minimum score
+- files over budget are excluded instead of silently bloating the prompt
+
+This approximates a small knapsack optimizer: maximize useful context while staying under the token budget.
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
 
