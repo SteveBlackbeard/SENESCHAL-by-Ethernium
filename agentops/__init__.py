@@ -8,4 +8,5 @@ __all__ = [
     "mcp_server",
     "prompt_firewall",
     "provider_health",
+    "provider_state",
 ]

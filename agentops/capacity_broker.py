@@ -7,6 +7,7 @@ from typing import Any
 
 from pathlib import Path
 
+from .provider_state import ProviderState, provider_is_degraded, read_provider_states
 from .provider_profiles import ProviderProfile, load_profiles
 from .router import classify_task
 
@@ -57,11 +58,13 @@ def broker_dry_run(
     allowed_providers: set[str] | None = None,
     task_class: str | None = None,
     providers_path: Path | None = None,
+    state_path: Path | None = None,
 ) -> BrokerDecision:
     selected_task = classify_task(objective, forced=task_class)
     blocked = blocked_providers or set()
     allowed = allowed_providers
     candidates = load_profiles(providers_path)
+    provider_states = read_provider_states(state_path) if state_path else {}
     rejected: list[dict[str, Any]] = []
     scored: list[tuple[float, ProviderProfile, float, list[str]]] = []
 
@@ -75,6 +78,7 @@ def broker_dry_run(
             blocked_providers=blocked,
             allowed_providers=allowed,
             cost=cost,
+            provider_states=provider_states,
         )
         if reject_reason:
             rejected.append({"model_id": profile.id, "provider": profile.provider, "reason": reject_reason})
@@ -119,9 +123,12 @@ def _reject_reason(
     blocked_providers: set[str],
     allowed_providers: set[str] | None,
     cost: float,
+    provider_states: dict[str, ProviderState],
 ) -> str | None:
     if not profile.enabled:
         return "provider-disabled"
+    if provider_is_degraded(profile.id, provider_states) or provider_is_degraded(profile.provider, provider_states):
+        return "provider-degraded"
     if profile.provider in blocked_providers or profile.id in blocked_providers:
         return "blocked-provider"
     if allowed_providers is not None and profile.provider not in allowed_providers and profile.id not in allowed_providers:

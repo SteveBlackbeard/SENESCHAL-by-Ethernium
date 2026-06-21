@@ -18,6 +18,7 @@ from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
 from .provider_health import check_provider_health
 from .provider_profiles import load_profiles
+from .provider_state import DEFAULT_PROVIDER_STATE, mark_provider_state, read_provider_states
 from .router import recommend_route
 from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
@@ -129,6 +130,18 @@ def cmd_provider_health(args: argparse.Namespace) -> int:
     return 0 if payload["ok"] else 1
 
 
+def cmd_provider_state(args: argparse.Namespace) -> int:
+    states = read_provider_states(Path(args.state))
+    print(json.dumps({"providers": [state.to_dict() for state in states.values()]}, indent=2, sort_keys=True))
+    return 0
+
+
+def cmd_provider_mark(args: argparse.Namespace) -> int:
+    state = mark_provider_state(args.provider, status=args.status, reason=args.reason or "", path=Path(args.state))
+    print(json.dumps({"provider": state.to_dict(), "state": args.state}, indent=2, sort_keys=True))
+    return 0
+
+
 def cmd_budget(args: argparse.Namespace) -> int:
     if args.text is not None:
         budget = budget_for_text(args.text, model_id=args.model, reserve_output_tokens=args.reserve_output)
@@ -238,6 +251,7 @@ def cmd_broker_dry_run(args: argparse.Namespace) -> int:
         allowed_providers=set(args.allowed_provider) if args.allowed_provider else None,
         task_class=args.task_class,
         providers_path=Path(args.providers) if args.providers else None,
+        state_path=Path(args.state) if args.state else None,
     )
     print(json.dumps(decision.to_dict(), indent=2, sort_keys=True))
     return 0
@@ -302,6 +316,17 @@ def build_parser() -> argparse.ArgumentParser:
     provider_health = subparsers.add_parser("provider-health", help="Check provider configuration without API calls.")
     provider_health.add_argument("--providers", help="Optional providers.local.json path.")
     provider_health.set_defaults(func=cmd_provider_health)
+
+    provider_state = subparsers.add_parser("provider-state", help="Show local provider circuit-breaker state.")
+    provider_state.add_argument("--state", default=DEFAULT_PROVIDER_STATE)
+    provider_state.set_defaults(func=cmd_provider_state)
+
+    provider_mark = subparsers.add_parser("provider-mark", help="Record a provider state event.")
+    provider_mark.add_argument("--provider", required=True)
+    provider_mark.add_argument("--status", required=True, choices=["ok", "fail", "rate_limited", "quota_exhausted", "disabled"])
+    provider_mark.add_argument("--reason")
+    provider_mark.add_argument("--state", default=DEFAULT_PROVIDER_STATE)
+    provider_mark.set_defaults(func=cmd_provider_mark)
 
     budget = subparsers.add_parser("budget", help="Estimate whether text or a file fits a model budget.")
     budget.add_argument("--model", default="local-small")
@@ -368,6 +393,7 @@ def build_parser() -> argparse.ArgumentParser:
     broker.add_argument("--blocked-provider", action="append")
     broker.add_argument("--task-class")
     broker.add_argument("--providers", help="Optional providers.local.json path.")
+    broker.add_argument("--state", help="Optional provider-state.json path for circuit-breaker routing.")
     broker.set_defaults(func=cmd_broker_dry_run)
     return parser
 

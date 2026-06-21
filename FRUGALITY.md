@@ -117,7 +117,9 @@ robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-m
 robinhood select --path . --changed agentops/cli.py --max-tokens 4000
 robinhood broker-dry-run --objective "release review" --estimated-input-tokens 12000 --privacy local-first
 robinhood provider-health --providers providers.local.json
+robinhood provider-mark --provider openai-compatible-free-tier --status quota_exhausted --reason "free tier exhausted"
 robinhood broker-dry-run --providers providers.local.json --objective "release review" --estimated-input-tokens 12000
+robinhood broker-dry-run --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000
 ```
 
 ## Relevance Selection
@@ -159,6 +161,8 @@ Provider catalogs:
 - disabled providers stay visible for planning but cannot be selected.
 
 Provider health is configuration-only. It catches missing environment variables and disabled providers before any paid or remote call is attempted. That reduces retry loops, prevents accidental cloud use, and keeps local-first routing honest.
+
+Provider state is a tiny circuit breaker. It records local observations such as `fail`, `rate_limited`, `quota_exhausted`, `disabled`, or `ok`. The broker can read that state and reject degraded providers before another retry burns tokens or time.
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
 

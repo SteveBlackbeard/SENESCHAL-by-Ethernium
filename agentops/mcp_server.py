@@ -18,6 +18,7 @@ from .health_guard import check_forbidden_text, check_manifest, check_required_d
 from .prompt_firewall import classify_text, scan_path
 from .provider_health import check_provider_health
 from .provider_profiles import load_profiles
+from .provider_state import mark_provider_state, read_provider_states
 from .router import recommend_route
 from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
@@ -111,6 +112,22 @@ def models_tool() -> dict[str, Any]:
 
 def provider_health_tool(*, providers_path: str | None = None) -> dict[str, Any]:
     return check_provider_health(providers_path=Path(providers_path) if providers_path else None)
+
+
+def provider_state_tool(*, state_path: str = ".robinhood/provider-state.json") -> dict[str, Any]:
+    states = read_provider_states(Path(state_path))
+    return {"providers": [state.to_dict() for state in states.values()]}
+
+
+def provider_mark_tool(
+    provider: str,
+    *,
+    status: str,
+    reason: str = "",
+    state_path: str = ".robinhood/provider-state.json",
+) -> dict[str, Any]:
+    state = mark_provider_state(provider, status=status, reason=reason, path=Path(state_path))
+    return {"provider": state.to_dict(), "state_path": state_path}
 
 
 def budget_tool(
@@ -234,6 +251,7 @@ def broker_dry_run_tool(
     allowed_providers: list[str] | None = None,
     task_class: str | None = None,
     providers_path: str | None = None,
+    state_path: str | None = None,
 ) -> dict[str, Any]:
     return broker_dry_run(
         objective,
@@ -244,6 +262,7 @@ def broker_dry_run_tool(
         allowed_providers=set(allowed_providers) if allowed_providers else None,
         task_class=task_class,
         providers_path=Path(providers_path) if providers_path else None,
+        state_path=Path(state_path) if state_path else None,
     ).to_dict()
 
 
@@ -262,6 +281,8 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.check_capability")(check_capability_tool)
     server.tool(name="robinhood.models")(models_tool)
     server.tool(name="robinhood.provider_health")(provider_health_tool)
+    server.tool(name="robinhood.provider_state")(provider_state_tool)
+    server.tool(name="robinhood.provider_mark")(provider_mark_tool)
     server.tool(name="robinhood.budget")(budget_tool)
     server.tool(name="robinhood.pack")(pack_tool)
     server.tool(name="robinhood.route")(route_tool)
@@ -279,6 +300,8 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.check_capability")(check_capability_tool)
     server.tool(name="agentops.models")(models_tool)
     server.tool(name="agentops.provider_health")(provider_health_tool)
+    server.tool(name="agentops.provider_state")(provider_state_tool)
+    server.tool(name="agentops.provider_mark")(provider_mark_tool)
     server.tool(name="agentops.budget")(budget_tool)
     server.tool(name="agentops.pack")(pack_tool)
     server.tool(name="agentops.route")(route_tool)

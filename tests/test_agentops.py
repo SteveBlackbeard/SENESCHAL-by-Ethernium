@@ -8,10 +8,11 @@ from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
 from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, provider_health_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from agentops.prompt_firewall import scan_path, classify_text
 from agentops.provider_health import check_provider_health
 from agentops.provider_profiles import get_profile, load_profiles
+from agentops.provider_state import mark_provider_state, read_provider_states
 from agentops.router import classify_task, recommend_route
 from agentops.savings import estimate_savings
 from agentops.token_budget import budget_for_text, estimate_tokens
@@ -602,3 +603,77 @@ def test_cli_provider_health_reports_config(capsys):
 def test_mcp_provider_health_tool_reads_external_catalog():
     payload = provider_health_tool(providers_path="providers.local.json.example")
     assert any(item["id"] == "ollama-local-code" for item in payload["profiles"])
+
+
+def test_provider_state_roundtrip(tmp_path: Path):
+    state_path = tmp_path / "provider-state.json"
+    state = mark_provider_state("ollama-local-code", status="rate_limited", reason="quota", path=state_path)
+    assert state.degraded is True
+    states = read_provider_states(state_path)
+    assert states["ollama-local-code"].status == "rate_limited"
+    ok_state = mark_provider_state("ollama-local-code", status="ok", reason="recovered", path=state_path)
+    assert ok_state.failures == 0
+    assert read_provider_states(state_path)["ollama-local-code"].degraded is False
+
+
+def test_broker_rejects_degraded_provider_state(tmp_path: Path):
+    providers = tmp_path / "providers.local.json"
+    state_path = tmp_path / "provider-state.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "bad-local",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["repository-context", "cheap"],
+      "enabled": true
+    },
+    {
+      "id": "good-local",
+      "provider": "local",
+      "context_window": 16000,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["repository-context"],
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    mark_provider_state("bad-local", status="fail", reason="timeout", path=state_path)
+    decision = broker_dry_run(
+        "Analyze repo architecture",
+        estimated_input_tokens=4000,
+        providers_path=providers,
+        state_path=state_path,
+    )
+    assert decision.selected_model == "good-local"
+    assert any(item["model_id"] == "bad-local" and item["reason"] == "provider-degraded" for item in decision.rejected)
+
+
+def test_cli_provider_mark_and_state(tmp_path: Path, capsys):
+    state_path = tmp_path / "provider-state.json"
+    assert cli_main(["provider-mark", "--provider", "ollama", "--status", "fail", "--reason", "timeout", "--state", str(state_path)]) == 0
+    assert cli_main(["provider-state", "--state", str(state_path)]) == 0
+    captured = capsys.readouterr()
+    assert '"id": "ollama"' in captured.out
+    assert '"status": "fail"' in captured.out
+
+
+def test_mcp_provider_state_tools(tmp_path: Path):
+    state_path = tmp_path / "provider-state.json"
+    marked = provider_mark_tool("ollama", status="quota_exhausted", reason="free tier", state_path=str(state_path))
+    assert marked["provider"]["degraded"] is True
+    payload = provider_state_tool(state_path=str(state_path))
+    assert payload["providers"][0]["id"] == "ollama"
