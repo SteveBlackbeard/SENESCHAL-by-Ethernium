@@ -21,6 +21,7 @@ from .provider_profiles import load_profiles
 from .provider_state import mark_provider_state, read_provider_states
 from .request_planner import plan_request
 from .router import recommend_route
+from .runner import run_request
 from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
 
@@ -290,6 +291,35 @@ def plan_request_tool(
     ).to_dict()
 
 
+def run_tool(
+    objective: str,
+    *,
+    prompt: str = "",
+    path: str | None = None,
+    providers_path: str | None = None,
+    state_path: str | None = None,
+    privacy: str = "local-first",
+    max_cost: float | None = None,
+    estimated_output_tokens: int = 1024,
+    model: str | None = None,
+    ledger_path: str | None = None,
+    timeout: int = 120,
+) -> dict[str, Any]:
+    return run_request(
+        objective=objective,
+        prompt=prompt,
+        path=Path(path) if path else None,
+        providers_path=Path(providers_path) if providers_path else None,
+        state_path=Path(state_path) if state_path else None,
+        privacy=privacy,
+        max_cost=max_cost,
+        estimated_output_tokens=estimated_output_tokens,
+        model_override=model,
+        ledger_path=Path(ledger_path) if ledger_path else None,
+        timeout=timeout,
+    ).to_dict()
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -316,6 +346,7 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.select")(select_tool)
     server.tool(name="robinhood.broker_dry_run")(broker_dry_run_tool)
     server.tool(name="robinhood.plan_request")(plan_request_tool)
+    server.tool(name="robinhood.run")(run_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -336,6 +367,7 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.select")(select_tool)
     server.tool(name="agentops.broker_dry_run")(broker_dry_run_tool)
     server.tool(name="agentops.plan_request")(plan_request_tool)
+    server.tool(name="agentops.run")(run_tool)
     return server
 
 

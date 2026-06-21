@@ -121,6 +121,7 @@ robinhood provider-mark --provider openai-compatible-free-tier --status quota_ex
 robinhood broker-dry-run --providers providers.local.json --objective "release review" --estimated-input-tokens 12000
 robinhood broker-dry-run --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000
 robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000 --estimated-output-tokens 2000
+robinhood run --providers providers.local.json --objective "release review" --path . --model llama3.1
 ```
 
 ## Relevance Selection
@@ -168,6 +169,8 @@ Provider health is configuration-only. It catches missing environment variables 
 Provider state is a tiny circuit breaker. It records local observations such as `fail`, `rate_limited`, `quota_exhausted`, `disabled`, or `ok`. The broker can read that state and reject degraded providers before another retry burns tokens or time.
 
 Request planning is the final frugality gate. It estimates total input/output cost, verifies readiness, checks degraded provider state, lists fallback models, and returns `should_call`. Real adapters should call the planner first and refuse requests with blockers.
+
+The first real execution path is local Ollama. It uses standard-library HTTP, no SDK dependency, and records failures into provider state. This keeps execution cheap while preserving the rule that every model call must pass planning first.
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
 

@@ -4,6 +4,10 @@ ROBIN HOOD by Ethernium is a local-first control layer for cheaper, safer AI-ass
 
 It helps decide what context to send, what to keep local, what to block, and whether a task deserves a stronger model. The goal is practical token economy: fewer whole-repo dumps, fewer retries, smaller prompts, safer tool scope, and clearer task packets.
 
+## Product Objective
+
+ROBIN HOOD's objective is to be the preflight and execution layer for AI work: reduce tokens, choose the cheapest sufficient provider, prefer local compute, block unsafe or wasteful calls, execute only when the plan is acceptable, and record enough evidence to improve the next run.
+
 ## What It Does
 
 - estimates token budgets without locking into one provider
@@ -145,6 +149,12 @@ Plan the request before any API call:
 robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000 --estimated-output-tokens 1200
 ```
 
+Run through the local Ollama adapter after planning:
+
+```powershell
+robinhood run --providers providers.local.json --objective "Summarize this repo" --path . --model llama3.1
+```
+
 ## CLI
 
 Current commands:
@@ -165,6 +175,7 @@ robinhood savings
 robinhood select
 robinhood broker-dry-run
 robinhood plan-request
+robinhood run
 robinhood packet
 robinhood scan
 robinhood grant
@@ -207,6 +218,8 @@ Experimental local models, including abliterated variants, can be represented as
 `robinhood provider-mark` and `robinhood provider-state` implement a small local circuit breaker. If a provider times out, hits quota, rate-limits, or should be disabled, ROBIN HOOD can remember that in `.robinhood/provider-state.json` and the broker can avoid that route before spending more tokens.
 
 `robinhood plan-request` is the final preflight gate before a real adapter call. It combines broker routing, provider readiness, circuit-breaker state, fallback candidates, and estimated input/output cost. It still does not call APIs; it tells a caller whether the request should proceed.
+
+`robinhood run` currently supports the Ollama/local adapter. It still plans first, then calls the selected local provider only if there are no blockers. Failed calls are written to provider state so later plans can avoid degraded routes.
 
 ## Integration
 

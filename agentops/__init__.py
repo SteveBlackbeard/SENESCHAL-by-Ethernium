@@ -10,4 +10,5 @@ __all__ = [
     "provider_health",
     "provider_state",
     "request_planner",
+    "runner",
 ]

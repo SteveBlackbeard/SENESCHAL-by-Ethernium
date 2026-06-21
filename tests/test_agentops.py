@@ -8,13 +8,15 @@ from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
 from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, run_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from agentops.ollama_adapter import call_ollama
 from agentops.prompt_firewall import scan_path, classify_text
 from agentops.provider_health import check_provider_health
 from agentops.provider_profiles import get_profile, load_profiles
 from agentops.provider_state import mark_provider_state, read_provider_states
 from agentops.request_planner import plan_request
 from agentops.router import classify_task, recommend_route
+from agentops.runner import run_request
 from agentops.savings import estimate_savings
 from agentops.token_budget import budget_for_text, estimate_tokens
 
@@ -765,3 +767,82 @@ def test_mcp_plan_request_tool():
     )
     assert payload["should_call"] is True
     assert payload["selected_model"] == "ollama-local-code"
+
+
+def test_ollama_adapter_uses_transport():
+    def fake_transport(endpoint: str, payload: bytes, timeout: int):
+        assert endpoint == "http://localhost:11434/api/generate"
+        assert b'"stream": false' in payload
+        assert timeout == 120
+        return {"response": "done"}
+
+    response = call_ollama("hello", model="tiny", transport=fake_transport)
+    assert response.ok is True
+    assert response.text == "done"
+
+
+def test_runner_blocks_before_call_when_plan_has_blockers(tmp_path: Path):
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "enabled-cloud",
+      "provider": "openai-compatible",
+      "context_window": 128000,
+      "input_cost_per_million": 1,
+      "output_cost_per_million": 2,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["review"],
+      "endpoint_env": "ROBINHOOD_TEST_BASE_URL",
+      "api_key_env": "ROBINHOOD_TEST_API_KEY",
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    result = run_request(
+        objective="Release review",
+        prompt="check",
+        providers_path=providers,
+        privacy="cloud-allowed",
+        state_path=tmp_path / "state.json",
+    )
+    assert result.plan.should_call is False
+    assert result.response.error == "blocked-by-request-plan"
+
+
+def test_cli_run_reports_missing_local_model_without_network(tmp_path: Path, capsys):
+    state_path = tmp_path / "state.json"
+    assert cli_main(
+        [
+            "run",
+            "--providers",
+            "providers.local.json.example",
+            "--state",
+            str(state_path),
+            "--objective",
+            "Analyze repo architecture",
+            "--prompt",
+            "Summarize.",
+        ]
+    ) == 1
+    captured = capsys.readouterr()
+    assert '"error": "missing-model"' in captured.out
+    assert state_path.exists()
+
+
+def test_mcp_run_tool_reports_missing_model_without_network(tmp_path: Path):
+    payload = run_tool(
+        "Analyze repo architecture",
+        prompt="Summarize.",
+        providers_path="providers.local.json.example",
+        state_path=str(tmp_path / "state.json"),
+    )
+    assert payload["response"]["ok"] is False
+    assert payload["response"]["error"] == "missing-model"

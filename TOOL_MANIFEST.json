@@ -55,6 +55,8 @@
     "provider_health",
     "provider_state",
     "request_planner",
+    "ollama_adapter",
+    "run_pipeline",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -81,7 +83,9 @@
     "external_provider_catalog",
     "provider_health",
     "provider_state",
-    "request_planner"
+    "request_planner",
+    "ollama_adapter",
+    "run_pipeline"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

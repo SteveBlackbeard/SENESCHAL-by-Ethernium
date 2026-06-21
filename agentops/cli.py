@@ -21,6 +21,7 @@ from .provider_profiles import load_profiles
 from .provider_state import DEFAULT_PROVIDER_STATE, mark_provider_state, read_provider_states
 from .request_planner import plan_request
 from .router import recommend_route
+from .runner import run_request
 from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
 
@@ -273,6 +274,24 @@ def cmd_plan_request(args: argparse.Namespace) -> int:
     return 0 if plan.should_call else 1
 
 
+def cmd_run(args: argparse.Namespace) -> int:
+    result = run_request(
+        objective=args.objective,
+        prompt=args.prompt or "",
+        path=Path(args.path) if args.path else None,
+        providers_path=Path(args.providers) if args.providers else None,
+        state_path=Path(args.state) if args.state else None,
+        privacy=args.privacy,
+        max_cost=args.max_cost,
+        estimated_output_tokens=args.estimated_output_tokens,
+        model_override=args.model,
+        ledger_path=Path(args.ledger) if args.ledger else None,
+        timeout=args.timeout,
+    )
+    print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+    return 0 if result.response.ok else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -422,6 +441,20 @@ def build_parser() -> argparse.ArgumentParser:
     plan.add_argument("--providers", help="Optional providers.local.json path.")
     plan.add_argument("--state", help="Optional provider-state.json path for circuit-breaker routing.")
     plan.set_defaults(func=cmd_plan_request)
+
+    run = subparsers.add_parser("run", help="Run a planned model request through a supported local adapter.")
+    run.add_argument("--objective", required=True)
+    run.add_argument("--prompt")
+    run.add_argument("--path")
+    run.add_argument("--providers", help="Optional providers.local.json path.")
+    run.add_argument("--state", default=DEFAULT_PROVIDER_STATE)
+    run.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    run.add_argument("--max-cost", type=float)
+    run.add_argument("--estimated-output-tokens", type=int, default=1024)
+    run.add_argument("--model", help="Concrete Ollama model name override.")
+    run.add_argument("--ledger", help="Optional JSONL ledger path.")
+    run.add_argument("--timeout", type=int, default=120)
+    run.set_defaults(func=cmd_run)
     return parser
 
 

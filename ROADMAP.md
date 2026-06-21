@@ -122,9 +122,16 @@ Acceptance:
 
 ## Phase 4: Standalone Release Hardening
 
+Status: current.
+
 Build:
 
 - `pyproject.toml`
+- local Ollama adapter
+- `robinhood run`
+- project config
+- quality gate
+- OpenAI-compatible adapter
 - CI
 - release notes
 - installation docs
@@ -134,6 +141,7 @@ Acceptance:
 - ROBIN HOOD stays independent from Continuity Legacy
 - tests pass in its own repo
 - no private Continuity file is required
+- every real model call passes request planning first
 
 ## Deferred
 
