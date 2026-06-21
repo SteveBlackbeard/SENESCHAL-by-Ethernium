@@ -8,11 +8,12 @@ from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
 from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from agentops.prompt_firewall import scan_path, classify_text
 from agentops.provider_health import check_provider_health
 from agentops.provider_profiles import get_profile, load_profiles
 from agentops.provider_state import mark_provider_state, read_provider_states
+from agentops.request_planner import plan_request
 from agentops.router import classify_task, recommend_route
 from agentops.savings import estimate_savings
 from agentops.token_budget import budget_for_text, estimate_tokens
@@ -677,3 +678,81 @@ def test_mcp_provider_state_tools(tmp_path: Path):
     assert marked["provider"]["degraded"] is True
     payload = provider_state_tool(state_path=str(state_path))
     assert payload["providers"][0]["id"] == "ollama"
+
+
+def test_request_planner_allows_ready_local_catalog():
+    plan = plan_request(
+        "Analyze repo architecture",
+        estimated_input_tokens=8000,
+        estimated_output_tokens=1000,
+        providers_path=Path("providers.local.json.example"),
+    )
+    assert plan.should_call is True
+    assert plan.selected_model == "ollama-local-code"
+    assert plan.estimated_total_cost == 0.0
+    assert "local-lora-specialist" in plan.fallback_models
+
+
+def test_request_planner_blocks_unready_enabled_cloud(tmp_path: Path):
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "enabled-cloud",
+      "provider": "openai-compatible",
+      "context_window": 128000,
+      "input_cost_per_million": 1,
+      "output_cost_per_million": 2,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["review", "release"],
+      "endpoint_env": "ROBINHOOD_TEST_BASE_URL",
+      "api_key_env": "ROBINHOOD_TEST_API_KEY",
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    plan = plan_request(
+        "Release review",
+        estimated_input_tokens=12000,
+        estimated_output_tokens=2000,
+        privacy="cloud-allowed",
+        providers_path=providers,
+    )
+    assert plan.selected_model == "enabled-cloud"
+    assert plan.should_call is False
+    assert "selected-provider-not-ready" in plan.blockers
+    assert plan.estimated_total_cost == 0.016
+
+
+def test_cli_plan_request_reports_preflight(capsys):
+    assert cli_main(
+        [
+            "plan-request",
+            "--providers",
+            "providers.local.json.example",
+            "--objective",
+            "Analyze repo architecture",
+            "--estimated-input-tokens",
+            "8000",
+        ]
+    ) == 0
+    captured = capsys.readouterr()
+    assert '"should_call": true' in captured.out
+    assert '"selected_model": "ollama-local-code"' in captured.out
+
+
+def test_mcp_plan_request_tool():
+    payload = plan_request_tool(
+        "Analyze repo architecture",
+        estimated_input_tokens=8000,
+        providers_path="providers.local.json.example",
+    )
+    assert payload["should_call"] is True
+    assert payload["selected_model"] == "ollama-local-code"

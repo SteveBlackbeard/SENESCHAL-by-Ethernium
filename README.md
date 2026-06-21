@@ -139,6 +139,12 @@ Avoid locally degraded providers:
 robinhood broker-dry-run --providers providers.local.json --state .robinhood/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000
 ```
 
+Plan the request before any API call:
+
+```powershell
+robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000 --estimated-output-tokens 1200
+```
+
 ## CLI
 
 Current commands:
@@ -158,6 +164,7 @@ robinhood reuse
 robinhood savings
 robinhood select
 robinhood broker-dry-run
+robinhood plan-request
 robinhood packet
 robinhood scan
 robinhood grant
@@ -196,6 +203,8 @@ Private provider catalogs should live in `providers.local.json`. That file is ig
 `robinhood provider-health` checks only local configuration. It verifies enabled/disabled state and required environment variables, but does not call remote APIs or run inference. This keeps readiness cheap, deterministic, and safe to run inside Cursor, VS Code, CI, or an MCP client before any model spend happens.
 
 `robinhood provider-mark` and `robinhood provider-state` implement a small local circuit breaker. If a provider times out, hits quota, rate-limits, or should be disabled, ROBIN HOOD can remember that in `.robinhood/provider-state.json` and the broker can avoid that route before spending more tokens.
+
+`robinhood plan-request` is the final preflight gate before a real adapter call. It combines broker routing, provider readiness, circuit-breaker state, fallback candidates, and estimated input/output cost. It still does not call APIs; it tells a caller whether the request should proceed.
 
 ## Integration
 

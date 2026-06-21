@@ -19,6 +19,7 @@ from .prompt_firewall import classify_file, classify_text, scan_path
 from .provider_health import check_provider_health
 from .provider_profiles import load_profiles
 from .provider_state import DEFAULT_PROVIDER_STATE, mark_provider_state, read_provider_states
+from .request_planner import plan_request
 from .router import recommend_route
 from .savings import estimate_savings
 from .token_budget import budget_for_file, budget_for_text
@@ -257,6 +258,21 @@ def cmd_broker_dry_run(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_plan_request(args: argparse.Namespace) -> int:
+    plan = plan_request(
+        args.objective,
+        estimated_input_tokens=args.estimated_input_tokens,
+        estimated_output_tokens=args.estimated_output_tokens,
+        privacy=args.privacy,
+        max_cost=args.max_cost,
+        providers_path=Path(args.providers) if args.providers else None,
+        state_path=Path(args.state) if args.state else None,
+        task_class=args.task_class,
+    )
+    print(json.dumps(plan.to_dict(), indent=2, sort_keys=True))
+    return 0 if plan.should_call else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -395,6 +411,17 @@ def build_parser() -> argparse.ArgumentParser:
     broker.add_argument("--providers", help="Optional providers.local.json path.")
     broker.add_argument("--state", help="Optional provider-state.json path for circuit-breaker routing.")
     broker.set_defaults(func=cmd_broker_dry_run)
+
+    plan = subparsers.add_parser("plan-request", help="Plan a model request before any API call.")
+    plan.add_argument("--objective", required=True)
+    plan.add_argument("--estimated-input-tokens", type=int, required=True)
+    plan.add_argument("--estimated-output-tokens", type=int, default=1024)
+    plan.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    plan.add_argument("--max-cost", type=float)
+    plan.add_argument("--task-class")
+    plan.add_argument("--providers", help="Optional providers.local.json path.")
+    plan.add_argument("--state", help="Optional provider-state.json path for circuit-breaker routing.")
+    plan.set_defaults(func=cmd_plan_request)
     return parser
 
 

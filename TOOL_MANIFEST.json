@@ -54,6 +54,7 @@
     "external_provider_catalog",
     "provider_health",
     "provider_state",
+    "request_planner",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -79,7 +80,8 @@
     "capacity_broker",
     "external_provider_catalog",
     "provider_health",
-    "provider_state"
+    "provider_state",
+    "request_planner"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],
