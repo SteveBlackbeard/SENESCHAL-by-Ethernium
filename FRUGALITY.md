@@ -161,6 +161,8 @@ Provider catalogs:
 - real API keys must be referenced by environment variable names only.
 - disabled providers stay visible for planning but cannot be selected.
 
+Experimental local models, including abliterated variants, belong in the provider catalog as explicit local routes. They should default to disabled, use local privacy, and pass through the same prompt scanning, planning, circuit-breaker, and human-review gates as any other model. The frugal win is local compute and fewer paid calls; the risk is weaker behavioral reliability, so ROBIN HOOD should never treat them as an automatic quality or safety upgrade.
+
 Provider health is configuration-only. It catches missing environment variables and disabled providers before any paid or remote call is attempted. That reduces retry loops, prevents accidental cloud use, and keeps local-first routing honest.
 
 Provider state is a tiny circuit breaker. It records local observations such as `fail`, `rate_limited`, `quota_exhausted`, `disabled`, or `ok`. The broker can read that state and reject degraded providers before another retry burns tokens or time.

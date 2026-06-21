@@ -519,6 +519,14 @@ def test_cli_providers_reads_external_catalog(tmp_path: Path, capsys):
     assert '"id": "custom-local"' in captured.out
 
 
+def test_example_catalog_includes_disabled_abliterated_route():
+    profiles = load_profiles(Path("providers.local.json.example"))
+    abliterated = next(profile for profile in profiles if profile.id == "abliterated-local-lab")
+    assert abliterated.enabled is False
+    assert abliterated.privacy == "local"
+    assert abliterated.provider == "ollama"
+
+
 def test_provider_health_reports_missing_required_env(tmp_path: Path):
     providers = tmp_path / "providers.local.json"
     providers.write_text(
@@ -691,6 +699,7 @@ def test_request_planner_allows_ready_local_catalog():
     assert plan.selected_model == "ollama-local-code"
     assert plan.estimated_total_cost == 0.0
     assert "local-lora-specialist" in plan.fallback_models
+    assert "abliterated-local-lab" not in plan.fallback_models
 
 
 def test_request_planner_blocks_unready_enabled_cloud(tmp_path: Path):

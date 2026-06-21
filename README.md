@@ -200,6 +200,8 @@ The default tokenizer is an honest fallback estimate. That is deliberate: the to
 
 Private provider catalogs should live in `providers.local.json`. That file is ignored by Git. Use `providers.local.json.example` as a safe template and keep real endpoints, key names, quotas, and enabled providers local.
 
+Experimental local models, including abliterated variants, can be represented as disabled provider profiles in `providers.local.json`. ROBIN HOOD treats them as local compute, not as privileged bypass tools. Keep them disabled until you explicitly need them, run `robinhood scan` on external prompts, run `robinhood plan-request` before use, and keep human review on outputs that affect code, security, legal, medical, finance, or public release decisions.
+
 `robinhood provider-health` checks only local configuration. It verifies enabled/disabled state and required environment variables, but does not call remote APIs or run inference. This keeps readiness cheap, deterministic, and safe to run inside Cursor, VS Code, CI, or an MCP client before any model spend happens.
 
 `robinhood provider-mark` and `robinhood provider-state` implement a small local circuit breaker. If a provider times out, hits quota, rate-limits, or should be disabled, ROBIN HOOD can remember that in `.robinhood/provider-state.json` and the broker can avoid that route before spending more tokens.

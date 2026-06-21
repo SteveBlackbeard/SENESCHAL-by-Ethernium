@@ -47,6 +47,22 @@
       "model_env": "ROBINHOOD_LORA_MODEL",
       "enabled": true,
       "notes": "Treat LoRA as a served model variant, not as a provider by itself."
+    },
+    {
+      "id": "abliterated-local-lab",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "variable",
+      "strengths": ["creative-generation", "drafting", "private", "cheap"],
+      "tokenizer": "estimate",
+      "endpoint_env": "ROBINHOOD_ABLITERATED_BASE_URL",
+      "model_env": "ROBINHOOD_ABLITERATED_MODEL",
+      "quota_policy": "local-compute",
+      "enabled": false,
+      "notes": "Experimental local abliterated model route. Enable only for lawful local work with prompt scanning, request planning, and human review."
     }
   ]
 }
