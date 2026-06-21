@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .capability_broker import CapabilityGrant, check_action
+from .capacity_broker import broker_dry_run
 from .context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packer import pack_context
 from .context_select import select_context
@@ -218,6 +219,27 @@ def select_tool(
     ).to_dict()
 
 
+def broker_dry_run_tool(
+    objective: str,
+    *,
+    estimated_input_tokens: int,
+    privacy: str = "local-first",
+    max_cost: float | None = None,
+    blocked_providers: list[str] | None = None,
+    allowed_providers: list[str] | None = None,
+    task_class: str | None = None,
+) -> dict[str, Any]:
+    return broker_dry_run(
+        objective,
+        estimated_input_tokens=estimated_input_tokens,
+        privacy=privacy,
+        max_cost=max_cost,
+        blocked_providers=set(blocked_providers or []),
+        allowed_providers=set(allowed_providers) if allowed_providers else None,
+        task_class=task_class,
+    ).to_dict()
+
+
 def build_mcp_server() -> Any:
     try:
         from mcp.server.fastmcp import FastMCP
@@ -239,6 +261,7 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.reuse")(reuse_tool)
     server.tool(name="robinhood.savings")(savings_tool)
     server.tool(name="robinhood.select")(select_tool)
+    server.tool(name="robinhood.broker_dry_run")(broker_dry_run_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
     server.tool(name="agentops.health")(health_tool)
@@ -254,6 +277,7 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.reuse")(reuse_tool)
     server.tool(name="agentops.savings")(savings_tool)
     server.tool(name="agentops.select")(select_tool)
+    server.tool(name="agentops.broker_dry_run")(broker_dry_run_tool)
     return server
 
 

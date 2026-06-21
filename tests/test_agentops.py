@@ -1,13 +1,14 @@
 from pathlib import Path
 
 from agentops.capability_broker import CapabilityGrant, check_action
+from agentops.capacity_broker import broker_dry_run
 from agentops.cli import main as cli_main
 from agentops.context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse
 from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
 from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import budget_tool, check_capability_tool, make_packet_tool, pack_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from agentops.prompt_firewall import scan_path, classify_text
 from agentops.provider_profiles import get_profile, load_profiles
 from agentops.router import classify_task, recommend_route
@@ -403,3 +404,39 @@ def test_mcp_select_tool(tmp_path: Path):
     target.write_text("hello", encoding="utf-8")
     payload = select_tool(str(tmp_path), changed_paths=["README.md"], max_tokens=100)
     assert payload["selected"][0]["path"] == "README.md"
+
+
+def test_capacity_broker_prefers_local_when_privacy_is_local_first():
+    decision = broker_dry_run("Fix typo in docs", estimated_input_tokens=1000, privacy="local-first")
+    assert decision.selected_provider == "local"
+    assert decision.selected_model == "local-small"
+
+
+def test_capacity_broker_respects_local_only():
+    decision = broker_dry_run(
+        "Security review before release",
+        estimated_input_tokens=9000,
+        privacy="local-only",
+    )
+    assert decision.selected_provider == "local"
+    assert decision.selected_model in {"local-long", "generic-local-lora"}
+
+
+def test_cli_broker_dry_run_reports_decision(capsys):
+    result = cli_main(
+        [
+            "broker-dry-run",
+            "--objective",
+            "Fix typo in docs",
+            "--estimated-input-tokens",
+            "1000",
+        ]
+    )
+    captured = capsys.readouterr()
+    assert result == 0
+    assert '"selected_provider": "local"' in captured.out
+
+
+def test_mcp_broker_dry_run_tool():
+    payload = broker_dry_run_tool("Fix typo in docs", estimated_input_tokens=1000)
+    assert payload["selected_provider"] == "local"

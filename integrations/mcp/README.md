@@ -23,6 +23,7 @@ MCP should expose local controls first:
 - context snapshots
 - prompt reuse estimates
 - relevance selection
+- capacity broker dry-runs
 
 Provider calls should stay deferred until the defensive controls are stable.
 
@@ -43,6 +44,7 @@ Provider calls should stay deferred until the defensive controls are stable.
 | `robinhood.reuse` | Estimate reusable/cacheable prompt share | Low |
 | `robinhood.savings` | Estimate token/cost savings | Low |
 | `robinhood.select` | Select useful neighboring context under budget | Medium |
+| `robinhood.broker_dry_run` | Dry-run provider capacity routing | Medium |
 
 ## Constraints
 

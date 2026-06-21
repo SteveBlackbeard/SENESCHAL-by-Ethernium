@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 from .capability_broker import CapabilityGrant, check_action
+from .capacity_broker import broker_dry_run
 from .context_packer import pack_context, render_pack
 from .context_cache import DEFAULT_CACHE, create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packet import ContextPacket
@@ -214,6 +215,20 @@ def cmd_select(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_broker_dry_run(args: argparse.Namespace) -> int:
+    decision = broker_dry_run(
+        args.objective,
+        estimated_input_tokens=args.estimated_input_tokens,
+        privacy=args.privacy,
+        max_cost=args.max_cost,
+        blocked_providers=set(args.blocked_provider or []),
+        allowed_providers=set(args.allowed_provider) if args.allowed_provider else None,
+        task_class=args.task_class,
+    )
+    print(json.dumps(decision.to_dict(), indent=2, sort_keys=True))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -321,6 +336,16 @@ def build_parser() -> argparse.ArgumentParser:
     select.add_argument("--source", default="internal")
     select.add_argument("--min-score", type=int, default=30)
     select.set_defaults(func=cmd_select)
+
+    broker = subparsers.add_parser("broker-dry-run", help="Dry-run provider capacity routing without API calls.")
+    broker.add_argument("--objective", required=True)
+    broker.add_argument("--estimated-input-tokens", type=int, required=True)
+    broker.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    broker.add_argument("--max-cost", type=float)
+    broker.add_argument("--allowed-provider", action="append")
+    broker.add_argument("--blocked-provider", action="append")
+    broker.add_argument("--task-class")
+    broker.set_defaults(func=cmd_broker_dry_run)
     return parser
 
 

@@ -81,6 +81,12 @@
       "implemented": true,
       "risk": "medium",
       "description": "Select changed files and useful neighboring context under a token budget."
+    },
+    {
+      "name": "robinhood.broker_dry_run",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Recommend provider capacity routing without API calls or secrets."
     }
   ],
   "forbidden": [

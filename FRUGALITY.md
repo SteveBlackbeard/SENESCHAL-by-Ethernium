@@ -115,6 +115,7 @@ robinhood snapshot --path . --input-cost-per-million 2 --runs 100
 robinhood reuse --system "stable operating rules" --user "task-specific request"
 robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
 robinhood select --path . --changed agentops/cli.py --max-tokens 4000
+robinhood broker-dry-run --objective "release review" --estimated-input-tokens 12000 --privacy local-first
 ```
 
 ## Relevance Selection
@@ -132,6 +133,21 @@ Changed-only context is cheap, but it may be too thin.
 - files over budget are excluded instead of silently bloating the prompt
 
 This approximates a small knapsack optimizer: maximize useful context while staying under the token budget.
+
+## Capacity Broker
+
+The first broker layer is dry-run only.
+
+It scores available provider profiles by:
+
+- task class
+- context window fit
+- privacy mode
+- estimated cost
+- blocked/allowed providers
+- quality overlap with the task
+
+It does not call APIs, store secrets, or chase free tokens blindly. It recommends the cheapest sufficient capacity route before any expensive model invocation happens.
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
 

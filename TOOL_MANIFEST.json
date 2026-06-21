@@ -50,6 +50,7 @@
     "context_cache",
     "savings",
     "context_select",
+    "capacity_broker",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -71,7 +72,8 @@
     "router",
     "context_cache",
     "savings",
-    "context_select"
+    "context_select",
+    "capacity_broker"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

@@ -12,6 +12,7 @@ It helps decide what context to send, what to keep local, what to block, and whe
 - snapshots context so unchanged files do not need to be resent
 - estimates token-cost savings across repeated runs
 - selects the most relevant neighboring context under a token budget
+- dry-runs provider capacity routing without API keys or network calls
 - scans untrusted text/files for prompt-injection and secret-like material
 - creates scoped context packets for agents
 - checks least-privilege capability grants
@@ -100,6 +101,12 @@ Select changed files plus useful neighbors under a strict budget:
 robinhood select --path . --changed agentops/cli.py --max-tokens 4000
 ```
 
+Dry-run provider capacity routing:
+
+```powershell
+robinhood broker-dry-run --objective "Security review before release" --estimated-input-tokens 12000 --privacy local-first
+```
+
 ## CLI
 
 Current commands:
@@ -114,6 +121,7 @@ robinhood snapshot
 robinhood reuse
 robinhood savings
 robinhood select
+robinhood broker-dry-run
 robinhood packet
 robinhood scan
 robinhood grant
