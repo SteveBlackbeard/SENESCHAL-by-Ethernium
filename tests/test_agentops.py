@@ -8,8 +8,9 @@ from agentops.context_packer import pack_context
 from agentops.context_packet import ContextPacket
 from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, provider_health_tool, reuse_tool, route_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from agentops.prompt_firewall import scan_path, classify_text
+from agentops.provider_health import check_provider_health
 from agentops.provider_profiles import get_profile, load_profiles
 from agentops.router import classify_task, recommend_route
 from agentops.savings import estimate_savings
@@ -514,3 +515,90 @@ def test_cli_providers_reads_external_catalog(tmp_path: Path, capsys):
     assert cli_main(["providers", "--providers", str(providers)]) == 0
     captured = capsys.readouterr()
     assert '"id": "custom-local"' in captured.out
+
+
+def test_provider_health_reports_missing_required_env(tmp_path: Path):
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "free-cloud",
+      "provider": "openai-compatible",
+      "context_window": 128000,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["review"],
+      "endpoint_env": "ROBINHOOD_TEST_BASE_URL",
+      "api_key_env": "ROBINHOOD_TEST_API_KEY",
+      "enabled": true
+    },
+    {
+      "id": "disabled-cloud",
+      "provider": "openai-compatible",
+      "context_window": 128000,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["review"],
+      "api_key_env": "ROBINHOOD_DISABLED_KEY",
+      "enabled": false
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    payload = check_provider_health(providers_path=providers, environ={})
+    assert payload["ok"] is False
+    profiles = {item["id"]: item for item in payload["profiles"]}
+    assert profiles["free-cloud"]["status"] == "missing-required-env"
+    assert profiles["free-cloud"]["missing_env"] == ["ROBINHOOD_TEST_BASE_URL", "ROBINHOOD_TEST_API_KEY"]
+    assert profiles["disabled-cloud"]["status"] == "disabled"
+
+
+def test_provider_health_treats_local_endpoint_as_optional(tmp_path: Path):
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "local-lora",
+      "provider": "local-lora",
+      "context_window": 16384,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["private"],
+      "endpoint_env": "ROBINHOOD_TEST_LORA_URL",
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    payload = check_provider_health(providers_path=providers, environ={})
+    assert payload["ok"] is True
+    assert payload["profiles"][0]["status"] == "ready"
+    assert payload["profiles"][0]["warnings"] == ["optional-env-not-set"]
+
+
+def test_cli_provider_health_reports_config(capsys):
+    assert cli_main(["provider-health", "--providers", "providers.local.json.example"]) == 0
+    captured = capsys.readouterr()
+    assert '"id": "openai-compatible-free-tier"' in captured.out
+    assert '"status": "disabled"' in captured.out
+
+
+def test_mcp_provider_health_tool_reads_external_catalog():
+    payload = provider_health_tool(providers_path="providers.local.json.example")
+    assert any(item["id"] == "ollama-local-code" for item in payload["profiles"])

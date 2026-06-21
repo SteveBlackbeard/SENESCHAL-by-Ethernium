@@ -52,6 +52,7 @@
     "context_select",
     "capacity_broker",
     "external_provider_catalog",
+    "provider_health",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -75,7 +76,8 @@
     "savings",
     "context_select",
     "capacity_broker",
-    "external_provider_catalog"
+    "external_provider_catalog",
+    "provider_health"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

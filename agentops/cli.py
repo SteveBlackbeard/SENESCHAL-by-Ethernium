@@ -16,6 +16,7 @@ from .context_select import select_context
 from .frugality_ledger import append_entry, new_entry, read_entries, summarize_entries
 from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
+from .provider_health import check_provider_health
 from .provider_profiles import load_profiles
 from .router import recommend_route
 from .savings import estimate_savings
@@ -120,6 +121,12 @@ def cmd_providers(args: argparse.Namespace) -> int:
     profiles = [profile.to_dict() for profile in load_profiles(Path(args.providers) if args.providers else None)]
     print(json.dumps({"profiles": profiles}, indent=2, sort_keys=True))
     return 0
+
+
+def cmd_provider_health(args: argparse.Namespace) -> int:
+    payload = check_provider_health(providers_path=Path(args.providers) if args.providers else None)
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0 if payload["ok"] else 1
 
 
 def cmd_budget(args: argparse.Namespace) -> int:
@@ -291,6 +298,10 @@ def build_parser() -> argparse.ArgumentParser:
     providers = subparsers.add_parser("providers", help="List provider profiles from the active catalog.")
     providers.add_argument("--providers", help="Optional providers.local.json path.")
     providers.set_defaults(func=cmd_providers)
+
+    provider_health = subparsers.add_parser("provider-health", help="Check provider configuration without API calls.")
+    provider_health.add_argument("--providers", help="Optional providers.local.json path.")
+    provider_health.set_defaults(func=cmd_provider_health)
 
     budget = subparsers.add_parser("budget", help="Estimate whether text or a file fits a model budget.")
     budget.add_argument("--model", default="local-small")

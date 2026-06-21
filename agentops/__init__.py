@@ -7,4 +7,5 @@ __all__ = [
     "health_guard",
     "mcp_server",
     "prompt_firewall",
+    "provider_health",
 ]

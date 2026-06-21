@@ -16,6 +16,7 @@ from .context_select import select_context
 from .context_packet import ContextPacket
 from .health_guard import check_forbidden_text, check_manifest, check_required_docs
 from .prompt_firewall import classify_text, scan_path
+from .provider_health import check_provider_health
 from .provider_profiles import load_profiles
 from .router import recommend_route
 from .savings import estimate_savings
@@ -106,6 +107,10 @@ def check_capability_tool(
 
 def models_tool() -> dict[str, Any]:
     return {"profiles": [profile.to_dict() for profile in load_profiles()]}
+
+
+def provider_health_tool(*, providers_path: str | None = None) -> dict[str, Any]:
+    return check_provider_health(providers_path=Path(providers_path) if providers_path else None)
 
 
 def budget_tool(
@@ -256,6 +261,7 @@ def build_mcp_server() -> Any:
     server.tool(name="robinhood.make_packet")(make_packet_tool)
     server.tool(name="robinhood.check_capability")(check_capability_tool)
     server.tool(name="robinhood.models")(models_tool)
+    server.tool(name="robinhood.provider_health")(provider_health_tool)
     server.tool(name="robinhood.budget")(budget_tool)
     server.tool(name="robinhood.pack")(pack_tool)
     server.tool(name="robinhood.route")(route_tool)
@@ -272,6 +278,7 @@ def build_mcp_server() -> Any:
     server.tool(name="agentops.make_packet")(make_packet_tool)
     server.tool(name="agentops.check_capability")(check_capability_tool)
     server.tool(name="agentops.models")(models_tool)
+    server.tool(name="agentops.provider_health")(provider_health_tool)
     server.tool(name="agentops.budget")(budget_tool)
     server.tool(name="agentops.pack")(pack_tool)
     server.tool(name="agentops.route")(route_tool)

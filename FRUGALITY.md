@@ -116,6 +116,7 @@ robinhood reuse --system "stable operating rules" --user "task-specific request"
 robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
 robinhood select --path . --changed agentops/cli.py --max-tokens 4000
 robinhood broker-dry-run --objective "release review" --estimated-input-tokens 12000 --privacy local-first
+robinhood provider-health --providers providers.local.json
 robinhood broker-dry-run --providers providers.local.json --objective "release review" --estimated-input-tokens 12000
 ```
 
@@ -156,6 +157,8 @@ Provider catalogs:
 - `providers.local.json` is ignored by Git.
 - real API keys must be referenced by environment variable names only.
 - disabled providers stay visible for planning but cannot be selected.
+
+Provider health is configuration-only. It catches missing environment variables and disabled providers before any paid or remote call is attempted. That reduces retry loops, prevents accidental cloud use, and keeps local-first routing honest.
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
 

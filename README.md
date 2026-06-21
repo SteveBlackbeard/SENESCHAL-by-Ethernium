@@ -54,6 +54,12 @@ copy providers.local.json.example providers.local.json
 robinhood providers --providers providers.local.json
 ```
 
+Check provider configuration without spending tokens:
+
+```powershell
+robinhood provider-health --providers providers.local.json
+```
+
 Estimate whether a file fits a model profile:
 
 ```powershell
@@ -128,6 +134,7 @@ Current commands:
 robinhood health
 robinhood models
 robinhood providers
+robinhood provider-health
 robinhood budget
 robinhood pack
 robinhood route
@@ -171,6 +178,8 @@ The default tokenizer is an honest fallback estimate. That is deliberate: the to
 
 Private provider catalogs should live in `providers.local.json`. That file is ignored by Git. Use `providers.local.json.example` as a safe template and keep real endpoints, key names, quotas, and enabled providers local.
 
+`robinhood provider-health` checks only local configuration. It verifies enabled/disabled state and required environment variables, but does not call remote APIs or run inference. This keeps readiness cheap, deterministic, and safe to run inside Cursor, VS Code, CI, or an MCP client before any model spend happens.
+
 ## Integration
 
 ROBIN HOOD can run from:
@@ -196,7 +205,7 @@ pip install -e .[mcp]
 robinhood-mcp
 ```
 
-MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, token budgets, context packing, context snapshots, prompt reuse estimates, and routing.
+MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, provider health, token budgets, context packing, context snapshots, prompt reuse estimates, and routing.
 Routing is exposed as a recommendation only; ROBIN HOOD still does not invoke models.
 
 ## Compatibility With Continuity Legacy
