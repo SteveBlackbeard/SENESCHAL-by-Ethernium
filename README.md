@@ -47,6 +47,8 @@ robinhood health --strict
 pytest -q
 ```
 
+For a full operational walkthrough, see `USAGE.md`. For release gates, see `RELEASE.md`.
+
 Inspect available model profiles:
 
 ```powershell

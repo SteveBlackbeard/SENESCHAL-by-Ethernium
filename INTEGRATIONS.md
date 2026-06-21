@@ -23,9 +23,11 @@ Recommended commands:
 
 - `robinhood health --strict`
 - `robinhood scan --path . --source repo --fail-on-block`
+- `robinhood plan-request --config robinhood.config.json --objective "Review change" --estimated-input-tokens 8000`
+- `robinhood run --config robinhood.config.json --objective "Review change" --path .`
 - `robinhood packet`
-- future: `ROBIN HOOD pack --path . --max-tokens 32000`
-- future: `ROBIN HOOD route --task code-review`
+- `robinhood pack --path . --max-tokens 32000`
+- `robinhood route --objective "Review change"`
 
 The template lives in:
 
@@ -64,9 +66,11 @@ Initial MCP tools should expose only local, low-risk operations:
 - `robinhood.scan_path`
 - `robinhood.make_packet`
 - `robinhood.check_capability`
-- future: `robinhood.estimate_budget`
-- future: `robinhood.pack_context`
-- future: `robinhood.route_model`
+- `robinhood.budget`
+- `robinhood.pack`
+- `robinhood.route`
+- `robinhood.plan_request`
+- `robinhood.run`
 
 The contract lives in:
 
@@ -74,7 +78,7 @@ The contract lives in:
 integrations/mcp/server_contract.json
 ```
 
-Do not expose provider calls before prompt scanning, capability checks, and token budgets are stable.
+Provider calls must stay behind planning, provider health, circuit-breaker state, and quality gates.
 
 ## Antigravity
 

@@ -38,7 +38,9 @@
     "CONTINUITY_USAGE.md",
     "MITIGATION_MATRIX.md",
     "PRIOR_ART.md",
-    "OPTIMIZATION_MODEL.md"
+    "OPTIMIZATION_MODEL.md",
+    "USAGE.md",
+    "RELEASE.md"
   ],
   "planned_modules": [
     "adversarial_corpus",
