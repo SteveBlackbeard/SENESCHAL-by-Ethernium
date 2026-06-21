@@ -10,10 +10,12 @@ from agentops.context_select import select_context
 from agentops.frugality_ledger import append_entry, new_entry, read_entries
 from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, run_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from agentops.ollama_adapter import call_ollama
+from agentops.openai_compatible_adapter import call_openai_compatible
 from agentops.prompt_firewall import scan_path, classify_text
 from agentops.provider_health import check_provider_health
 from agentops.provider_profiles import get_profile, load_profiles
 from agentops.provider_state import mark_provider_state, read_provider_states
+from agentops.quality_gate import evaluate_response
 from agentops.request_planner import plan_request
 from agentops.router import classify_task, recommend_route
 from agentops.runner import run_request
@@ -781,6 +783,33 @@ def test_ollama_adapter_uses_transport():
     assert response.text == "done"
 
 
+def test_openai_compatible_adapter_uses_transport():
+    def fake_transport(endpoint: str, payload: bytes, headers: dict[str, str], timeout: int):
+        assert endpoint == "http://localhost:1234/v1/chat/completions"
+        assert headers["Authorization"] == "Bearer test-key"
+        assert b'"stream": false' in payload
+        assert timeout == 120
+        return {"choices": [{"message": {"content": "review complete"}}]}
+
+    response = call_openai_compatible(
+        "hello",
+        model="local-chat",
+        base_url="http://localhost:1234",
+        api_key="test-key",
+        transport=fake_transport,
+    )
+    assert response.ok is True
+    assert response.text == "review complete"
+
+
+def test_quality_gate_flags_empty_and_accepts_relevant_response():
+    bad = evaluate_response("review release", "")
+    assert bad.ok is False
+    assert "empty-response" in bad.findings
+    good = evaluate_response("review release", "Release review complete with tests and build checked.")
+    assert good.ok is True
+
+
 def test_runner_blocks_before_call_when_plan_has_blockers(tmp_path: Path):
     providers = tmp_path / "providers.local.json"
     providers.write_text(
@@ -815,6 +844,7 @@ def test_runner_blocks_before_call_when_plan_has_blockers(tmp_path: Path):
     )
     assert result.plan.should_call is False
     assert result.response.error == "blocked-by-request-plan"
+    assert result.quality.ok is False
 
 
 def test_cli_run_reports_missing_local_model_without_network(tmp_path: Path, capsys):

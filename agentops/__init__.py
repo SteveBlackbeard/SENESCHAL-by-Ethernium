@@ -9,6 +9,7 @@ __all__ = [
     "prompt_firewall",
     "provider_health",
     "provider_state",
+    "quality_gate",
     "request_planner",
     "runner",
 ]

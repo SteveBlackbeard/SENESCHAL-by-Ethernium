@@ -289,7 +289,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         timeout=args.timeout,
     )
     print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
-    return 0 if result.response.ok else 1
+    return 0 if result.response.ok and result.quality.ok else 1
 
 
 def build_parser() -> argparse.ArgumentParser:

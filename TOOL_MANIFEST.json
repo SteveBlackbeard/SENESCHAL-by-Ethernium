@@ -56,7 +56,9 @@
     "provider_state",
     "request_planner",
     "ollama_adapter",
+    "openai_compatible_adapter",
     "run_pipeline",
+    "quality_gate",
     "vscode_integration",
     "cursor_integration",
     "mcp_server"
@@ -85,7 +87,9 @@
     "provider_state",
     "request_planner",
     "ollama_adapter",
-    "run_pipeline"
+    "openai_compatible_adapter",
+    "run_pipeline",
+    "quality_gate"
   ],
   "acceptance_metrics": {
     "must_reduce_one_of": ["cost", "risk", "drift"],

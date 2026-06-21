@@ -170,7 +170,9 @@ Provider state is a tiny circuit breaker. It records local observations such as 
 
 Request planning is the final frugality gate. It estimates total input/output cost, verifies readiness, checks degraded provider state, lists fallback models, and returns `should_call`. Real adapters should call the planner first and refuse requests with blockers.
 
-The first real execution path is local Ollama. It uses standard-library HTTP, no SDK dependency, and records failures into provider state. This keeps execution cheap while preserving the rule that every model call must pass planning first.
+The first real execution paths are local Ollama and OpenAI-compatible chat completions. They use standard-library HTTP, no SDK dependency, and record failures into provider state. This keeps execution cheap while preserving the rule that every model call must pass planning first.
+
+The quality gate is intentionally small and deterministic. It is not a judge model; it is a cheap post-call filter for empty responses, evasions, generated-output risk, and low objective overlap. This avoids paying for another model just to detect obvious bad outputs.
 
 The first implementation uses a conservative fallback estimate instead of pretending to know every provider tokenizer. Provider-specific tokenizers can be added later as optional adapters.
 

@@ -21,6 +21,8 @@ ROBIN HOOD's objective is to be the preflight and execution layer for AI work: r
 - creates scoped context packets for agents
 - checks least-privilege capability grants
 - records cost/retry/outcome data in a JSONL frugality ledger
+- can execute planned calls through local Ollama and OpenAI-compatible adapters
+- applies a cheap quality gate after model responses
 - exposes terminal and optional MCP controls
 
 ## What It Is Not
@@ -219,7 +221,9 @@ Experimental local models, including abliterated variants, can be represented as
 
 `robinhood plan-request` is the final preflight gate before a real adapter call. It combines broker routing, provider readiness, circuit-breaker state, fallback candidates, and estimated input/output cost. It still does not call APIs; it tells a caller whether the request should proceed.
 
-`robinhood run` currently supports the Ollama/local adapter. It still plans first, then calls the selected local provider only if there are no blockers. Failed calls are written to provider state so later plans can avoid degraded routes.
+`robinhood run` currently supports Ollama/local and OpenAI-compatible adapters. It still plans first, then calls the selected provider only if there are no blockers. Failed calls and quality failures are written to provider state so later plans can avoid degraded routes.
+
+The quality gate is deliberately cheap: empty answers, very short answers, evasions, risky generated text, and low overlap with the objective are flagged before a run is considered successful.
 
 ## Integration
 
