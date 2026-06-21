@@ -116,6 +116,12 @@ def cmd_models(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_providers(args: argparse.Namespace) -> int:
+    profiles = [profile.to_dict() for profile in load_profiles(Path(args.providers) if args.providers else None)]
+    print(json.dumps({"profiles": profiles}, indent=2, sort_keys=True))
+    return 0
+
+
 def cmd_budget(args: argparse.Namespace) -> int:
     if args.text is not None:
         budget = budget_for_text(args.text, model_id=args.model, reserve_output_tokens=args.reserve_output)
@@ -224,6 +230,7 @@ def cmd_broker_dry_run(args: argparse.Namespace) -> int:
         blocked_providers=set(args.blocked_provider or []),
         allowed_providers=set(args.allowed_provider) if args.allowed_provider else None,
         task_class=args.task_class,
+        providers_path=Path(args.providers) if args.providers else None,
     )
     print(json.dumps(decision.to_dict(), indent=2, sort_keys=True))
     return 0
@@ -280,6 +287,10 @@ def build_parser() -> argparse.ArgumentParser:
     models = subparsers.add_parser("models", help="List model/provider profiles.")
     models.add_argument("--profiles", help="Optional custom provider_profiles.json path.")
     models.set_defaults(func=cmd_models)
+
+    providers = subparsers.add_parser("providers", help="List provider profiles from the active catalog.")
+    providers.add_argument("--providers", help="Optional providers.local.json path.")
+    providers.set_defaults(func=cmd_providers)
 
     budget = subparsers.add_parser("budget", help="Estimate whether text or a file fits a model budget.")
     budget.add_argument("--model", default="local-small")
@@ -345,6 +356,7 @@ def build_parser() -> argparse.ArgumentParser:
     broker.add_argument("--allowed-provider", action="append")
     broker.add_argument("--blocked-provider", action="append")
     broker.add_argument("--task-class")
+    broker.add_argument("--providers", help="Optional providers.local.json path.")
     broker.set_defaults(func=cmd_broker_dry_run)
     return parser
 

@@ -7,3 +7,4 @@ dist/
 *.pyc
 agentops-usage.jsonl
 .robinhood/
+providers.local.json

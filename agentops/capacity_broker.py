@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from pathlib import Path
+
 from .provider_profiles import ProviderProfile, load_profiles
 from .router import classify_task
 
@@ -54,11 +56,12 @@ def broker_dry_run(
     blocked_providers: set[str] | None = None,
     allowed_providers: set[str] | None = None,
     task_class: str | None = None,
+    providers_path: Path | None = None,
 ) -> BrokerDecision:
     selected_task = classify_task(objective, forced=task_class)
     blocked = blocked_providers or set()
     allowed = allowed_providers
-    candidates = load_profiles()
+    candidates = load_profiles(providers_path)
     rejected: list[dict[str, Any]] = []
     scored: list[tuple[float, ProviderProfile, float, list[str]]] = []
 
@@ -117,6 +120,8 @@ def _reject_reason(
     allowed_providers: set[str] | None,
     cost: float,
 ) -> str | None:
+    if not profile.enabled:
+        return "provider-disabled"
     if profile.provider in blocked_providers or profile.id in blocked_providers:
         return "blocked-provider"
     if allowed_providers is not None and profile.provider not in allowed_providers and profile.id not in allowed_providers:

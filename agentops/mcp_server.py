@@ -228,6 +228,7 @@ def broker_dry_run_tool(
     blocked_providers: list[str] | None = None,
     allowed_providers: list[str] | None = None,
     task_class: str | None = None,
+    providers_path: str | None = None,
 ) -> dict[str, Any]:
     return broker_dry_run(
         objective,
@@ -237,6 +238,7 @@ def broker_dry_run_tool(
         blocked_providers=set(blocked_providers or []),
         allowed_providers=set(allowed_providers) if allowed_providers else None,
         task_class=task_class,
+        providers_path=Path(providers_path) if providers_path else None,
     ).to_dict()
 
 

@@ -1,0 +1,52 @@
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "ollama-local-code",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["private", "code", "repository-context", "cheap"],
+      "tokenizer": "estimate",
+      "endpoint_env": "ROBINHOOD_OLLAMA_BASE_URL",
+      "model_env": "ROBINHOOD_OLLAMA_MODEL",
+      "enabled": true,
+      "notes": "Local model server. No API key required by default."
+    },
+    {
+      "id": "openai-compatible-free-tier",
+      "provider": "openai-compatible",
+      "context_window": 128000,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "cloud",
+      "latency": "medium",
+      "strengths": ["tool-use", "coding", "review", "release"],
+      "tokenizer": "estimate",
+      "endpoint_env": "ROBINHOOD_OPENAI_COMPAT_BASE_URL",
+      "api_key_env": "ROBINHOOD_OPENAI_COMPAT_API_KEY",
+      "model_env": "ROBINHOOD_OPENAI_COMPAT_MODEL",
+      "quota_policy": "free-tier",
+      "enabled": false,
+      "notes": "Enable only when terms, privacy, quality, and quota are acceptable."
+    },
+    {
+      "id": "local-lora-specialist",
+      "provider": "local-lora",
+      "context_window": 16384,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "variable",
+      "strengths": ["adapter-specific", "private", "specialized"],
+      "tokenizer": "estimate",
+      "endpoint_env": "ROBINHOOD_LORA_BASE_URL",
+      "model_env": "ROBINHOOD_LORA_MODEL",
+      "enabled": true,
+      "notes": "Treat LoRA as a served model variant, not as a provider by itself."
+    }
+  ]
+}

@@ -159,6 +159,7 @@ def test_provider_profiles_include_local_default():
     profiles = load_profiles()
     assert get_profile("local-small").provider == "local"
     assert any(profile.id == "local-long" for profile in profiles)
+    assert profiles[0].enabled is True
 
 
 def test_token_budget_reports_fit():
@@ -440,3 +441,76 @@ def test_cli_broker_dry_run_reports_decision(capsys):
 def test_mcp_broker_dry_run_tool():
     payload = broker_dry_run_tool("Fix typo in docs", estimated_input_tokens=1000)
     assert payload["selected_provider"] == "local"
+
+
+def test_capacity_broker_loads_external_provider_catalog(tmp_path: Path):
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "disabled-free-cloud",
+      "provider": "openai-compatible",
+      "context_window": 200000,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "cloud",
+      "latency": "low",
+      "strengths": ["review", "release"],
+      "enabled": false
+    },
+    {
+      "id": "custom-local",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["private", "repository-context", "cheap"],
+      "endpoint_env": "ROBINHOOD_OLLAMA_BASE_URL",
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    decision = broker_dry_run(
+        "Analyze repo architecture",
+        estimated_input_tokens=8000,
+        privacy="local-first",
+        providers_path=providers,
+    )
+    assert decision.selected_model == "custom-local"
+    assert any(item["reason"] == "provider-disabled" for item in decision.rejected)
+
+
+def test_cli_providers_reads_external_catalog(tmp_path: Path, capsys):
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "custom-local",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "local",
+      "latency": "medium",
+      "strengths": ["private"],
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    assert cli_main(["providers", "--providers", str(providers)]) == 0
+    captured = capsys.readouterr()
+    assert '"id": "custom-local"' in captured.out

@@ -47,6 +47,13 @@ Inspect available model profiles:
 robinhood models
 ```
 
+List provider profiles from a local catalog:
+
+```powershell
+copy providers.local.json.example providers.local.json
+robinhood providers --providers providers.local.json
+```
+
 Estimate whether a file fits a model profile:
 
 ```powershell
@@ -107,6 +114,12 @@ Dry-run provider capacity routing:
 robinhood broker-dry-run --objective "Security review before release" --estimated-input-tokens 12000 --privacy local-first
 ```
 
+Use a local provider catalog:
+
+```powershell
+robinhood broker-dry-run --providers providers.local.json --objective "Analyze repo" --estimated-input-tokens 8000
+```
+
 ## CLI
 
 Current commands:
@@ -114,6 +127,7 @@ Current commands:
 ```text
 robinhood health
 robinhood models
+robinhood providers
 robinhood budget
 robinhood pack
 robinhood route
@@ -154,6 +168,8 @@ generic-local-lora
 ```
 
 The default tokenizer is an honest fallback estimate. That is deliberate: the tool should work before provider SDKs, API keys, local servers, or tokenizer packages are installed. Later adapters can add measured tokenizers without changing the command surface.
+
+Private provider catalogs should live in `providers.local.json`. That file is ignored by Git. Use `providers.local.json.example` as a safe template and keep real endpoints, key names, quotas, and enabled providers local.
 
 ## Integration
 

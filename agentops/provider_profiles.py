@@ -20,6 +20,12 @@ class ProviderProfile:
     latency: str
     strengths: tuple[str, ...]
     tokenizer: str = "estimate"
+    enabled: bool = True
+    endpoint_env: str | None = None
+    api_key_env: str | None = None
+    model_env: str | None = None
+    quota_policy: str | None = None
+    notes: str | None = None
 
     @classmethod
     def from_mapping(cls, payload: dict[str, Any]) -> "ProviderProfile":
@@ -33,6 +39,12 @@ class ProviderProfile:
             latency=str(payload.get("latency", "unknown")),
             strengths=tuple(str(item) for item in payload.get("strengths", [])),
             tokenizer=str(payload.get("tokenizer", "estimate")),
+            enabled=bool(payload.get("enabled", True)),
+            endpoint_env=str(payload["endpoint_env"]) if payload.get("endpoint_env") else None,
+            api_key_env=str(payload["api_key_env"]) if payload.get("api_key_env") else None,
+            model_env=str(payload["model_env"]) if payload.get("model_env") else None,
+            quota_policy=str(payload["quota_policy"]) if payload.get("quota_policy") else None,
+            notes=str(payload["notes"]) if payload.get("notes") else None,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -46,6 +58,12 @@ class ProviderProfile:
             "latency": self.latency,
             "strengths": list(self.strengths),
             "tokenizer": self.tokenizer,
+            "enabled": self.enabled,
+            "endpoint_env": self.endpoint_env,
+            "api_key_env": self.api_key_env,
+            "model_env": self.model_env,
+            "quota_policy": self.quota_policy,
+            "notes": self.notes,
         }
 
 
