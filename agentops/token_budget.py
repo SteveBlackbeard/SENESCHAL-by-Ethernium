@@ -46,12 +46,37 @@ def estimate_tokens(text: str) -> int:
     return max(1, (non_space + 3) // 4 + lines)
 
 
+def count_tokens(text: str, *, tokenizer: str = "estimate") -> tuple[int, str]:
+    """Return ``(token_count, tokenizer_used)``.
+
+    When a profile declares a real tokenizer (e.g. ``"tiktoken:cl100k_base"``)
+    and the package is installed, the count is measured and ``tokenizer_used``
+    reflects that. Otherwise it falls back to the heuristic estimate, so the tool
+    still runs with zero extra dependencies. This is what turns "we *estimate*
+    your savings" into "we *measured* them" wherever a measured tokenizer exists.
+    """
+    if not text:
+        return 0, "estimate"
+    if tokenizer.startswith("tiktoken"):
+        encoding_name = tokenizer.split(":", 1)[1] if ":" in tokenizer else "cl100k_base"
+        try:
+            import tiktoken
+
+            encoder = tiktoken.get_encoding(encoding_name)
+            return len(encoder.encode(text)), f"tiktoken:{encoding_name}"
+        except Exception:
+            pass  # package/encoding unavailable -> honest fallback below
+    return estimate_tokens(text), "estimate"
+
+
 def budget_for_text(text: str, *, model_id: str, reserve_output_tokens: int = 1024) -> TokenBudget:
     profile = get_profile(model_id)
+    tokens, tokenizer_used = count_tokens(text, tokenizer=profile.tokenizer)
     return budget_for_tokens(
-        estimate_tokens(text),
+        tokens,
         profile=profile,
         reserve_output_tokens=reserve_output_tokens,
+        tokenizer_used=tokenizer_used,
     )
 
 
@@ -65,6 +90,7 @@ def budget_for_tokens(
     *,
     profile: ProviderProfile,
     reserve_output_tokens: int = 1024,
+    tokenizer_used: str | None = None,
 ) -> TokenBudget:
     available_input_tokens = max(0, profile.context_window - reserve_output_tokens)
     usage_ratio = estimated_input_tokens / available_input_tokens if available_input_tokens else 1.0
@@ -72,7 +98,7 @@ def budget_for_tokens(
     return TokenBudget(
         model_id=profile.id,
         provider=profile.provider,
-        tokenizer=profile.tokenizer,
+        tokenizer=tokenizer_used or profile.tokenizer,
         context_window=profile.context_window,
         reserve_output_tokens=reserve_output_tokens,
         available_input_tokens=available_input_tokens,

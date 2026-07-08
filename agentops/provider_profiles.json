@@ -32,7 +32,7 @@
       "privacy": "cloud",
       "latency": "medium",
       "strengths": ["tool-use", "coding", "review", "release"],
-      "tokenizer": "estimate"
+      "tokenizer": "tiktoken:cl100k_base"
     },
     {
       "id": "anthropic-compatible-long",
@@ -43,7 +43,7 @@
       "privacy": "cloud",
       "latency": "medium",
       "strengths": ["long-context", "analysis", "synthesis"],
-      "tokenizer": "estimate"
+      "tokenizer": "tiktoken:cl100k_base"
     },
     {
       "id": "generic-local-lora",
