@@ -73,3 +73,25 @@ def summarize_entries(entries: list[LedgerEntry]) -> dict[str, int]:
     for entry in entries:
         summary[entry.reduced] += 1
     return summary
+
+
+def summarize_by_model(entries: list[LedgerEntry]) -> dict[str, dict[str, float]]:
+    """Per-model track record from the ledger.
+
+    This is what turns the ledger from a write-only log into feedback: the router
+    can read these outcomes and down-rank models that have been failing or forcing
+    retries, instead of recommending the same route every time regardless of how
+    the last runs went."""
+    stats: dict[str, dict[str, float]] = {}
+    for entry in entries:
+        row = stats.setdefault(
+            entry.model, {"entries": 0, "failures": 0, "retries": 0, "failure_rate": 0.0}
+        )
+        row["entries"] += 1
+        row["retries"] += entry.retries
+        if entry.outcome == "fail":
+            row["failures"] += 1
+    for row in stats.values():
+        total = row["entries"]
+        row["failure_rate"] = round(row["failures"] / total, 4) if total else 0.0
+    return stats

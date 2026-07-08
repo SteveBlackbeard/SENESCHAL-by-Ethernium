@@ -21,7 +21,7 @@ from agentops.request_planner import plan_request
 from agentops.router import classify_task, recommend_route
 from agentops.runner import run_request
 from agentops.savings import estimate_savings
-from agentops.token_budget import budget_for_text, estimate_tokens
+from agentops.token_budget import budget_for_text, count_tokens, estimate_tokens
 
 
 def test_context_packet_renders_scope():
@@ -175,6 +175,54 @@ def test_token_budget_reports_fit():
     assert budget.fits
     assert budget.available_input_tokens == 8064
     assert estimate_tokens("abcd") >= 1
+
+
+def test_count_tokens_falls_back_when_tokenizer_absent():
+    tokens, used = count_tokens("hello world", tokenizer="estimate")
+    assert tokens == estimate_tokens("hello world")
+    assert used == "estimate"
+
+
+def test_count_tokens_measures_with_tiktoken():
+    # Cloud profiles declare a real tokenizer; measured counts are what make the
+    # savings claim provable rather than estimated.
+    tokens, used = count_tokens("hello world", tokenizer="tiktoken:cl100k_base")
+    assert tokens > 0
+    assert used == "tiktoken:cl100k_base"
+
+
+def test_budget_reports_measured_tokenizer_for_cloud_profile():
+    budget = budget_for_text("small task", model_id="openai-compatible-balanced")
+    assert budget.fits
+    assert budget.tokenizer == "tiktoken:cl100k_base"
+
+
+def test_summarize_by_model_tracks_failures_and_retries():
+    from agentops.frugality_ledger import new_entry, summarize_by_model
+
+    entries = [
+        new_entry(task_id="a", model="local-small", tokens_estimated=10, retries=0, outcome="pass", reduced="cost"),
+        new_entry(task_id="b", model="local-small", tokens_estimated=10, retries=2, outcome="fail", reduced="cost"),
+    ]
+    stats = summarize_by_model(entries)
+    assert stats["local-small"]["entries"] == 2
+    assert stats["local-small"]["failures"] == 1
+    assert stats["local-small"]["retries"] == 2
+    assert stats["local-small"]["failure_rate"] == 0.5
+
+
+def test_router_downranks_unreliable_model_from_ledger():
+    from agentops.router import recommend_route
+
+    # Without history, small-edit local-first picks the cheapest local profile.
+    baseline = recommend_route("fix typo in docs", privacy="local-first")
+    assert baseline.selected_model == "local-small"
+
+    # A perfect failure record on that model must move the route off it.
+    model_stats = {"local-small": {"entries": 5, "failures": 5, "retries": 0, "failure_rate": 1.0}}
+    weighted = recommend_route("fix typo in docs", privacy="local-first", model_stats=model_stats)
+    assert weighted.selected_model != "local-small"
+    assert "reliability-weighted from ledger history" in weighted.reasons
 
 
 def test_context_packer_respects_budget_and_ignores_generated_dirs(tmp_path: Path):

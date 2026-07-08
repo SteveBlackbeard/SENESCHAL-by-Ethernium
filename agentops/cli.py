@@ -14,7 +14,7 @@ from .context_packer import pack_context, render_pack
 from .context_cache import DEFAULT_CACHE, create_snapshot, diff_snapshot, estimate_prompt_reuse, read_snapshot, write_snapshot
 from .context_packet import ContextPacket
 from .context_select import select_context
-from .frugality_ledger import append_entry, new_entry, read_entries, summarize_entries
+from .frugality_ledger import append_entry, new_entry, read_entries, summarize_by_model, summarize_entries
 from .health_guard import main as health_main
 from .prompt_firewall import classify_file, classify_text, scan_path
 from .provider_health import check_provider_health
@@ -179,6 +179,10 @@ def cmd_route(args: argparse.Namespace) -> int:
         context = args.context
     elif args.context_file is not None:
         context = Path(args.context_file).read_text(encoding="utf-8", errors="replace")
+    model_stats = None
+    ledger_path = Path(args.ledger) if getattr(args, "ledger", None) else None
+    if ledger_path and ledger_path.exists():
+        model_stats = summarize_by_model(read_entries(ledger_path))
     recommendation = recommend_route(
         args.objective,
         context=context,
@@ -186,6 +190,7 @@ def cmd_route(args: argparse.Namespace) -> int:
         privacy=args.privacy,
         max_escalation=args.max_escalation,
         reserve_output_tokens=args.reserve_output,
+        model_stats=model_stats,
     )
     print(json.dumps(recommendation.to_dict(), indent=2, sort_keys=True))
     return 0 if recommendation.fits else 1
@@ -390,6 +395,7 @@ def build_parser() -> argparse.ArgumentParser:
     route.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
     route.add_argument("--max-escalation", choices=["local", "balanced", "strong"], default="balanced")
     route.add_argument("--reserve-output", type=int, default=1024)
+    route.add_argument("--ledger", help="Optional frugality ledger; past outcomes down-rank unreliable models.")
     route.set_defaults(func=cmd_route)
 
     snapshot = subparsers.add_parser("snapshot", help="Create a context snapshot and estimate changed-only savings.")

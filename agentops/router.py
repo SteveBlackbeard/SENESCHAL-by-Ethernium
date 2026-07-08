@@ -76,6 +76,7 @@ def recommend_route(
     privacy: str = "local-first",
     max_escalation: str = "balanced",
     reserve_output_tokens: int = 1024,
+    model_stats: dict[str, Any] | None = None,
 ) -> RouteRecommendation:
     selected_task = classify_task(objective, forced=task_class)
     profiles = load_profiles()
@@ -85,10 +86,12 @@ def recommend_route(
         f"privacy={privacy}",
         f"max_escalation={max_escalation}",
     ]
+    if model_stats:
+        reasons.append("reliability-weighted from ledger history")
     candidates = _filter_profiles(profiles, privacy=privacy, max_escalation=max_escalation)
     ranked = sorted(
         candidates,
-        key=lambda profile: _profile_score(profile, selected_task, privacy, max_escalation),
+        key=lambda profile: _profile_score(profile, selected_task, privacy, max_escalation, model_stats),
     )
     text = f"{objective}\n\n{context}".strip()
 
@@ -149,14 +152,37 @@ def _filter_profiles(
     return allowed
 
 
-def _profile_score(profile: ProviderProfile, task_class: str, privacy: str, max_escalation: str) -> tuple[int, int, int]:
+def _reliability_penalty(profile: ProviderProfile, model_stats: dict[str, Any] | None) -> int:
+    """Down-rank a model whose ledger history shows failures or heavy retries.
+
+    Bounded on purpose: a poor track record penalizes a model, but a hard
+    task-strength mismatch (penalty 20) still wins — being right for the task
+    outranks being historically reliable at the wrong one."""
+    if not model_stats:
+        return 0
+    stats = model_stats.get(profile.id)
+    if not stats or not stats.get("entries"):
+        return 0
+    fail_rate = float(stats.get("failure_rate", 0.0))
+    retry_rate = stats.get("retries", 0) / stats["entries"]
+    return round(fail_rate * 10 + min(retry_rate, 1.0) * 2)
+
+
+def _profile_score(
+    profile: ProviderProfile,
+    task_class: str,
+    privacy: str,
+    max_escalation: str,
+    model_stats: dict[str, Any] | None = None,
+) -> tuple[int, int, int]:
     local_penalty = 0 if profile.privacy == "local" else 10
     if privacy == "cloud-allowed":
         local_penalty = 0 if profile.privacy == "local" else 2
     if privacy == "cloud-allowed" and max_escalation == "strong" and task_class in {"release", "security-review"}:
         local_penalty = 8 if profile.privacy == "local" else 0
     strength_penalty = 0 if _profile_satisfies_task(profile, task_class) else 20
-    return (local_penalty + strength_penalty, profile.context_window, len(profile.strengths))
+    reliability_penalty = _reliability_penalty(profile, model_stats)
+    return (local_penalty + strength_penalty + reliability_penalty, profile.context_window, len(profile.strengths))
 
 
 def _profile_satisfies_task(profile: ProviderProfile, task_class: str) -> bool:
