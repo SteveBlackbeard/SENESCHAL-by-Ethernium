@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from agentops.capability_broker import CapabilityGrant, check_action
 from agentops.capacity_broker import broker_dry_run
 from agentops.cli import main as cli_main
@@ -184,6 +186,9 @@ def test_count_tokens_falls_back_when_tokenizer_absent():
 
 
 def test_count_tokens_measures_with_tiktoken():
+    # tiktoken is an optional extra; skip (don't fail) where it isn't installed,
+    # so the tokenizer-free fallback stays valid in a minimal environment.
+    pytest.importorskip("tiktoken")
     # Cloud profiles declare a real tokenizer; measured counts are what make the
     # savings claim provable rather than estimated.
     tokens, used = count_tokens("hello world", tokenizer="tiktoken:cl100k_base")
@@ -192,6 +197,7 @@ def test_count_tokens_measures_with_tiktoken():
 
 
 def test_budget_reports_measured_tokenizer_for_cloud_profile():
+    pytest.importorskip("tiktoken")
     budget = budget_for_text("small task", model_id="openai-compatible-balanced")
     assert budget.fits
     assert budget.tokenizer == "tiktoken:cl100k_base"
