@@ -191,6 +191,8 @@ def cmd_route(args: argparse.Namespace) -> int:
         max_escalation=args.max_escalation,
         reserve_output_tokens=args.reserve_output,
         model_stats=model_stats,
+        explore=args.explore,
+        seed=args.seed,
     )
     print(json.dumps(recommendation.to_dict(), indent=2, sort_keys=True))
     return 0 if recommendation.fits else 1
@@ -222,7 +224,18 @@ def cmd_reuse(args: argparse.Namespace) -> int:
         system_prompt = Path(args.system_file).read_text(encoding="utf-8", errors="replace")
     if args.user_file:
         user_prompt = Path(args.user_file).read_text(encoding="utf-8", errors="replace")
-    print(json.dumps(estimate_prompt_reuse(system_prompt, user_prompt), indent=2, sort_keys=True))
+    payload = estimate_prompt_reuse(system_prompt, user_prompt)
+    if args.layout:
+        from .context_cache import plan_cache_layout
+
+        payload["cache_layout"] = plan_cache_layout(
+            system_prompt,
+            user_prompt,
+            args.stable_block or [],
+            input_cost_per_million=args.input_cost_per_million or 0.0,
+            runs=args.runs,
+        )
+    print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
 
 
@@ -244,9 +257,35 @@ def cmd_select(args: argparse.Namespace) -> int:
         max_tokens=args.max_tokens,
         source=args.source,
         min_score=args.min_score,
+        objective=args.objective or "",
     )
     print(json.dumps(selection.to_dict(), indent=2, sort_keys=True))
     return 0
+
+
+def cmd_cascade(args: argparse.Namespace) -> int:
+    from .cascade import run_cascade
+
+    model_stats = None
+    if args.ledger:
+        ledger_path = Path(args.ledger)
+        if ledger_path.exists():
+            model_stats = summarize_by_model(read_entries(ledger_path))
+    result = run_cascade(
+        args.objective,
+        prompt=args.prompt or "",
+        path=Path(args.path) if args.path else None,
+        privacy=args.privacy,
+        max_hops=args.max_hops,
+        providers_path=Path(args.providers) if args.providers else None,
+        state_path=Path(args.state) if args.state else None,
+        ledger_path=Path(args.ledger) if args.ledger else None,
+        model_stats=model_stats,
+        model_override=args.model,
+        timeout=args.timeout,
+    )
+    print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+    return 0 if result.ok else 1
 
 
 def cmd_broker_dry_run(args: argparse.Namespace) -> int:
@@ -396,7 +435,22 @@ def build_parser() -> argparse.ArgumentParser:
     route.add_argument("--max-escalation", choices=["local", "balanced", "strong"], default="balanced")
     route.add_argument("--reserve-output", type=int, default=1024)
     route.add_argument("--ledger", help="Optional frugality ledger; past outcomes down-rank unreliable models.")
+    route.add_argument("--explore", action="store_true", help="Thompson-sampling bandit ranking over ledger posteriors (explores under-observed models).")
+    route.add_argument("--seed", type=int, help="Seed for reproducible exploration.")
     route.set_defaults(func=cmd_route)
+
+    cascade = subparsers.add_parser("cascade", help="FrugalGPT cascade: cheapest model first, quality gate, escalate only on failure.")
+    cascade.add_argument("--objective", required=True)
+    cascade.add_argument("--prompt")
+    cascade.add_argument("--path")
+    cascade.add_argument("--privacy", choices=["local-only", "local-first", "cloud-allowed"], default="local-first")
+    cascade.add_argument("--max-hops", type=int, default=3)
+    cascade.add_argument("--providers")
+    cascade.add_argument("--state")
+    cascade.add_argument("--ledger", help="Frugality ledger: every hop is recorded and past outcomes shape the order.")
+    cascade.add_argument("--model", help="Model override passed to adapters.")
+    cascade.add_argument("--timeout", type=int, default=120)
+    cascade.set_defaults(func=cmd_cascade)
 
     snapshot = subparsers.add_parser("snapshot", help="Create a context snapshot and estimate changed-only savings.")
     snapshot.add_argument("--path", default=".")
@@ -411,6 +465,10 @@ def build_parser() -> argparse.ArgumentParser:
     reuse.add_argument("--user")
     reuse.add_argument("--system-file")
     reuse.add_argument("--user-file")
+    reuse.add_argument("--layout", action="store_true", help="Emit a provider prompt-caching layout plan (stable prefix first).")
+    reuse.add_argument("--stable-block", action="append", help="Additional stable text block (repeatable).")
+    reuse.add_argument("--input-cost-per-million", type=float)
+    reuse.add_argument("--runs", type=int, default=1)
     reuse.set_defaults(func=cmd_reuse)
 
     savings = subparsers.add_parser("savings", help="Estimate token and cost savings across repeated runs.")
@@ -426,6 +484,7 @@ def build_parser() -> argparse.ArgumentParser:
     select.add_argument("--max-tokens", type=int, required=True)
     select.add_argument("--source", default="internal")
     select.add_argument("--min-score", type=int, default=30)
+    select.add_argument("--objective", help="Rank candidates by BM25 relevance to this objective.")
     select.set_defaults(func=cmd_select)
 
     broker = subparsers.add_parser("broker-dry-run", help="Dry-run provider capacity routing without API calls.")

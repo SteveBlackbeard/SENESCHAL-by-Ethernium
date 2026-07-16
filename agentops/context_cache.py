@@ -119,3 +119,48 @@ def estimate_prompt_reuse(system_prompt: str, user_prompt: str) -> dict[str, Any
         "cacheable_tokens": system_tokens,
         "cacheable_ratio": round(system_tokens / total, 4) if total else 0.0,
     }
+
+
+def plan_cache_layout(
+    system_prompt: str,
+    user_prompt: str,
+    stable_blocks: list[str] | None = None,
+    *,
+    input_cost_per_million: float = 0.0,
+    runs: int = 1,
+    cache_discount: float = 0.9,
+) -> dict[str, Any]:
+    """Provider prompt-caching layout optimizer.
+
+    Providers (Anthropic/OpenAI) discount ~90% of a cached prompt PREFIX — but
+    only the prefix: one variable byte early in the prompt invalidates everything
+    after it. The optimal layout is therefore [system + stable blocks, largest
+    first] then the variable user segment last. Returns the ordered layout, the
+    cacheable prefix size, and the money left on the table by a naive layout.
+    """
+    blocks = stable_blocks or []
+    ordered_stable = sorted(blocks, key=lambda b: -estimate_tokens(b))
+    stable_segments = [s for s in [system_prompt, *ordered_stable] if s and s.strip()]
+    prefix_tokens = sum(estimate_tokens(s) for s in stable_segments)
+    user_tokens = estimate_tokens(user_prompt)
+    total = prefix_tokens + user_tokens
+
+    # Savings model: from run 2 onward the stable prefix costs (1-discount) of
+    # its normal price. A naive layout that interleaves variable content caches 0.
+    cached_runs = max(0, runs - 1)
+    tokens_discounted = prefix_tokens * cached_runs
+    cost_saved = (tokens_discounted / 1_000_000) * input_cost_per_million * cache_discount
+
+    return {
+        "layout": (
+            [{"segment": "system+stable", "order": i, "tokens": estimate_tokens(s)} for i, s in enumerate(stable_segments)]
+            + [{"segment": "variable-user", "order": len(stable_segments), "tokens": user_tokens}]
+        ),
+        "cacheable_prefix_tokens": prefix_tokens,
+        "total_tokens": total,
+        "cacheable_ratio": round(prefix_tokens / total, 4) if total else 0.0,
+        "runs": runs,
+        "tokens_discounted_across_runs": tokens_discounted,
+        "estimated_cost_saved": round(cost_saved, 6),
+        "advice": "place stable segments first; one variable byte early in the prompt invalidates the provider cache for everything after it",
+    }

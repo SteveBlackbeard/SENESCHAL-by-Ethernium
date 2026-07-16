@@ -1,0 +1,224 @@
+"""Tests for the advanced frugality engine: Thompson bandit routing, the
+FrugalGPT cascade, BM25 context relevance, and prompt-cache layout planning."""
+
+from pathlib import Path
+
+import json
+
+import pytest
+
+from agentops.bandit import expected_success, posterior_params, thompson_scores
+from agentops.bm25 import BM25
+from agentops.cascade import run_cascade
+from agentops.context_cache import plan_cache_layout
+from agentops.context_select import select_context
+from agentops.frugality_ledger import new_entry, read_entries, summarize_by_model
+from agentops.router import recommend_route
+
+
+# ── Bandit ────────────────────────────────────────────────────────────────────
+
+def test_posterior_params_reflect_track_record():
+    assert posterior_params(None) == (1.0, 1.0)  # no history -> uniform
+    good = posterior_params({"entries": 10, "failures": 0, "retries": 0})
+    bad = posterior_params({"entries": 10, "failures": 10, "retries": 0})
+    assert good == (11.0, 1.0)
+    assert bad == (1.0, 11.0)
+    assert expected_success({"entries": 10, "failures": 0, "retries": 0}) > 0.9
+    assert expected_success({"entries": 10, "failures": 10, "retries": 0}) < 0.1
+
+
+def test_thompson_scores_deterministic_under_seed():
+    stats = {"a": {"entries": 5, "failures": 0, "retries": 0}}
+    assert thompson_scores(["a", "b"], stats, seed=7) == thompson_scores(["a", "b"], stats, seed=7)
+
+
+def test_route_explore_prefers_reliable_arm():
+    # Perfect record for lora, perfect failure for local-small: with strongly
+    # separated posteriors the sampled ranking must favor the reliable arm.
+    stats = {
+        "local-small": {"entries": 12, "failures": 12, "retries": 0, "failure_rate": 1.0},
+        "generic-local-lora": {"entries": 12, "failures": 0, "retries": 0, "failure_rate": 0.0},
+    }
+    wins = 0
+    for seed in range(20):
+        route = recommend_route("fix typo in docs", privacy="local-first",
+                                model_stats=stats, explore=True, seed=seed)
+        if route.selected_model != "local-small":
+            wins += 1
+    assert wins >= 18, f"bandit ignored a perfect failure record ({wins}/20)"
+
+
+def test_route_explore_reason_present():
+    route = recommend_route("fix typo in docs", privacy="local-first",
+                            model_stats={}, explore=True, seed=1)
+    assert any("bandit" in r for r in route.reasons)
+
+
+# ── Ledger failure semantics ─────────────────────────────────────────────────
+
+def test_error_string_outcomes_count_as_failures():
+    entries = [
+        new_entry(task_id="a", model="m", tokens_estimated=1, retries=0, outcome="pass", reduced="cost"),
+        new_entry(task_id="b", model="m", tokens_estimated=1, retries=0, outcome="quality-gate-failed", reduced="cost"),
+        new_entry(task_id="c", model="m", tokens_estimated=1, retries=0, outcome="timeout", reduced="cost"),
+    ]
+    stats = summarize_by_model(entries)
+    assert stats["m"]["failures"] == 2
+    assert stats["m"]["failure_rate"] == round(2 / 3, 4)
+
+
+# ── Cascade ───────────────────────────────────────────────────────────────────
+
+def _write_providers(tmp_path: Path) -> Path:
+    payload = {
+        "version": "0.1.0",
+        "profiles": [
+            {
+                "id": "cheap-a", "provider": "ollama", "context_window": 4096,
+                "privacy": "local", "latency": "low", "strengths": ["cheap"],
+                "model_env": "RH_TEST_MODEL_A",
+            },
+            {
+                "id": "strong-b", "provider": "ollama", "context_window": 8192,
+                "privacy": "local", "latency": "medium", "strengths": ["private"],
+                "model_env": "RH_TEST_MODEL_B",
+            },
+        ],
+    }
+    path = tmp_path / "providers.json"
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    return path
+
+
+def test_cascade_escalates_on_quality_failure(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("RH_TEST_MODEL_A", "model-a")
+    monkeypatch.setenv("RH_TEST_MODEL_B", "model-b")
+    providers = _write_providers(tmp_path)
+    ledger = tmp_path / "ledger.jsonl"
+    state = tmp_path / "state.json"
+    objective = "summarize the repository readme file"
+
+    transports = {
+        # Hop 1: empty answer -> quality gate fails -> escalate.
+        "cheap-a": lambda endpoint, payload, timeout: {"response": ""},
+        # Hop 2: grounded answer -> gate passes -> stop.
+        "strong-b": lambda endpoint, payload, timeout: {
+            "response": "The repository readme file explains the project purpose and usage instructions."
+        },
+    }
+    result = run_cascade(
+        objective,
+        providers_path=providers,
+        state_path=state,
+        ledger_path=ledger,
+        transports=transports,
+    )
+    assert result.ok
+    assert result.selected_model == "strong-b"
+    called = [h for h in result.hops if h.called]
+    assert [h.model_id for h in called] == ["cheap-a", "strong-b"], "must try cheapest first, escalate once"
+    assert not called[0].ok and called[1].ok
+    outcomes = [e.outcome for e in read_entries(ledger)]
+    assert outcomes == ["fail", "pass"], "every hop must leave ledger evidence"
+
+
+def test_cascade_stops_at_first_pass(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("RH_TEST_MODEL_A", "model-a")
+    monkeypatch.setenv("RH_TEST_MODEL_B", "model-b")
+    providers = _write_providers(tmp_path)
+    calls = {"b": 0}
+
+    def transport_b(endpoint, payload, timeout):
+        calls["b"] += 1
+        return {"response": "unused"}
+
+    transports = {
+        "cheap-a": lambda endpoint, payload, timeout: {
+            "response": "The repository readme file explains the project purpose and usage instructions."
+        },
+        "strong-b": transport_b,
+    }
+    result = run_cascade(
+        "summarize the repository readme file",
+        providers_path=providers,
+        state_path=tmp_path / "state.json",
+        transports=transports,
+    )
+    assert result.ok and result.selected_model == "cheap-a"
+    assert calls["b"] == 0, "no escalation when the cheap model passes the gate"
+
+
+def test_cascade_skips_unconfigured_profiles(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("RH_TEST_MODEL_A", raising=False)
+    monkeypatch.setenv("RH_TEST_MODEL_B", "model-b")
+    providers = _write_providers(tmp_path)
+    ledger = tmp_path / "ledger.jsonl"
+    transports = {
+        "strong-b": lambda endpoint, payload, timeout: {
+            "response": "The repository readme file explains the project purpose and usage instructions."
+        },
+    }
+    result = run_cascade(
+        "summarize the repository readme file",
+        providers_path=providers,
+        state_path=tmp_path / "state.json",
+        ledger_path=ledger,
+        transports=transports,
+    )
+    assert result.ok and result.selected_model == "strong-b"
+    skipped = [h for h in result.hops if not h.called]
+    assert skipped and skipped[0].error == "missing-model"
+    assert len(read_entries(ledger)) == 1, "skipped hops must not pollute the ledger"
+
+
+# ── BM25 context relevance ───────────────────────────────────────────────────
+
+def test_bm25_ranks_relevant_document_first():
+    corpus = {
+        "auth.py": "def login(user, password): verify credentials token session",
+        "billing.py": "def invoice(amount): tax subtotal currency payment",
+        "readme.md": "project overview installation quickstart",
+    }
+    scores = BM25(corpus).scores("fix the login credentials verification")
+    assert scores["auth.py"] > scores["billing.py"]
+    assert scores["auth.py"] > scores["readme.md"]
+
+
+def test_select_context_objective_boosts_relevant_file(tmp_path: Path):
+    (tmp_path / "auth.py").write_text(
+        "def login(user, password):\n    # verify credentials and issue token\n    return token\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "billing.py").write_text(
+        "def invoice(amount):\n    return amount * 1.16\n", encoding="utf-8"
+    )
+    (tmp_path / "changed.py").write_text("print('x')\n", encoding="utf-8")
+
+    with_objective = select_context(
+        tmp_path, changed_paths=["changed.py"], max_tokens=4000,
+        min_score=0, objective="fix the login credentials token verification",
+    )
+    by_path = {item.path: item for item in with_objective.selected}
+    assert "auth.py" in by_path
+    assert "bm25-match" in by_path["auth.py"].reason
+    baseline = select_context(tmp_path, changed_paths=["changed.py"], max_tokens=4000, min_score=0)
+    baseline_auth = {i.path: i for i in baseline.selected}["auth.py"]
+    assert by_path["auth.py"].score > baseline_auth.score
+
+
+# ── Prompt-cache layout ──────────────────────────────────────────────────────
+
+def test_cache_layout_orders_stable_first_and_prices_savings():
+    plan = plan_cache_layout(
+        "You are a frugal assistant." * 20,
+        "What changed today?",
+        ["STABLE RULESET " * 50],
+        input_cost_per_million=2.0,
+        runs=101,
+    )
+    assert plan["layout"][-1]["segment"] == "variable-user"
+    assert all(seg["segment"] == "system+stable" for seg in plan["layout"][:-1])
+    assert plan["cacheable_ratio"] > 0.9
+    expected = (plan["cacheable_prefix_tokens"] * 100 / 1_000_000) * 2.0 * 0.9
+    assert plan["estimated_cost_saved"] == round(expected, 6)

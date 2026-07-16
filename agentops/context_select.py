@@ -53,10 +53,27 @@ def select_context(
     max_tokens: int,
     source: str = "internal",
     min_score: int = 30,
+    objective: str = "",
 ) -> ContextSelection:
     resolved_root = root.resolve()
     changed = {_normalize(path) for path in changed_paths}
     candidates = _collect_candidates(resolved_root)
+
+    # BM25 relevance to the task objective: real IR evidence on top of the
+    # structural heuristics (same-dir / same-stem / import-neighbor).
+    bm25_scores: dict[str, float] = {}
+    if objective:
+        from .bm25 import BM25
+
+        corpus = {
+            _relative(item, resolved_root): _safe_text(item)
+            for item, _tokens, _base in candidates
+        }
+        raw = BM25(corpus).scores(objective)
+        top = max(raw.values(), default=0.0)
+        if top > 0:
+            bm25_scores = {doc: value / top for doc, value in raw.items()}
+
     scored: list[SelectedContextFile] = []
     excluded: list[SelectedContextFile] = []
 
@@ -64,6 +81,11 @@ def select_context(
         relative = _relative(item, resolved_root)
         risk = classify_file(item, source=source)
         score, reason = _context_score(item, resolved_root, changed, base_score)
+        relevance = bm25_scores.get(relative, 0.0)
+        if relevance > 0:
+            score += int(50 * relevance)
+            if relevance >= 0.3:
+                reason = f"{reason}+bm25-match"
         record = SelectedContextFile(relative, tokens, score, reason)
         if source != "internal" and risk.blocked:
             excluded.append(SelectedContextFile(relative, tokens, score, "blocked-by-prompt-firewall"))
@@ -141,6 +163,13 @@ def _is_import_neighbor(path: Path, root: Path, changed: set[str]) -> bool:
         if f"import {short_name}" in text or f"from . import {short_name}" in text or f"from .{short_name}" in text:
             return True
     return False
+
+
+def _safe_text(path: Path, limit: int = 200_000) -> str:
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")[:limit]
+    except OSError:
+        return ""
 
 
 def _density(item: SelectedContextFile) -> float:

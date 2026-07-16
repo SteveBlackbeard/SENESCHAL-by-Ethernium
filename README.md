@@ -192,6 +192,7 @@ robinhood select
 robinhood broker-dry-run
 robinhood plan-request
 robinhood run
+robinhood cascade
 robinhood packet
 robinhood scan
 robinhood grant
@@ -210,6 +211,26 @@ robinhood grant --task-id RH-001 --capability read --capability edit --allowed-p
 robinhood log --task-id RH-002 --model local-small --tokens-estimated 900 --outcome pass --reduced cost
 robinhood report
 ```
+
+## Frugal Cascade And Learning Router
+
+`robinhood cascade` implements the FrugalGPT pattern: call the cheapest
+sufficient model, apply the quality gate, and escalate only on failure — every
+hop is recorded in the frugality ledger as evidence:
+
+```powershell
+robinhood cascade --objective "Summarize this repo" --path . --providers providers.local.json --ledger agentops-usage.jsonl
+```
+
+`robinhood route --explore` upgrades routing from static penalties to a
+Thompson-sampling bandit: each model's Beta posterior is built from ledger
+outcomes, so the router exploits reliable models and keeps exploring
+under-observed ones (`--seed` makes exploration reproducible).
+
+`robinhood select --objective "..."` ranks candidate context files with Okapi
+BM25 relevance to the task on top of the structural heuristics, and
+`robinhood reuse --layout` emits a provider prompt-caching plan (stable prefix
+first, cacheable ratio, and the money a naive layout leaves on the table).
 
 ## Frugality Core
 

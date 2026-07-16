@@ -77,6 +77,8 @@ def recommend_route(
     max_escalation: str = "balanced",
     reserve_output_tokens: int = 1024,
     model_stats: dict[str, Any] | None = None,
+    explore: bool = False,
+    seed: int | None = None,
 ) -> RouteRecommendation:
     selected_task = classify_task(objective, forced=task_class)
     profiles = load_profiles()
@@ -89,10 +91,26 @@ def recommend_route(
     if model_stats:
         reasons.append("reliability-weighted from ledger history")
     candidates = _filter_profiles(profiles, privacy=privacy, max_escalation=max_escalation)
-    ranked = sorted(
-        candidates,
-        key=lambda profile: _profile_score(profile, selected_task, privacy, max_escalation, model_stats),
-    )
+    if explore:
+        # Thompson sampling: rank arms by a Beta-posterior sample built from the
+        # ledger. Exploits reliable models, keeps exploring under-observed ones.
+        # Hard constraints (task strength, privacy) still dominate the ordering.
+        from .bandit import thompson_scores
+
+        samples = thompson_scores([p.id for p in candidates], model_stats, seed=seed)
+        reasons.append("bandit-exploration (thompson sampling over ledger posteriors)")
+        ranked = sorted(
+            candidates,
+            key=lambda profile: (
+                0 if _profile_satisfies_task(profile, selected_task) else 1,
+                -samples.get(profile.id, 0.0),
+            ),
+        )
+    else:
+        ranked = sorted(
+            candidates,
+            key=lambda profile: _profile_score(profile, selected_task, privacy, max_escalation, model_stats),
+        )
     text = f"{objective}\n\n{context}".strip()
 
     for profile in ranked:

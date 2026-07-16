@@ -89,7 +89,10 @@ def summarize_by_model(entries: list[LedgerEntry]) -> dict[str, dict[str, float]
         )
         row["entries"] += 1
         row["retries"] += entry.retries
-        if entry.outcome == "fail":
+        # Anything that is not an explicit success counts as a failure: the
+        # runner/cascade write error strings ("timeout", "quality-gate-failed")
+        # as outcomes, and those are failures for routing purposes.
+        if entry.outcome not in {"pass", "ok"}:
             row["failures"] += 1
     for row in stats.values():
         total = row["entries"]
