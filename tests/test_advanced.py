@@ -276,6 +276,50 @@ def test_foreign_key_resign_is_rejected(tmp_path: Path):
     assert "untrusted key" in reason
 
 
+def test_grant_fingerprint_pin(tmp_path: Path):
+    _require_crypto()
+    from agentops.signing import generate_keys, key_fingerprint, load_keys, sign_grant, verify_grant_fingerprint
+
+    generate_keys(tmp_path)
+    priv, pub = load_keys(tmp_path)
+    fp = key_fingerprint(pub)
+    grant = {"task_id": "RH-1", "capabilities": ["read"], "allowed_paths": ["src/"], "denied_paths": []}
+    sign_grant(grant, priv, pub)
+    ok, _ = verify_grant_fingerprint(grant, fp)
+    assert ok
+    bad, reason = verify_grant_fingerprint(grant, "SHA256:not-the-key")
+    assert not bad and "fingerprint" in reason
+
+
+def test_cli_grant_fingerprint_and_task_binding(tmp_path: Path, capsys: pytest.CaptureFixture):
+    _require_crypto()
+    from agentops.cli import main as cli_main
+    from agentops.signing import key_fingerprint, load_keys
+
+    keys = str(tmp_path / "keys")
+    grant_file = str(tmp_path / "grant.json")
+    assert cli_main(["keygen", "--keys", keys]) == 0
+    capsys.readouterr()
+    cli_main(["grant", "--sign", "--keys", keys, "--task-id", "TASK-A",
+              "--capability", "read", "--allowed-path", "src/", "--out", grant_file])
+    capsys.readouterr()
+    fp = key_fingerprint(load_keys(keys)[1])
+
+    # Third party with only the fingerprint (no --keys dir) authorizes in-scope.
+    assert cli_main(["grant", "--grant-file", grant_file, "--expect-fingerprint", fp,
+                     "--keys", str(tmp_path / "nonexistent"),
+                     "--action", "read", "--path", "src/main.py"]) == 0
+    capsys.readouterr()
+    # Wrong fingerprint -> rejected.
+    assert cli_main(["grant", "--grant-file", grant_file, "--expect-fingerprint", "SHA256:wrong",
+                     "--action", "read", "--path", "src/main.py"]) == 1
+    assert "fingerprint" in capsys.readouterr().out
+    # Replay for a different task -> rejected even though signature is valid.
+    assert cli_main(["grant", "--grant-file", grant_file, "--require-signed", "--keys", keys,
+                     "--task-id", "TASK-B", "--action", "read", "--path", "src/main.py"]) == 1
+    assert "bound to task" in capsys.readouterr().out
+
+
 def test_expired_grant_is_rejected(tmp_path: Path):
     _require_crypto()
     from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant

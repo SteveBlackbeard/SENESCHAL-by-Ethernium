@@ -26,6 +26,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Repository = "https://github.com/SteveBlackbeard/ROBIN-HOOD-by-Ethernium"
+Issues = "https://github.com/SteveBlackbeard/ROBIN-HOOD-by-Ethernium/issues"
+Changelog = "https://github.com/SteveBlackbeard/ROBIN-HOOD-by-Ethernium/blob/main/CHANGELOG.md"
+
 [project.optional-dependencies]
 mcp = ["mcp>=1.0.0"]
 measure = ["tiktoken>=0.7"]

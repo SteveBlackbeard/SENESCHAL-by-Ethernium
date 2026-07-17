@@ -94,11 +94,14 @@ def cmd_keygen(args: argparse.Namespace) -> int:
         print(json.dumps({"error": "keypair already exists; not overwriting", "dir": args.keys}, indent=2))
         return 1
     priv_path, pub_path = generate_keys(args.keys)
+    from .signing import key_fingerprint
+
     print(json.dumps({
         "generated": True,
         "private_key": str(priv_path),
         "public_key": str(pub_path),
-        "note": "keep grant.priv out of version control",
+        "fingerprint": key_fingerprint(pub_path.read_bytes()),
+        "note": "keep grant.priv out of version control; publish the fingerprint out of band",
     }, indent=2, sort_keys=True))
     return 0
 
@@ -116,19 +119,31 @@ def _load_grant_document(args: argparse.Namespace) -> tuple[dict, str | None]:
         }, ("grant is unsigned" if args.require_signed else None)
 
     document = json.loads(Path(args.grant_file).read_text(encoding="utf-8"))
-    if args.require_signed or document.get("signature"):
-        from .signing import load_keys, signing_available
+    expect_fp = getattr(args, "expect_fingerprint", None)
+    if args.require_signed or document.get("signature") or expect_fp:
+        from .signing import signing_available
 
         if not signing_available():
             return document, "cryptography not installed; cannot verify a signed grant"
-        _priv, pub = load_keys(args.keys)
-        if pub is None:
-            return document, f"no trusted public key at {args.keys} (run `robinhood keygen`)"
-        from .signing import verify_grant
+        if expect_fp:
+            # Third-party path: pin by fingerprint, no local keypair needed.
+            from .signing import verify_grant_fingerprint
 
-        ok, reason = verify_grant(document, pub)
+            ok, reason = verify_grant_fingerprint(document, expect_fp)
+        else:
+            from .signing import load_keys, verify_grant
+
+            _priv, pub = load_keys(args.keys)
+            if pub is None:
+                return document, f"no trusted public key at {args.keys} (run `robinhood keygen`), or pass --expect-fingerprint"
+            ok, reason = verify_grant(document, pub)
         if not ok:
             return document, reason
+    # Replay binding: a signed grant carries a task_id. If the caller states which
+    # task it is authorizing (--task-id), it must match — a grant for task A must
+    # not be replayed for task B.
+    if args.task_id and str(document.get("task_id", "")) != str(args.task_id):
+        return document, f"grant is bound to task '{document.get('task_id')}', not '{args.task_id}'"
     return document, None
 
 
@@ -472,6 +487,7 @@ def build_parser() -> argparse.ArgumentParser:
     grant.add_argument("--expires", help="Optional ISO-8601 expiry for the signed grant.")
     grant.add_argument("--grant-file", help="Load the grant from a (signed) JSON document.")
     grant.add_argument("--require-signed", action="store_true", help="Fail closed unless the grant carries a valid operator signature.")
+    grant.add_argument("--expect-fingerprint", help="Pin the operator's key fingerprint (SHA256:...) published out of band; verifies a signed grant without the local keypair.")
     grant.add_argument("--keys", default=".robinhood/keys", help="Directory with grant.pub / grant.priv.")
     grant.set_defaults(func=cmd_grant)
 

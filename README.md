@@ -229,6 +229,14 @@ an untrusted key, any modification after signing (capability escalation), and
 expired grants. `sig_alg` is carried on every signed document so a post-quantum
 signer can drop in later without a format break.
 
+A third party who has only the signed grant (not your keypair) can verify it by
+pinning the operator's **key fingerprint**, published out of band (shown by
+`keygen`), and a grant is bound to its task so it cannot be replayed elsewhere:
+
+```powershell
+robinhood grant --grant-file grant.json --expect-fingerprint "SHA256:..." --task-id RH-001 --action read --path src/main.py
+```
+
 ## Frugal Cascade And Learning Router
 
 `robinhood cascade` implements the FrugalGPT pattern: call the cheapest

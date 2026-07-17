@@ -73,6 +73,33 @@ def sign_grant(grant: dict[str, Any], private_bytes: bytes, public_bytes: bytes)
     return grant
 
 
+def key_fingerprint(public_bytes: bytes) -> str:
+    """Human-verifiable fingerprint of a public key (SSH-style SHA256:<base64>).
+
+    Symmetric to Continuity's sovereign fingerprint: publish it out of band and a
+    verifier who has only the signed grant (not your keypair) can pin the key
+    with `grant --expect-fingerprint`, defeating a key-swap."""
+    import base64
+    import hashlib
+
+    return "SHA256:" + base64.b64encode(hashlib.sha256(public_bytes).digest()).decode("ascii").rstrip("=")
+
+
+def verify_grant_fingerprint(grant: dict[str, Any], expected_fingerprint: str) -> tuple[bool, str]:
+    """Third-party verification using only a pinned fingerprint (no local keypair).
+    Pins the embedded key by fingerprint, then verifies signature and expiry."""
+    pub_hex = grant.get("public_key", "")
+    if not pub_hex:
+        return False, "grant has no public key"
+    try:
+        pub = bytes.fromhex(pub_hex)
+    except ValueError:
+        return False, "grant public key is malformed"
+    if key_fingerprint(pub) != expected_fingerprint.strip():
+        return False, "grant key does not match the pinned fingerprint"
+    return verify_grant(grant, pub)
+
+
 def verify_grant(grant: dict[str, Any], trusted_public: bytes) -> tuple[bool, str]:
     """Verify a signed grant against the operator's trusted public key.
 
