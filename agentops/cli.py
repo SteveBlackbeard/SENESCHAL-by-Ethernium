@@ -83,12 +83,104 @@ def cmd_scan(args: argparse.Namespace) -> int:
     return 1 if args.fail_on_block and risk.blocked else 0
 
 
+def cmd_keygen(args: argparse.Namespace) -> int:
+    from .signing import generate_keys, load_keys, signing_available
+
+    if not signing_available():
+        print(json.dumps({"error": "cryptography not installed; pip install robin-hood[security]"}, indent=2))
+        return 1
+    priv, _pub = load_keys(args.keys)
+    if priv is not None:
+        print(json.dumps({"error": "keypair already exists; not overwriting", "dir": args.keys}, indent=2))
+        return 1
+    priv_path, pub_path = generate_keys(args.keys)
+    print(json.dumps({
+        "generated": True,
+        "private_key": str(priv_path),
+        "public_key": str(pub_path),
+        "note": "keep grant.priv out of version control",
+    }, indent=2, sort_keys=True))
+    return 0
+
+
+def _load_grant_document(args: argparse.Namespace) -> tuple[dict, str | None]:
+    """Load the grant either from a signed file or from CLI flags.
+    Returns (grant_dict, verification_error). Fail-closed when signature
+    verification is required or a signature is present."""
+    if not args.grant_file:
+        return {
+            "task_id": args.task_id,
+            "capabilities": sorted(set(args.capability)),
+            "allowed_paths": list(args.allowed_path or []),
+            "denied_paths": list(args.denied_path or []),
+        }, ("grant is unsigned" if args.require_signed else None)
+
+    document = json.loads(Path(args.grant_file).read_text(encoding="utf-8"))
+    if args.require_signed or document.get("signature"):
+        from .signing import load_keys, signing_available
+
+        if not signing_available():
+            return document, "cryptography not installed; cannot verify a signed grant"
+        _priv, pub = load_keys(args.keys)
+        if pub is None:
+            return document, f"no trusted public key at {args.keys} (run `robinhood keygen`)"
+        from .signing import verify_grant
+
+        ok, reason = verify_grant(document, pub)
+        if not ok:
+            return document, reason
+    return document, None
+
+
 def cmd_grant(args: argparse.Namespace) -> int:
+    if args.sign and not (args.task_id and args.capability):
+        print(json.dumps({"error": "--sign requires --task-id and --capability"}, indent=2))
+        return 1
+    if not args.sign:
+        if not args.grant_file and not (args.task_id and args.capability):
+            print(json.dumps({"error": "provide --grant-file, or --task-id with --capability"}, indent=2))
+            return 1
+        if not args.action:
+            print(json.dumps({"error": "--action is required to check a grant"}, indent=2))
+            return 1
+    # --sign: emit a signed grant document instead of checking an action.
+    if args.sign:
+        from .signing import load_keys, sign_grant, signing_available
+
+        if not signing_available():
+            print(json.dumps({"error": "cryptography not installed; pip install robin-hood[security]"}, indent=2))
+            return 1
+        priv, pub = load_keys(args.keys)
+        if not (priv and pub):
+            print(json.dumps({"error": f"no keypair at {args.keys}; run `robinhood keygen`"}, indent=2))
+            return 1
+        document = {
+            "task_id": args.task_id,
+            "capabilities": sorted(set(args.capability)),
+            "allowed_paths": list(args.allowed_path or []),
+            "denied_paths": list(args.denied_path or []),
+        }
+        if args.expires:
+            document["expires"] = args.expires
+        sign_grant(document, priv, pub)
+        text = json.dumps(document, indent=2, sort_keys=True)
+        if args.out:
+            Path(args.out).write_text(text, encoding="utf-8")
+            print(json.dumps({"signed": True, "grant_file": args.out}, indent=2, sort_keys=True))
+        else:
+            print(text)
+        return 0
+
+    document, verification_error = _load_grant_document(args)
+    if verification_error:
+        print(json.dumps({"allowed": False, "reason": f"grant rejected: {verification_error}"}, indent=2, sort_keys=True))
+        return 1
+
     grant = CapabilityGrant(
-        task_id=args.task_id,
-        capabilities=set(args.capability),
-        allowed_paths=tuple(args.allowed_path or []),
-        denied_paths=tuple(args.denied_path or []),
+        task_id=str(document.get("task_id", "")),
+        capabilities=set(document.get("capabilities", [])),
+        allowed_paths=tuple(document.get("allowed_paths", [])),
+        denied_paths=tuple(document.get("denied_paths", [])),
     )
     decision = check_action(grant, capability=args.action, path=args.path)
     print(json.dumps({"allowed": decision.allowed, "reason": decision.reason}, indent=2, sort_keys=True))
@@ -364,13 +456,23 @@ def build_parser() -> argparse.ArgumentParser:
     scan.add_argument("--fail-on-block", action="store_true")
     scan.set_defaults(func=cmd_scan)
 
-    grant = subparsers.add_parser("grant", help="Check a least-privilege capability grant.")
-    grant.add_argument("--task-id", required=True)
-    grant.add_argument("--capability", action="append", required=True)
+    keygen = subparsers.add_parser("keygen", help="Generate the operator's Ed25519 grant-signing keypair.")
+    keygen.add_argument("--keys", default=".robinhood/keys")
+    keygen.set_defaults(func=cmd_keygen)
+
+    grant = subparsers.add_parser("grant", help="Check (or sign) a least-privilege capability grant.")
+    grant.add_argument("--task-id")
+    grant.add_argument("--capability", action="append", default=None)
     grant.add_argument("--allowed-path", action="append")
     grant.add_argument("--denied-path", action="append")
-    grant.add_argument("--action", required=True)
+    grant.add_argument("--action")
     grant.add_argument("--path")
+    grant.add_argument("--sign", action="store_true", help="Emit an Ed25519-signed grant document instead of checking.")
+    grant.add_argument("--out", help="Write the signed grant here (with --sign).")
+    grant.add_argument("--expires", help="Optional ISO-8601 expiry for the signed grant.")
+    grant.add_argument("--grant-file", help="Load the grant from a (signed) JSON document.")
+    grant.add_argument("--require-signed", action="store_true", help="Fail closed unless the grant carries a valid operator signature.")
+    grant.add_argument("--keys", default=".robinhood/keys", help="Directory with grant.pub / grant.priv.")
     grant.set_defaults(func=cmd_grant)
 
     log = subparsers.add_parser("log", help="Append a JSONL frugality ledger entry.")

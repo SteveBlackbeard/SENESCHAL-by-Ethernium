@@ -28,6 +28,7 @@ dependencies = []
 [project.optional-dependencies]
 mcp = ["mcp>=1.0.0"]
 measure = ["tiktoken>=0.7"]
+security = ["cryptography>=42"]
 
 [project.scripts]
 agentops = "agentops.cli:main"

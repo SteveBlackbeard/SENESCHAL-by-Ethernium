@@ -212,6 +212,23 @@ robinhood log --task-id RH-002 --model local-small --tokens-estimated 900 --outc
 robinhood report
 ```
 
+## Signed Capability Grants
+
+An unsigned grant is a JSON file any process can edit — an agent could forge its
+own permissions. With the `security` extra (`pip install -e ".[security]"`),
+grants become cryptographic guarantees:
+
+```powershell
+robinhood keygen
+robinhood grant --sign --task-id RH-001 --capability read --allowed-path src/ --expires 2026-12-31T00:00:00+00:00 --out grant.json
+robinhood grant --grant-file grant.json --require-signed --action read --path src/main.py
+```
+
+The broker fails closed on: missing or invalid signatures, grants re-signed by
+an untrusted key, any modification after signing (capability escalation), and
+expired grants. `sig_alg` is carried on every signed document so a post-quantum
+signer can drop in later without a format break.
+
 ## Frugal Cascade And Learning Router
 
 `robinhood cascade` implements the FrugalGPT pattern: call the cheapest

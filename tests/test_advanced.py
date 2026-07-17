@@ -207,6 +207,109 @@ def test_select_context_objective_boosts_relevant_file(tmp_path: Path):
     assert by_path["auth.py"].score > baseline_auth.score
 
 
+# ── Signed capability grants ─────────────────────────────────────────────────
+
+def _require_crypto():
+    pytest.importorskip("cryptography")
+
+
+def test_signed_grant_roundtrip(tmp_path: Path):
+    _require_crypto()
+    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+
+    generate_keys(tmp_path)
+    priv, pub = load_keys(tmp_path)
+    grant = {"task_id": "RH-1", "capabilities": ["read"], "allowed_paths": ["src/"], "denied_paths": []}
+    sign_grant(grant, priv, pub)
+    ok, reason = verify_grant(grant, pub)
+    assert ok, reason
+
+
+def test_capability_escalation_is_rejected(tmp_path: Path):
+    _require_crypto()
+    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+
+    generate_keys(tmp_path)
+    priv, pub = load_keys(tmp_path)
+    grant = {"task_id": "RH-1", "capabilities": ["read"], "allowed_paths": ["src/"], "denied_paths": []}
+    sign_grant(grant, priv, pub)
+    grant["capabilities"] = ["read", "shell", "publish"]  # agent forges more power
+    ok, reason = verify_grant(grant, pub)
+    assert not ok
+    assert "modified after signing" in reason
+
+
+def test_foreign_key_resign_is_rejected(tmp_path: Path):
+    _require_crypto()
+    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+
+    generate_keys(tmp_path / "operator")
+    _op_priv, op_pub = load_keys(tmp_path / "operator")
+    generate_keys(tmp_path / "attacker")
+    att_priv, att_pub = load_keys(tmp_path / "attacker")
+    grant = {"task_id": "RH-1", "capabilities": ["shell"], "allowed_paths": ["/"], "denied_paths": []}
+    sign_grant(grant, att_priv, att_pub)  # attacker signs with THEIR key
+    ok, reason = verify_grant(grant, op_pub)
+    assert not ok
+    assert "untrusted key" in reason
+
+
+def test_expired_grant_is_rejected(tmp_path: Path):
+    _require_crypto()
+    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+
+    generate_keys(tmp_path)
+    priv, pub = load_keys(tmp_path)
+    grant = {"task_id": "RH-1", "capabilities": ["read"], "allowed_paths": ["src/"],
+             "denied_paths": [], "expires": "2020-01-01T00:00:00+00:00"}
+    sign_grant(grant, priv, pub)
+    ok, reason = verify_grant(grant, pub)
+    assert not ok
+    assert "expired" in reason
+
+
+def test_cli_sign_and_check_signed_grant(tmp_path: Path, capsys: pytest.CaptureFixture):
+    _require_crypto()
+    from agentops.cli import main as cli_main
+
+    keys = str(tmp_path / "keys")
+    grant_file = str(tmp_path / "grant.json")
+    assert cli_main(["keygen", "--keys", keys]) == 0
+    capsys.readouterr()
+    assert cli_main([
+        "grant", "--sign", "--keys", keys, "--task-id", "RH-9",
+        "--capability", "read", "--allowed-path", "src/", "--out", grant_file,
+    ]) == 0
+    capsys.readouterr()
+    # Signed grant verifies and authorizes an in-scope action.
+    assert cli_main([
+        "grant", "--grant-file", grant_file, "--require-signed", "--keys", keys,
+        "--action", "read", "--path", "src/main.py",
+    ]) == 0
+    capsys.readouterr()
+    # Tampered grant (escalated capabilities) is rejected fail-closed.
+    payload = json.loads(Path(grant_file).read_text(encoding="utf-8"))
+    payload["capabilities"] = ["read", "shell"]
+    Path(grant_file).write_text(json.dumps(payload), encoding="utf-8")
+    assert cli_main([
+        "grant", "--grant-file", grant_file, "--require-signed", "--keys", keys,
+        "--action", "shell",
+    ]) == 1
+    out = capsys.readouterr().out
+    assert "rejected" in out
+
+
+def test_cli_unsigned_grant_with_require_signed_fails(tmp_path: Path, capsys: pytest.CaptureFixture):
+    from agentops.cli import main as cli_main
+
+    assert cli_main([
+        "grant", "--task-id", "RH-1", "--capability", "read",
+        "--allowed-path", "src/", "--action", "read", "--path", "src/x.py",
+        "--require-signed",
+    ]) == 1
+    assert "unsigned" in capsys.readouterr().out
+
+
 # ── Prompt-cache layout ──────────────────────────────────────────────────────
 
 def test_cache_layout_orders_stable_first_and_prices_savings():
