@@ -207,6 +207,28 @@ def test_select_context_objective_boosts_relevant_file(tmp_path: Path):
     assert by_path["auth.py"].score > baseline_auth.score
 
 
+# ── Health guard (runtime vs repo modes) ─────────────────────────────────────
+
+def test_health_runtime_passes_without_repo_docs(monkeypatch: pytest.MonkeyPatch):
+    # Simulate an installed package (no repo checkout): runtime health must pass
+    # and the governance doc checks must be skipped — the bug the install audit
+    # caught was health failing on missing README/BLUEPRINT from site-packages.
+    import agentops.health_guard as hg
+
+    monkeypatch.setattr(hg, "is_repo_checkout", lambda: False)
+    assert hg.check_runtime() == []
+    assert hg.main(["--strict"]) == 0
+
+
+def test_health_runtime_detects_broken_profiles(monkeypatch: pytest.MonkeyPatch):
+    import agentops.health_guard as hg
+    from agentops import provider_profiles
+
+    monkeypatch.setattr(provider_profiles, "load_profiles", lambda *a, **k: [])
+    findings = hg.check_runtime()
+    assert any("provider profiles" in f.message for f in findings)
+
+
 # ── Signed capability grants ─────────────────────────────────────────────────
 
 def _require_crypto():

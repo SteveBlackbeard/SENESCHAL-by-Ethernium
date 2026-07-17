@@ -42,6 +42,32 @@ class Finding:
     message: str
 
 
+def is_repo_checkout() -> bool:
+    """True only when running from a source checkout. An installed wheel lives in
+    site-packages with no repo docs, so the governance guard below is a
+    repo-development concern, not a runtime-health concern for an end user."""
+    return (ROOT / "pyproject.toml").is_file() and (ROOT / "TOOL_MANIFEST.json").is_file()
+
+
+def check_runtime() -> list[Finding]:
+    """Runtime health an INSTALLED user actually cares about: the package
+    imports, the bundled provider profiles load, and the core surface is wired."""
+    findings: list[Finding] = []
+    try:
+        from .provider_profiles import load_profiles
+
+        if not load_profiles():
+            findings.append(Finding("error", "no provider profiles are available"))
+    except Exception as exc:  # noqa: BLE001 - report any load failure as a health error
+        findings.append(Finding("error", f"provider profiles failed to load: {exc}"))
+    for module in ("router", "cascade", "quality_gate", "prompt_firewall", "token_budget"):
+        try:
+            __import__(f"agentops.{module}")
+        except Exception as exc:  # noqa: BLE001
+            findings.append(Finding("error", f"core module '{module}' failed to import: {exc}"))
+    return findings
+
+
 def check_required_docs() -> list[Finding]:
     findings: list[Finding] = []
     for rel_path in REQUIRED_DOCS:
@@ -83,12 +109,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--strict", action="store_true", help="Treat warnings as errors.")
     args = parser.parse_args(argv)
 
-    findings = check_required_docs() + check_manifest() + check_forbidden_text()
+    # Runtime health always runs (matters most for an installed user). The
+    # governance guard (docs / manifest / forbidden text) runs only from a source
+    # checkout — it validates repo development, not an installed package.
+    findings = check_runtime()
+    if is_repo_checkout():
+        findings += check_required_docs() + check_manifest() + check_forbidden_text()
     for finding in findings:
         print(f"{finding.severity.upper()}: {finding.message}")
 
     if not findings:
-        print("robinhood-health: ok")
+        mode = "repo" if is_repo_checkout() else "installed"
+        print(f"robinhood-health: ok ({mode})")
         return 0
     if any(f.severity == "error" for f in findings):
         return 1
