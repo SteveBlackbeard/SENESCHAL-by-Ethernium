@@ -229,6 +229,50 @@ def test_health_runtime_detects_broken_profiles(monkeypatch: pytest.MonkeyPatch)
     assert any("provider profiles" in f.message for f in findings)
 
 
+# ── init: first-run provider setup ───────────────────────────────────────────
+
+def test_init_creates_starter_providers(tmp_path: Path, capsys: pytest.CaptureFixture):
+    from seneschal.cli import main as cli_main
+    from seneschal.provider_profiles import load_profiles
+
+    out = tmp_path / "providers.local.json"
+    assert cli_main(["init", "--out", str(out)]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["created"] is True
+    assert "ollama-local" in report["enabled_profiles"]
+
+    # What it writes must actually load as provider profiles.
+    profiles = load_profiles(out)
+    assert {p.id for p in profiles} == {"ollama-local", "openai-compatible"}
+    # Local-first: the cloud profile ships disabled so nothing escalates by accident.
+    assert {p.id: p.enabled for p in profiles}["openai-compatible"] is False
+
+
+def test_init_refuses_to_overwrite_without_force(tmp_path: Path, capsys: pytest.CaptureFixture):
+    from seneschal.cli import main as cli_main
+
+    out = tmp_path / "providers.local.json"
+    out.write_text("{}", encoding="utf-8")
+    assert cli_main(["init", "--out", str(out)]) == 1
+    assert "already exists" in capsys.readouterr().out
+    assert out.read_text(encoding="utf-8") == "{}"  # untouched
+    assert cli_main(["init", "--out", str(out), "--force"]) == 0
+
+
+def test_route_honours_custom_providers_file(tmp_path: Path, capsys: pytest.CaptureFixture):
+    """route must rank the profiles YOU configured. It used to load them and then
+    re-resolve each id against the bundled set, raising KeyError for any custom id."""
+    from seneschal.cli import main as cli_main
+
+    providers = tmp_path / "providers.local.json"
+    assert cli_main(["init", "--out", str(providers)]) == 0
+    capsys.readouterr()
+    assert cli_main(["route", "--objective", "fix a typo", "--providers", str(providers)]) == 0
+    route = json.loads(capsys.readouterr().out)
+    assert route["selected_model"] == "ollama-local"
+    assert route["privacy"] == "local"
+
+
 # ── Signed capability grants ─────────────────────────────────────────────────
 
 def _require_crypto():

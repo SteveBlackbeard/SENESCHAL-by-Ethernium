@@ -17,6 +17,39 @@ Seneschal by Ethernium is a local-first control layer for cheaper, safer AI-assi
 
 It helps decide what context to send, what to keep local, what to block, and whether a task deserves a stronger model. The goal is practical token economy: fewer whole-repo dumps, fewer retries, smaller prompts, safer tool scope, and clearer task packets.
 
+## Measured, on real repositories
+
+Not an estimate — counted with `tiktoken`, reproducible with the command below.
+
+| Repository | Naive dump | Seneschal selection | Reduction |
+| :--- | ---: | ---: | ---: |
+| This repo (69 files) | 69,412 tokens | 8,236 tokens | **88.1%** |
+| Chronolith Pro (109 files) | 109,978 tokens | 8,527 tokens | **92.2%** |
+
+On a second run with nothing changed, context snapshots avoid **100%** of the resend.
+
+```bash
+python scripts/benchmark_savings.py --path . --objective "fix the signed capability grant verification logic"
+```
+
+**Not measured here:** cascade and routing savings. Those depend on live model
+calls and accumulated ledger evidence, so any figure would be a guess — and this
+project does not publish guesses as measurements.
+
+## Architecture
+
+```mermaid
+graph LR
+    A[Task + repo] --> B[Prompt firewall<br/>injection & secret scan]
+    B --> C[Context selection<br/>BM25 under token budget]
+    C --> D[Router<br/>cheapest sufficient model]
+    D --> E{Capability grant<br/>Ed25519 signed}
+    E -->|denied| X[Fail closed]
+    E -->|allowed| F[Cascade<br/>call → quality gate → escalate]
+    F --> G[Frugality ledger<br/>evidence for next run]
+    G -.learns.-> D
+```
+
 ## Product Objective
 
 Seneschal's objective is to be the preflight and execution layer for AI work: reduce tokens, choose the cheapest sufficient provider, prefer local compute, block unsafe or wasteful calls, execute only when the plan is acceptable, and record enough evidence to improve the next run.

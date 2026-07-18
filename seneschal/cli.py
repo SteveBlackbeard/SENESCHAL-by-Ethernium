@@ -31,6 +31,71 @@ def cmd_health(args: argparse.Namespace) -> int:
     return health_main(["--strict"] if args.strict else [])
 
 
+# Starter provider profiles. Local-first by default: the Ollama profile works as
+# soon as a model is pulled, and the cloud profile stays disabled until someone
+# deliberately enables it and supplies a key.
+_STARTER_PROVIDERS = {
+    "version": "0.1.0",
+    "profiles": [
+        {
+            "id": "ollama-local",
+            "provider": "ollama",
+            "context_window": 32768,
+            "input_cost_per_million": 0.0,
+            "output_cost_per_million": 0.0,
+            "privacy": "local",
+            "latency": "medium",
+            "strengths": ["private", "code", "repository-context", "cheap"],
+            "tokenizer": "estimate",
+            "endpoint_env": "SENESCHAL_OLLAMA_BASE_URL",
+            "model_env": "SENESCHAL_OLLAMA_MODEL",
+            "enabled": True,
+            "notes": "Local model server. No API key. Set SENESCHAL_OLLAMA_MODEL to a pulled model.",
+        },
+        {
+            "id": "openai-compatible",
+            "provider": "openai-compatible",
+            "context_window": 128000,
+            "input_cost_per_million": 0.0,
+            "output_cost_per_million": 0.0,
+            "privacy": "cloud",
+            "latency": "medium",
+            "strengths": ["tool-use", "coding", "review", "long-context"],
+            "tokenizer": "tiktoken:cl100k_base",
+            "endpoint_env": "SENESCHAL_OPENAI_COMPAT_BASE_URL",
+            "api_key_env": "SENESCHAL_OPENAI_COMPAT_API_KEY",
+            "model_env": "SENESCHAL_OPENAI_COMPAT_MODEL",
+            "enabled": False,
+            "notes": "Disabled by default. Enable deliberately, then set the three env vars.",
+        },
+    ],
+}
+
+
+def cmd_init(args: argparse.Namespace) -> int:
+    """Write a starter providers file so `run`/`cascade` are usable without
+    hand-authoring JSON. Never overwrites an existing file."""
+    target = Path(args.out)
+    if target.exists() and not args.force:
+        print(json.dumps({
+            "created": False,
+            "reason": f"{target} already exists; pass --force to overwrite",
+        }, indent=2, sort_keys=True))
+        return 1
+    target.write_text(json.dumps(_STARTER_PROVIDERS, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps({
+        "created": True,
+        "providers_file": str(target),
+        "enabled_profiles": [p["id"] for p in _STARTER_PROVIDERS["profiles"] if p["enabled"]],
+        "next_steps": [
+            "set SENESCHAL_OLLAMA_MODEL to a model you have pulled",
+            f"seneschal route --objective 'your task' --providers {target}",
+            "enable the cloud profile only if you want escalation beyond local",
+        ],
+    }, indent=2, sort_keys=True))
+    return 0
+
+
 def cmd_packet(args: argparse.Namespace) -> int:
     packet = ContextPacket(
         objective=args.objective,
@@ -300,6 +365,7 @@ def cmd_route(args: argparse.Namespace) -> int:
         model_stats=model_stats,
         explore=args.explore,
         seed=args.seed,
+        providers_path=Path(args.providers) if args.providers else None,
     )
     print(json.dumps(recommendation.to_dict(), indent=2, sort_keys=True))
     return 0 if recommendation.fits else 1
@@ -454,6 +520,11 @@ def build_parser() -> argparse.ArgumentParser:
     health.add_argument("--strict", action="store_true", help="Treat warnings as errors.")
     health.set_defaults(func=cmd_health)
 
+    init = subparsers.add_parser("init", help="Write a starter providers file (local-first, cloud disabled).")
+    init.add_argument("--out", default="providers.local.json")
+    init.add_argument("--force", action="store_true", help="Overwrite an existing providers file.")
+    init.set_defaults(func=cmd_init)
+
     packet = subparsers.add_parser("packet", help="Render a scoped context packet.")
     packet.add_argument("--objective", required=True)
     packet.add_argument("--allowed-file", action="append")
@@ -555,6 +626,7 @@ def build_parser() -> argparse.ArgumentParser:
     route.add_argument("--ledger", help="Optional frugality ledger; past outcomes down-rank unreliable models.")
     route.add_argument("--explore", action="store_true", help="Thompson-sampling bandit ranking over ledger posteriors (explores under-observed models).")
     route.add_argument("--seed", type=int, help="Seed for reproducible exploration.")
+    route.add_argument("--providers", help="Provider profiles file (e.g. the one written by `seneschal init`).")
     route.set_defaults(func=cmd_route)
 
     cascade = subparsers.add_parser("cascade", help="FrugalGPT cascade: cheapest model first, quality gate, escalate only on failure.")

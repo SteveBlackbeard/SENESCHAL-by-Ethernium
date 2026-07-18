@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from .provider_profiles import ProviderProfile, load_profiles
-from .token_budget import budget_for_text
+from .token_budget import budget_for_tokens, count_tokens
 
 
 TASK_MARKERS: dict[str, tuple[str, ...]] = {
@@ -79,9 +79,12 @@ def recommend_route(
     model_stats: dict[str, Any] | None = None,
     explore: bool = False,
     seed: int | None = None,
+    providers_path=None,
 ) -> RouteRecommendation:
     selected_task = classify_task(objective, forced=task_class)
-    profiles = load_profiles()
+    # Honour a caller-supplied providers file; without it, the bundled profiles.
+    # Routing against profiles you did not configure is a silent wrong answer.
+    profiles = load_profiles(providers_path)
     rejected: list[dict[str, Any]] = []
     reasons = [
         f"task_class={selected_task}",
@@ -114,7 +117,8 @@ def recommend_route(
     text = f"{objective}\n\n{context}".strip()
 
     for profile in ranked:
-        budget = budget_for_text(text, model_id=profile.id, reserve_output_tokens=reserve_output_tokens)
+        _tok, _used = count_tokens(text, tokenizer=profile.tokenizer)
+        budget = budget_for_tokens(_tok, profile=profile, reserve_output_tokens=reserve_output_tokens, tokenizer_used=_used)
         if budget.fits and _profile_satisfies_task(profile, selected_task):
             reasons.append(f"selected {profile.id}: cheapest sufficient profile that fits context")
             return RouteRecommendation(
@@ -138,7 +142,8 @@ def recommend_route(
         )
 
     fallback = max(candidates or profiles, key=lambda profile: profile.context_window)
-    budget = budget_for_text(text, model_id=fallback.id, reserve_output_tokens=reserve_output_tokens)
+    _tok, _used = count_tokens(text, tokenizer=fallback.tokenizer)
+    budget = budget_for_tokens(_tok, profile=fallback, reserve_output_tokens=reserve_output_tokens, tokenizer_used=_used)
     reasons.append("no sufficient profile found; fallback is largest allowed context")
     return RouteRecommendation(
         task_class=selected_task,
