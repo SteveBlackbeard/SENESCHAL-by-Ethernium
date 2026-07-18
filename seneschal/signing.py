@@ -7,7 +7,7 @@ key, that was modified after signing (capability escalation), or that has
 expired. `sig_alg` is carried for crypto-agility (a post-quantum signer can drop
 in without a format break).
 
-`cryptography` is an optional extra (`pip install robinhood[security]`); every
+`cryptography` is an optional extra (`pip install seneschal[security]`); every
 import here is lazy so the rest of the tool keeps its zero-dependency core.
 """
 
@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-DEFAULT_KEY_DIR = ".robinhood/keys"
+DEFAULT_KEY_DIR = ".seneschal/keys"
 SIG_ALG = "ed25519"
 
 

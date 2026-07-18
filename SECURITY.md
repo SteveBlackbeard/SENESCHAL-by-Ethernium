@@ -1,11 +1,11 @@
 # Security Policy
 
-ROBIN HOOD is a local-first control layer for AI-assisted work. This policy is
+Seneschal is a local-first control layer for AI-assisted work. This policy is
 written to be honest about what it protects and what it does not.
 
 ## Supported versions
 
-The latest `0.x` release on `main` receives security fixes. ROBIN HOOD is
+The latest `0.x` release on `main` receives security fixes. Seneschal is
 pre-1.0: interfaces may change between minor versions.
 
 ## Reporting a vulnerability
@@ -17,17 +17,17 @@ within a few days; there is no bug-bounty program.
 
 ## What is in scope
 
-- **Signed capability grants** (`agentops/signing.py`): forging a grant,
+- **Signed capability grants** (`seneschal/signing.py`): forging a grant,
   escalating a signed grant after signing, bypassing expiry, or authorizing an
   action outside the granted capabilities/paths.
-- **Prompt firewall / secret scanner** (`agentops/prompt_firewall.py`): missed
+- **Prompt firewall / secret scanner** (`seneschal/prompt_firewall.py`): missed
   injection markers or secret-like material in scanned inputs.
-- **Capability broker** (`agentops/capability_broker.py`): path traversal or
+- **Capability broker** (`seneschal/capability_broker.py`): path traversal or
   scope-escape in `check_action`.
 
 ## What is NOT protected (by design)
 
-ROBIN HOOD is a preflight and control layer, not a sandbox. Honestly:
+Seneschal is a preflight and control layer, not a sandbox. Honestly:
 
 1. **It does not execute or contain model output.** It decides *whether* to call
    a model and *what* context to send; it does not sandbox what a model or an
@@ -39,7 +39,7 @@ ROBIN HOOD is a preflight and control layer, not a sandbox. Honestly:
 3. **Trust bootstrapping needs an out-of-band step.** A verifier must obtain the
    operator's key fingerprint through a channel an attacker cannot control.
    There is no certificate authority — a deliberate scope choice.
-4. **Provider calls are the provider's trust boundary.** ROBIN HOOD scans and
+4. **Provider calls are the provider's trust boundary.** Seneschal scans and
    budgets, but does not certify a remote model's behavior.
 
 ## Cryptography

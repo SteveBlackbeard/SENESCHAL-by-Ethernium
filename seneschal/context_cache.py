@@ -13,7 +13,7 @@ from .context_packer import _collect_candidates
 from .token_budget import estimate_tokens
 
 
-DEFAULT_CACHE = ".robinhood/context-cache.json"
+DEFAULT_CACHE = ".seneschal/context-cache.json"
 
 
 @dataclass(frozen=True)

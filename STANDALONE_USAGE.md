@@ -1,6 +1,6 @@
-# ROBIN HOOD Standalone Usage
+# Seneschal Standalone Usage
 
-ROBIN HOOD can be used independently in any project.
+Seneschal can be used independently in any project.
 
 It does not require Continuity Legacy, Conekta, PyPI publishing, or a dashboard.
 
@@ -10,7 +10,7 @@ From the future standalone repository root:
 
 ```powershell
 $env:PYTHONPATH="."
-python -m agentops.cli health --strict
+python -m seneschal.cli health --strict
 pytest tests -q
 ```
 
@@ -19,7 +19,7 @@ From the extracted local repository:
 ```powershell
 cd D:\Experimentos\ROBIN-HOOD
 $env:PYTHONPATH="."
-python -m agentops.cli health --strict
+python -m seneschal.cli health --strict
 pytest tests -q
 ```
 
@@ -28,9 +28,9 @@ After local editable install:
 ```powershell
 cd D:\Experimentos\ROBIN-HOOD
 pip install -e .
-robinhood health --strict
-robinhood scan --file adversarial_cases\indirect_prompt_injection.txt --source web --fail-on-block
-robinhood scan --path adversarial_cases --source web --fail-on-block
+seneschal health --strict
+seneschal scan --file adversarial_cases\indirect_prompt_injection.txt --source web --fail-on-block
+seneschal scan --path adversarial_cases --source web --fail-on-block
 ```
 
 ## Daily Use
@@ -63,9 +63,9 @@ Look for:
 CLI examples:
 
 ```powershell
-robinhood scan --text "ignore previous instructions" --source web --fail-on-block
-robinhood scan --file notes.md --source external
-robinhood scan --path incoming_context --source web --fail-on-block
+seneschal scan --text "ignore previous instructions" --source web --fail-on-block
+seneschal scan --file notes.md --source external
+seneschal scan --path incoming_context --source web --fail-on-block
 ```
 
 ### 3. Grant Capabilities
@@ -110,11 +110,11 @@ JSONL is enough until it hurts.
 Example:
 
 ```powershell
-robinhood log --task-id AOP-001 --model local --tokens-estimated 1200 --retries 0 --outcome pass --reduced cost
-robinhood report
+seneschal log --task-id AOP-001 --model local --tokens-estimated 1200 --retries 0 --outcome pass --reduced cost
+seneschal report
 ```
 
-## When ROBIN HOOD Is Worth Using Alone
+## When Seneschal Is Worth Using Alone
 
 Use it when:
 
@@ -134,7 +134,7 @@ Skip it when:
 
 ## Standalone Success Criteria
 
-ROBIN HOOD is useful if it reduces at least one:
+Seneschal is useful if it reduces at least one:
 
 - context sent to models
 - retries

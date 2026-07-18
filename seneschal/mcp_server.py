@@ -1,4 +1,4 @@
-"""Optional MCP server for ROBIN HOOD local controls."""
+"""Optional MCP server for Seneschal local controls."""
 
 from __future__ import annotations
 
@@ -116,7 +116,7 @@ def provider_health_tool(*, providers_path: str | None = None) -> dict[str, Any]
     return check_provider_health(providers_path=Path(providers_path) if providers_path else None)
 
 
-def provider_state_tool(*, state_path: str = ".robinhood/provider-state.json") -> dict[str, Any]:
+def provider_state_tool(*, state_path: str = ".seneschal/provider-state.json") -> dict[str, Any]:
     states = read_provider_states(Path(state_path))
     return {"providers": [state.to_dict() for state in states.values()]}
 
@@ -126,7 +126,7 @@ def provider_mark_tool(
     *,
     status: str,
     reason: str = "",
-    state_path: str = ".robinhood/provider-state.json",
+    state_path: str = ".seneschal/provider-state.json",
 ) -> dict[str, Any]:
     state = mark_provider_state(provider, status=status, reason=reason, path=Path(state_path))
     return {"provider": state.to_dict(), "state_path": state_path}
@@ -185,7 +185,7 @@ def route_tool(
 def snapshot_tool(
     path: str,
     *,
-    cache: str = ".robinhood/context-cache.json",
+    cache: str = ".seneschal/context-cache.json",
     no_diff: bool = False,
     input_cost_per_million: float | None = None,
     runs: int = 1,
@@ -326,53 +326,53 @@ def build_mcp_server() -> Any:
     except ImportError as exc:  # pragma: no cover - depends on optional package
         raise RuntimeError("Install the optional MCP extra first: pip install -e .[mcp]") from exc
 
-    server = FastMCP("robin-hood")
+    server = FastMCP("seneschal")
 
-    server.tool(name="robinhood.health")(health_tool)
-    server.tool(name="robinhood.scan_text")(scan_text_tool)
-    server.tool(name="robinhood.scan_path")(scan_path_tool)
-    server.tool(name="robinhood.make_packet")(make_packet_tool)
-    server.tool(name="robinhood.check_capability")(check_capability_tool)
-    server.tool(name="robinhood.models")(models_tool)
-    server.tool(name="robinhood.provider_health")(provider_health_tool)
-    server.tool(name="robinhood.provider_state")(provider_state_tool)
-    server.tool(name="robinhood.provider_mark")(provider_mark_tool)
-    server.tool(name="robinhood.budget")(budget_tool)
-    server.tool(name="robinhood.pack")(pack_tool)
-    server.tool(name="robinhood.route")(route_tool)
-    server.tool(name="robinhood.snapshot")(snapshot_tool)
-    server.tool(name="robinhood.reuse")(reuse_tool)
-    server.tool(name="robinhood.savings")(savings_tool)
-    server.tool(name="robinhood.select")(select_tool)
-    server.tool(name="robinhood.broker_dry_run")(broker_dry_run_tool)
-    server.tool(name="robinhood.plan_request")(plan_request_tool)
-    server.tool(name="robinhood.run")(run_tool)
+    server.tool(name="seneschal.health")(health_tool)
+    server.tool(name="seneschal.scan_text")(scan_text_tool)
+    server.tool(name="seneschal.scan_path")(scan_path_tool)
+    server.tool(name="seneschal.make_packet")(make_packet_tool)
+    server.tool(name="seneschal.check_capability")(check_capability_tool)
+    server.tool(name="seneschal.models")(models_tool)
+    server.tool(name="seneschal.provider_health")(provider_health_tool)
+    server.tool(name="seneschal.provider_state")(provider_state_tool)
+    server.tool(name="seneschal.provider_mark")(provider_mark_tool)
+    server.tool(name="seneschal.budget")(budget_tool)
+    server.tool(name="seneschal.pack")(pack_tool)
+    server.tool(name="seneschal.route")(route_tool)
+    server.tool(name="seneschal.snapshot")(snapshot_tool)
+    server.tool(name="seneschal.reuse")(reuse_tool)
+    server.tool(name="seneschal.savings")(savings_tool)
+    server.tool(name="seneschal.select")(select_tool)
+    server.tool(name="seneschal.broker_dry_run")(broker_dry_run_tool)
+    server.tool(name="seneschal.plan_request")(plan_request_tool)
+    server.tool(name="seneschal.run")(run_tool)
 
     # Backward-compatible aliases from the agent-ops incubation phase.
-    server.tool(name="agentops.health")(health_tool)
-    server.tool(name="agentops.scan_text")(scan_text_tool)
-    server.tool(name="agentops.scan_path")(scan_path_tool)
-    server.tool(name="agentops.make_packet")(make_packet_tool)
-    server.tool(name="agentops.check_capability")(check_capability_tool)
-    server.tool(name="agentops.models")(models_tool)
-    server.tool(name="agentops.provider_health")(provider_health_tool)
-    server.tool(name="agentops.provider_state")(provider_state_tool)
-    server.tool(name="agentops.provider_mark")(provider_mark_tool)
-    server.tool(name="agentops.budget")(budget_tool)
-    server.tool(name="agentops.pack")(pack_tool)
-    server.tool(name="agentops.route")(route_tool)
-    server.tool(name="agentops.snapshot")(snapshot_tool)
-    server.tool(name="agentops.reuse")(reuse_tool)
-    server.tool(name="agentops.savings")(savings_tool)
-    server.tool(name="agentops.select")(select_tool)
-    server.tool(name="agentops.broker_dry_run")(broker_dry_run_tool)
-    server.tool(name="agentops.plan_request")(plan_request_tool)
-    server.tool(name="agentops.run")(run_tool)
+    server.tool(name="seneschal.health")(health_tool)
+    server.tool(name="seneschal.scan_text")(scan_text_tool)
+    server.tool(name="seneschal.scan_path")(scan_path_tool)
+    server.tool(name="seneschal.make_packet")(make_packet_tool)
+    server.tool(name="seneschal.check_capability")(check_capability_tool)
+    server.tool(name="seneschal.models")(models_tool)
+    server.tool(name="seneschal.provider_health")(provider_health_tool)
+    server.tool(name="seneschal.provider_state")(provider_state_tool)
+    server.tool(name="seneschal.provider_mark")(provider_mark_tool)
+    server.tool(name="seneschal.budget")(budget_tool)
+    server.tool(name="seneschal.pack")(pack_tool)
+    server.tool(name="seneschal.route")(route_tool)
+    server.tool(name="seneschal.snapshot")(snapshot_tool)
+    server.tool(name="seneschal.reuse")(reuse_tool)
+    server.tool(name="seneschal.savings")(savings_tool)
+    server.tool(name="seneschal.select")(select_tool)
+    server.tool(name="seneschal.broker_dry_run")(broker_dry_run_tool)
+    server.tool(name="seneschal.plan_request")(plan_request_tool)
+    server.tool(name="seneschal.run")(run_tool)
     return server
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the optional ROBIN HOOD MCP server.")
+    parser = argparse.ArgumentParser(description="Run the optional Seneschal MCP server.")
     parser.add_argument("--stdio", action="store_true", help="Run over stdio. This is the default MCP transport.")
     parser.parse_args(argv)
 
@@ -383,7 +383,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     with contextlib.redirect_stdout(sys.stderr):
-        print("robinhood-mcp: starting stdio server")
+        print("seneschal-mcp: starting stdio server")
     server.run()
     return 0
 

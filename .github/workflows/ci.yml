@@ -22,7 +22,7 @@ jobs:
       - name: Install package with measured tokenizer and signing
         run: python -m pip install -e ".[measure,security]"
       - name: Health
-        run: python agentops/health_guard.py --strict
+        run: python seneschal/health_guard.py --strict
       - name: Tests
         run: pytest -q
       - name: Build

@@ -1,4 +1,4 @@
-"""High-level local run pipeline for ROBIN HOOD."""
+"""High-level local run pipeline for Seneschal."""
 
 from __future__ import annotations
 
@@ -102,7 +102,7 @@ def run_request(
         append_entry(
             ledger_path,
             new_entry(
-                task_id=objective[:80] or "robinhood-run",
+                task_id=objective[:80] or "seneschal-run",
                 model=plan.selected_model,
                 tokens_estimated=prompt_tokens,
                 retries=0,

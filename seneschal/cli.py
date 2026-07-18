@@ -1,4 +1,4 @@
-"""Command-line interface for ROBIN HOOD."""
+"""Command-line interface for Seneschal."""
 
 from __future__ import annotations
 
@@ -87,7 +87,7 @@ def cmd_keygen(args: argparse.Namespace) -> int:
     from .signing import generate_keys, load_keys, signing_available
 
     if not signing_available():
-        print(json.dumps({"error": "cryptography not installed; pip install robin-hood[security]"}, indent=2))
+        print(json.dumps({"error": "cryptography not installed; pip install seneschal[security]"}, indent=2))
         return 1
     priv, _pub = load_keys(args.keys)
     if priv is not None:
@@ -135,7 +135,7 @@ def _load_grant_document(args: argparse.Namespace) -> tuple[dict, str | None]:
 
             _priv, pub = load_keys(args.keys)
             if pub is None:
-                return document, f"no trusted public key at {args.keys} (run `robinhood keygen`), or pass --expect-fingerprint"
+                return document, f"no trusted public key at {args.keys} (run `seneschal keygen`), or pass --expect-fingerprint"
             ok, reason = verify_grant(document, pub)
         if not ok:
             return document, reason
@@ -163,11 +163,11 @@ def cmd_grant(args: argparse.Namespace) -> int:
         from .signing import load_keys, sign_grant, signing_available
 
         if not signing_available():
-            print(json.dumps({"error": "cryptography not installed; pip install robin-hood[security]"}, indent=2))
+            print(json.dumps({"error": "cryptography not installed; pip install seneschal[security]"}, indent=2))
             return 1
         priv, pub = load_keys(args.keys)
         if not (priv and pub):
-            print(json.dumps({"error": f"no keypair at {args.keys}; run `robinhood keygen`"}, indent=2))
+            print(json.dumps({"error": f"no keypair at {args.keys}; run `seneschal keygen`"}, indent=2))
             return 1
         document = {
             "task_id": args.task_id,
@@ -447,10 +447,10 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="robinhood", description="Frugal operations for AI-agent work.")
+    parser = argparse.ArgumentParser(prog="seneschal", description="Frugal operations for AI-agent work.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    health = subparsers.add_parser("health", help="Run ROBIN HOOD health checks.")
+    health = subparsers.add_parser("health", help="Run Seneschal health checks.")
     health.add_argument("--strict", action="store_true", help="Treat warnings as errors.")
     health.set_defaults(func=cmd_health)
 
@@ -472,7 +472,7 @@ def build_parser() -> argparse.ArgumentParser:
     scan.set_defaults(func=cmd_scan)
 
     keygen = subparsers.add_parser("keygen", help="Generate the operator's Ed25519 grant-signing keypair.")
-    keygen.add_argument("--keys", default=".robinhood/keys")
+    keygen.add_argument("--keys", default=".seneschal/keys")
     keygen.set_defaults(func=cmd_keygen)
 
     grant = subparsers.add_parser("grant", help="Check (or sign) a least-privilege capability grant.")
@@ -488,11 +488,11 @@ def build_parser() -> argparse.ArgumentParser:
     grant.add_argument("--grant-file", help="Load the grant from a (signed) JSON document.")
     grant.add_argument("--require-signed", action="store_true", help="Fail closed unless the grant carries a valid operator signature.")
     grant.add_argument("--expect-fingerprint", help="Pin the operator's key fingerprint (SHA256:...) published out of band; verifies a signed grant without the local keypair.")
-    grant.add_argument("--keys", default=".robinhood/keys", help="Directory with grant.pub / grant.priv.")
+    grant.add_argument("--keys", default=".seneschal/keys", help="Directory with grant.pub / grant.priv.")
     grant.set_defaults(func=cmd_grant)
 
     log = subparsers.add_parser("log", help="Append a JSONL frugality ledger entry.")
-    log.add_argument("--ledger", default="agentops-usage.jsonl")
+    log.add_argument("--ledger", default="seneschal-usage.jsonl")
     log.add_argument("--task-id", required=True)
     log.add_argument("--model", required=True)
     log.add_argument("--tokens-estimated", type=int, required=True)
@@ -502,7 +502,7 @@ def build_parser() -> argparse.ArgumentParser:
     log.set_defaults(func=cmd_log)
 
     report = subparsers.add_parser("report", help="Summarize a JSONL frugality ledger.")
-    report.add_argument("--ledger", default="agentops-usage.jsonl")
+    report.add_argument("--ledger", default="seneschal-usage.jsonl")
     report.set_defaults(func=cmd_report)
 
     models = subparsers.add_parser("models", help="List model/provider profiles.")
@@ -618,7 +618,7 @@ def build_parser() -> argparse.ArgumentParser:
     broker.set_defaults(func=cmd_broker_dry_run)
 
     plan = subparsers.add_parser("plan-request", help="Plan a model request before any API call.")
-    plan.add_argument("--config", help="Optional robinhood.config.json path.")
+    plan.add_argument("--config", help="Optional seneschal.config.json path.")
     plan.add_argument("--objective", required=True)
     plan.add_argument("--estimated-input-tokens", type=int, required=True)
     plan.add_argument("--estimated-output-tokens", type=int)
@@ -630,7 +630,7 @@ def build_parser() -> argparse.ArgumentParser:
     plan.set_defaults(func=cmd_plan_request)
 
     run = subparsers.add_parser("run", help="Run a planned model request through a supported local adapter.")
-    run.add_argument("--config", help="Optional robinhood.config.json path.")
+    run.add_argument("--config", help="Optional seneschal.config.json path.")
     run.add_argument("--objective", required=True)
     run.add_argument("--prompt")
     run.add_argument("--path")

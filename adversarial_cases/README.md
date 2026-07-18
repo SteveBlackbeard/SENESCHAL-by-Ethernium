@@ -1,8 +1,8 @@
-# ROBIN HOOD Adversarial Cases
+# Seneschal Adversarial Cases
 
 These are benign defensive test cases.
 
-They exist to verify that ROBIN HOOD detects risky patterns without storing leaked prompts, real secrets, exploit chains, or provider-specific hidden instructions.
+They exist to verify that Seneschal detects risky patterns without storing leaked prompts, real secrets, exploit chains, or provider-specific hidden instructions.
 
 Rules:
 

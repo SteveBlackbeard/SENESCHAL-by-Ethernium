@@ -1,6 +1,6 @@
-# ROBIN HOOD by Ethernium Optimization Model
+# Seneschal by Ethernium Optimization Model
 
-ROBIN HOOD minimizes spend by treating model power as an escalation resource, not the default path.
+Seneschal minimizes spend by treating model power as an escalation resource, not the default path.
 
 ## Core Loop
 
@@ -8,7 +8,7 @@ ROBIN HOOD minimizes spend by treating model power as an escalation resource, no
 classify -> scan risk -> estimate tokens -> pack context -> route -> execute elsewhere -> log outcome
 ```
 
-ROBIN HOOD does not need to invoke models to save money. The first savings come from avoiding bad context, bad routing, bad retries, and unsafe scope.
+Seneschal does not need to invoke models to save money. The first savings come from avoiding bad context, bad routing, bad retries, and unsafe scope.
 
 ## Disciplinary Model
 
@@ -52,7 +52,7 @@ Reverse engineering:
 Low-code and automation:
 
 - keep commands small enough for VS Code tasks, Cursor rules, CI, MCP and shell scripts
-- use JSON output so other tools can compose around ROBIN HOOD
+- use JSON output so other tools can compose around Seneschal
 
 Advanced programming:
 
@@ -74,7 +74,7 @@ Advanced programming:
 
 Frugal does not mean weak.
 
-ROBIN HOOD escalates when:
+Seneschal escalates when:
 
 - the task is security-sensitive
 - the task is release-critical

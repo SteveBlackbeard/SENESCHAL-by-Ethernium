@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_PROVIDER_STATE = ".robinhood/provider-state.json"
+DEFAULT_PROVIDER_STATE = ".seneschal/provider-state.json"
 DEGRADED_STATUSES = {"fail", "rate_limited", "quota_exhausted", "disabled"}
 
 

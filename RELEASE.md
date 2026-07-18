@@ -1,16 +1,16 @@
-# ROBIN HOOD Release Checklist
+# Seneschal Release Checklist
 
-ROBIN HOOD is releasable when the package can be installed, tested, planned, and built without private files or remote model access.
+Seneschal is releasable when the package can be installed, tested, planned, and built without private files or remote model access.
 
 ## Local Gate
 
 ```powershell
-python agentops\health_guard.py --strict
+python seneschal\health_guard.py --strict
 pytest -q
 python -m build
-python -m agentops.cli providers --providers providers.local.json.example
-python -m agentops.cli provider-health --providers providers.local.json.example
-python -m agentops.cli plan-request --config robinhood.config.json.example --objective "Analyze repo architecture" --estimated-input-tokens 8000
+python -m seneschal.cli providers --providers providers.local.json.example
+python -m seneschal.cli provider-health --providers providers.local.json.example
+python -m seneschal.cli plan-request --config seneschal.config.json.example --objective "Analyze repo architecture" --estimated-input-tokens 8000
 ```
 
 ## Clean Install Gate
@@ -18,16 +18,16 @@ python -m agentops.cli plan-request --config robinhood.config.json.example --obj
 ```powershell
 python -m venv .venv-release
 .\.venv-release\Scripts\python -m pip install --upgrade pip
-.\.venv-release\Scripts\python -m pip install dist\robin_hood-*.whl
-.\.venv-release\Scripts\robinhood health --strict
+.\.venv-release\Scripts\python -m pip install dist\seneschal-*.whl
+.\.venv-release\Scripts\seneschal health --strict
 ```
 
 ## Release Rules
 
 - Keep `providers.local.json` private.
-- Keep `robinhood.config.json` private.
+- Keep `seneschal.config.json` private.
 - Do not publish real API keys, endpoints, quotas, or provider account names.
-- Do not publish generated `.robinhood/` state.
+- Do not publish generated `.seneschal/` state.
 - Every real adapter path must pass `plan-request` first.
 - Every failed call should mark provider state.
 - Quality gate failures are release-relevant failures.

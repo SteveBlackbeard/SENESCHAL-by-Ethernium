@@ -104,7 +104,7 @@ def pack_context(
 
 def render_pack(pack: ContextPack, root: Path) -> str:
     sections = [
-        "# ROBIN HOOD Context Pack",
+        "# Seneschal Context Pack",
         "",
         f"model_id: {pack.model_id}",
         f"estimated_packed_tokens: {pack.estimated_packed_tokens}",
@@ -144,7 +144,7 @@ def _score_file(path: Path, root: Path) -> int:
         score += 40
     if "tests" in parts:
         score += 15
-    if "agentops" in parts or "src" in parts:
+    if "seneschal" in parts or "src" in parts:
         score += 20
     if "integrations" in parts:
         score += 8

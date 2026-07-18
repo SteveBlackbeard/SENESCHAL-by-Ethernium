@@ -1,4 +1,4 @@
-"""Project-level ROBIN HOOD configuration."""
+"""Project-level Seneschal configuration."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_CONFIG = "robinhood.config.json"
+DEFAULT_CONFIG = "seneschal.config.json"
 
 
 @dataclass(frozen=True)

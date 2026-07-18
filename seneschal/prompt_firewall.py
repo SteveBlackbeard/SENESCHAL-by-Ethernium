@@ -32,7 +32,7 @@ TEXT_SUFFIXES = {".md", ".txt", ".json", ".toml", ".yaml", ".yml", ".py", ".ts",
 IGNORED_DIRS = {
     ".git",
     ".venv",
-    ".robinhood",
+    ".seneschal",
     "__pycache__",
     ".pytest_cache",
     "node_modules",

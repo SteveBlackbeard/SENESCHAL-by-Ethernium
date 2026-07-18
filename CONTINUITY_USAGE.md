@@ -1,6 +1,6 @@
-# Using Continuity Legacy With ROBIN HOOD
+# Using Continuity Legacy With Seneschal
 
-Continuity Legacy and ROBIN HOOD solve different parts of the same workflow.
+Continuity Legacy and Seneschal solve different parts of the same workflow.
 
 Continuity Legacy protects project state:
 
@@ -10,7 +10,7 @@ Continuity Legacy protects project state:
 - package/release integrity
 - cryptographic identity and continuity memory
 
-ROBIN HOOD protects agent operations:
+Seneschal protects agent operations:
 
 - context minimization
 - prompt-risk triage
@@ -27,7 +27,7 @@ python scripts\golden_baseline.py verify
 python scripts\health_guard.py --strict
 ```
 
-2. Build an ROBIN HOOD context packet:
+2. Build an Seneschal context packet:
 
 ```text
 Objective:
@@ -73,7 +73,7 @@ pytest -q
 
 Task: update a README from an external issue.
 
-Use ROBIN HOOD to:
+Use Seneschal to:
 
 - mark the issue text as untrusted external content
 - scan for prompt-injection phrases
@@ -89,6 +89,6 @@ Use Continuity to:
 
 ## Boundary
 
-ROBIN HOOD must not become a dependency of Continuity Legacy runtime.
+Seneschal must not become a dependency of Continuity Legacy runtime.
 
-Continuity can call ROBIN HOOD in future CI as an optional external gate, but Legacy must remain usable without ROBIN HOOD installed.
+Continuity can call Seneschal in future CI as an optional external gate, but Legacy must remain usable without Seneschal installed.

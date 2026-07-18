@@ -1,4 +1,4 @@
-"""Health guard for ROBIN HOOD."""
+"""Health guard for Seneschal."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ REQUIRED_DOCS = [
     "TOOL_MANIFEST.json",
     "pyproject.toml",
     "integrations/vscode/tasks.json",
-    "integrations/cursor/rules/agentops.mdc",
+    "integrations/cursor/rules/seneschal.mdc",
     "integrations/mcp/server_contract.json",
 ]
 FORBIDDEN_MARKERS = [
@@ -62,7 +62,7 @@ def check_runtime() -> list[Finding]:
         findings.append(Finding("error", f"provider profiles failed to load: {exc}"))
     for module in ("router", "cascade", "quality_gate", "prompt_firewall", "token_budget"):
         try:
-            __import__(f"agentops.{module}")
+            __import__(f"seneschal.{module}")
         except Exception as exc:  # noqa: BLE001
             findings.append(Finding("error", f"core module '{module}' failed to import: {exc}"))
     return findings
@@ -86,7 +86,7 @@ def check_manifest() -> list[Finding]:
     if data.get("extractable") is not True:
         return [Finding("error", "manifest must declare extractable=true")]
     if data.get("relationship_to_continuity") != "none":
-        return [Finding("error", "ROBIN HOOD must remain independent from Continuity runtime")]
+        return [Finding("error", "Seneschal must remain independent from Continuity runtime")]
     return []
 
 
@@ -105,7 +105,7 @@ def check_forbidden_text() -> list[Finding]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="ROBIN HOOD health guard.")
+    parser = argparse.ArgumentParser(description="Seneschal health guard.")
     parser.add_argument("--strict", action="store_true", help="Treat warnings as errors.")
     args = parser.parse_args(argv)
 
@@ -120,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if not findings:
         mode = "repo" if is_repo_checkout() else "installed"
-        print(f"robinhood-health: ok ({mode})")
+        print(f"seneschal-health: ok ({mode})")
         return 0
     if any(f.severity == "error" for f in findings):
         return 1

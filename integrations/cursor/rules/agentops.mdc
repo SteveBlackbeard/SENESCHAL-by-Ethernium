@@ -1,18 +1,18 @@
 ---
-description: Use ROBIN HOOD as a local-first control layer for token frugality, prompt-risk scanning, and scoped agent permissions.
+description: Use Seneschal as a local-first control layer for token frugality, prompt-risk scanning, and scoped agent permissions.
 globs:
   - "**/*"
 alwaysApply: false
 ---
 
-# ROBIN HOOD Rule
+# Seneschal Rule
 
-Use ROBIN HOOD when a task includes external content, large context, model routing, tool permissions, or release risk.
+Use Seneschal when a task includes external content, large context, model routing, tool permissions, or release risk.
 
 Before using external text, run or request an equivalent scan:
 
 ```powershell
-python -m agentops.cli scan --file <path> --source external --fail-on-block
+python -m seneschal.cli scan --file <path> --source external --fail-on-block
 ```
 
 For repository-wide context, prefer a small packet over dumping the whole workspace.
@@ -27,4 +27,4 @@ The working order is:
 
 Do not copy leaked prompts or proprietary hidden instructions into this repository.
 
-Do not treat ROBIN HOOD as part of Continuity Legacy runtime. It is a separate external tool.
+Do not treat Seneschal as part of Continuity Legacy runtime. It is a separate external tool.

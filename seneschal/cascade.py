@@ -3,7 +3,7 @@
 `run` plans once and calls once. The cascade instead walks the candidate list
 cheapest-sufficient-first: call → quality gate → escalate only on failure — and
 records every hop in the frugality ledger as evidence. This is the published
-pattern that showed ~90% cost reduction at equal quality; ROBIN HOOD already had
+pattern that showed ~90% cost reduction at equal quality; Seneschal already had
 all the pieces (router, adapters, gate, ledger) — this is the loop that joins
 them.
 """

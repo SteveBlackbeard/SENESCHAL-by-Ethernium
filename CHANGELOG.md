@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to ROBIN HOOD are documented here. This project follows
+All notable changes to Seneschal are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
 ## [0.2.0] - 2026-07-16
@@ -12,14 +12,14 @@ All notable changes to ROBIN HOOD are documented here. This project follows
   polluting the ledger.
 - **`route --explore`**: Thompson-sampling bandit over Beta posteriors built from
   ledger outcomes — exploits reliable models and keeps exploring under-observed
-  ones. Reproducible with `--seed` (`agentops/bandit.py`, pure stdlib).
+  ones. Reproducible with `--seed` (`seneschal/bandit.py`, pure stdlib).
 - **`select --objective`**: Okapi BM25 lexical relevance to the task objective,
-  blended with the structural heuristics (`agentops/bm25.py`, zero dependencies).
+  blended with the structural heuristics (`seneschal/bm25.py`, zero dependencies).
 - **`reuse --layout`**: provider prompt-caching layout planner — orders the stable
   prefix first, reports the cacheable ratio and the savings a naive layout wastes.
 
 ### Added — security
-- **Ed25519-signed capability grants** (`agentops/signing.py`, `keygen`,
+- **Ed25519-signed capability grants** (`seneschal/signing.py`, `keygen`,
   `grant --sign` / `--grant-file` / `--require-signed`). The broker fails closed
   on unsigned grants (when required), untrusted keys, any modification after
   signing (capability escalation), and expiry. The public key and `sig_alg` are

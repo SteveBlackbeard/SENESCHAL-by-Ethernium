@@ -1,10 +1,10 @@
-# ROBIN HOOD Pending Work
+# Seneschal Pending Work
 
-This file tracks what remains before ROBIN HOOD becomes a finished standalone tool.
+This file tracks what remains before Seneschal becomes a finished standalone tool.
 
 ## Mission
 
-ROBIN HOOD exists to reduce wasted tokens, retries, unsafe tool use, and context drift across AI-assisted work.
+Seneschal exists to reduce wasted tokens, retries, unsafe tool use, and context drift across AI-assisted work.
 
 The target is not a generic agent framework. The target is a small local-first control layer that can work with cloud LLM APIs, local LLM servers, LoRA-backed model variants, IDE agents, and repository governance tools without becoming locked to any provider.
 
@@ -42,14 +42,14 @@ Goal: turn frugality from an estimate into a measurable control.
 
 Build:
 
-- `agentops/provider_profiles.py`
-- `agentops/provider_profiles.json`
-- `agentops/token_budget.py`
-- `agentops/context_packer.py`
+- `seneschal/provider_profiles.py`
+- `seneschal/provider_profiles.json`
+- `seneschal/token_budget.py`
+- `seneschal/context_packer.py`
 - CLI commands:
-  - `robinhood models`
-  - `robinhood budget`
-  - `robinhood pack`
+  - `seneschal models`
+  - `seneschal budget`
+  - `seneschal pack`
 
 Acceptance:
 
@@ -83,7 +83,7 @@ Build:
   - approximate latency
   - approximate cost
 - routing command:
-  - `robinhood route --objective "release readiness" --privacy local-first`
+  - `seneschal route --objective "release readiness" --privacy local-first`
 
 Acceptance:
 
@@ -96,7 +96,7 @@ Status: first router implemented as recommendation-only. Ledger-based learning r
 
 ## Phase 4: API Adapter Layer
 
-Goal: connect to model providers without coupling ROBIN HOOD to one vendor.
+Goal: connect to model providers without coupling Seneschal to one vendor.
 
 Planned adapters:
 
@@ -123,7 +123,7 @@ Acceptance:
 
 ## Phase 5: Editor And Agent Integrations
 
-Goal: make ROBIN HOOD usable from coding environments without becoming editor-specific.
+Goal: make Seneschal usable from coding environments without becoming editor-specific.
 
 Build:
 
@@ -136,13 +136,13 @@ Build:
 Acceptance:
 
 - editor integrations call the same CLI
-- ROBIN HOOD remains usable from terminal
+- Seneschal remains usable from terminal
 - no editor config becomes required for the package
 - no integration bypasses prompt scanning or capability checks
 
 ## Phase 6: Standalone Release Hardening
 
-Goal: make ROBIN HOOD releasable as its own package and repository without depending on Continuity Legacy.
+Goal: make Seneschal releasable as its own package and repository without depending on Continuity Legacy.
 
 Build:
 

@@ -69,7 +69,7 @@ class ProviderProfile:
 
 def load_profiles(path: Path | None = None) -> list[ProviderProfile]:
     if path is None:
-        raw = resources.files("agentops").joinpath("provider_profiles.json").read_text(encoding="utf-8")
+        raw = resources.files("seneschal").joinpath("provider_profiles.json").read_text(encoding="utf-8")
     else:
         raw = path.read_text(encoding="utf-8")
     payload = json.loads(raw)

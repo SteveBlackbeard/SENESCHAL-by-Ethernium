@@ -1,10 +1,10 @@
-# ROBIN HOOD Frugality Doctrine
+# Seneschal Frugality Doctrine
 
 Frugality is not cheapness. It is disciplined allocation of model power, context, time, and human attention.
 
 ## Core Question
 
-Every ROBIN HOOD feature must answer:
+Every Seneschal feature must answer:
 
 ```text
 Does this reduce cost, risk, or drift?
@@ -103,33 +103,33 @@ Minimum metrics for prototype:
 
 ## Executable Controls
 
-ROBIN HOOD now includes a small token core:
+Seneschal now includes a small token core:
 
 ```powershell
-robinhood models
-robinhood budget --file README.md --model local-small
-robinhood pack --path . --model local-long --max-tokens 12000
-robinhood route --objective "Security review before release" --privacy cloud-allowed
-robinhood snapshot --path .
-robinhood snapshot --path . --input-cost-per-million 2 --runs 100
-robinhood reuse --system "stable operating rules" --user "task-specific request"
-robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
-robinhood select --path . --changed agentops/cli.py --max-tokens 4000
-robinhood broker-dry-run --objective "release review" --estimated-input-tokens 12000 --privacy local-first
-robinhood provider-health --providers providers.local.json
-robinhood provider-mark --provider openai-compatible-free-tier --status quota_exhausted --reason "free tier exhausted"
-robinhood broker-dry-run --providers providers.local.json --objective "release review" --estimated-input-tokens 12000
-robinhood broker-dry-run --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000
-robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "release review" --estimated-input-tokens 12000 --estimated-output-tokens 2000
-robinhood plan-request --config robinhood.config.json --objective "release review" --estimated-input-tokens 12000
-robinhood run --providers providers.local.json --objective "release review" --path . --model llama3.1
+seneschal models
+seneschal budget --file README.md --model local-small
+seneschal pack --path . --model local-long --max-tokens 12000
+seneschal route --objective "Security review before release" --privacy cloud-allowed
+seneschal snapshot --path .
+seneschal snapshot --path . --input-cost-per-million 2 --runs 100
+seneschal reuse --system "stable operating rules" --user "task-specific request"
+seneschal savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
+seneschal select --path . --changed seneschal/cli.py --max-tokens 4000
+seneschal broker-dry-run --objective "release review" --estimated-input-tokens 12000 --privacy local-first
+seneschal provider-health --providers providers.local.json
+seneschal provider-mark --provider openai-compatible-free-tier --status quota_exhausted --reason "free tier exhausted"
+seneschal broker-dry-run --providers providers.local.json --objective "release review" --estimated-input-tokens 12000
+seneschal broker-dry-run --providers providers.local.json --state .seneschal/provider-state.json --objective "release review" --estimated-input-tokens 12000
+seneschal plan-request --providers providers.local.json --state .seneschal/provider-state.json --objective "release review" --estimated-input-tokens 12000 --estimated-output-tokens 2000
+seneschal plan-request --config seneschal.config.json --objective "release review" --estimated-input-tokens 12000
+seneschal run --providers providers.local.json --objective "release review" --path . --model llama3.1
 ```
 
 ## Relevance Selection
 
 Changed-only context is cheap, but it may be too thin.
 
-`robinhood select` adds mathematical triage:
+`seneschal select` adds mathematical triage:
 
 - changed files get first priority
 - files in the same directory get extra weight
@@ -160,12 +160,12 @@ Provider catalogs:
 
 - `providers.local.json.example` is safe to commit.
 - `providers.local.json` is ignored by Git.
-- `robinhood.config.json.example` is safe to commit.
-- `robinhood.config.json` is ignored by Git.
+- `seneschal.config.json.example` is safe to commit.
+- `seneschal.config.json` is ignored by Git.
 - real API keys must be referenced by environment variable names only.
 - disabled providers stay visible for planning but cannot be selected.
 
-Experimental local models, including abliterated variants, belong in the provider catalog as explicit local routes. They should default to disabled, use local privacy, and pass through the same prompt scanning, planning, circuit-breaker, and human-review gates as any other model. The frugal win is local compute and fewer paid calls; the risk is weaker behavioral reliability, so ROBIN HOOD should never treat them as an automatic quality or safety upgrade.
+Experimental local models, including abliterated variants, belong in the provider catalog as explicit local routes. They should default to disabled, use local privacy, and pass through the same prompt scanning, planning, circuit-breaker, and human-review gates as any other model. The frugal win is local compute and fewer paid calls; the risk is weaker behavioral reliability, so Seneschal should never treat them as an automatic quality or safety upgrade.
 
 Provider health is configuration-only. It catches missing environment variables and disabled providers before any paid or remote call is attempted. That reduces retry loops, prevents accidental cloud use, and keeps local-first routing honest.
 
@@ -194,7 +194,7 @@ This mirrors a defensive biological pattern: cheap reflex first, stronger immune
 
 Most teams waste tokens by resending unchanged files.
 
-`robinhood snapshot` creates a local hash/token cache under `.robinhood/`. The next run reports added, changed, deleted and unchanged files, plus an estimated changed-only token cost.
+`seneschal snapshot` creates a local hash/token cache under `.seneschal/`. The next run reports added, changed, deleted and unchanged files, plus an estimated changed-only token cost.
 
 This is useful for:
 

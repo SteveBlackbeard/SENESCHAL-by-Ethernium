@@ -1,24 +1,24 @@
-# ROBIN HOOD Governance Seed
+# Seneschal Governance Seed
 
-ROBIN HOOD is an incubated tool, not part of Continuity Legacy.
+Seneschal is an incubated tool, not part of Continuity Legacy.
 
 ## Golden Rules
 
-- Keep ROBIN HOOD extractable as a standalone repository.
-- Do not import ROBIN HOOD from Continuity Legacy runtime code.
-- Do not package ROBIN HOOD into Continuity Legacy PyPI artifacts.
+- Keep Seneschal extractable as a standalone repository.
+- Do not import Seneschal from Continuity Legacy runtime code.
+- Do not package Seneschal into Continuity Legacy PyPI artifacts.
 - Use clean-room engineering only: patterns, economics, routing, and measurement are allowed; leaked prompts or proprietary hidden instructions are not.
 - Prefer measurable credit/context reduction over narrative expansion.
 
 ## Health Gate
 
-ROBIN HOOD is considered healthy when:
+Seneschal is considered healthy when:
 
 - `TOOL_MANIFEST.json` is valid JSON.
 - `README.md` states the boundary from Continuity Legacy.
 - `BLUEPRINT.md` describes the workflow without provider-specific hidden text.
 - `RULEBOOK.md`, `FRUGALITY.md`, `THREAT_MODEL.md`, `EXTRACTION_CONTRACT.md`, and `ROADMAP.md` exist before executable code is added.
-- `pyproject.toml` exposes the local `ROBIN HOOD` CLI when the prototype has executable code.
+- `pyproject.toml` exposes the local `Seneschal` CLI when the prototype has executable code.
 - No leaked prompt text, jailbreak collections, or vendor-imitation instructions are stored in this folder.
 - Every new module states whether it reduces cost, risk, or drift.
 

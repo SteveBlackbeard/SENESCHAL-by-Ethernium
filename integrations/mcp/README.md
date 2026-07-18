@@ -1,13 +1,13 @@
-# ROBIN HOOD MCP Integration
+# Seneschal MCP Integration
 
-This folder defines the MCP surface for ROBIN HOOD local controls.
+This folder defines the MCP surface for Seneschal local controls.
 
 The current codebase includes an optional local MCP server:
 
 ```powershell
 cd D:\Experimentos\ROBIN-HOOD
 pip install -e .[mcp]
-robinhood-mcp
+seneschal-mcp
 ```
 
 MCP should expose local controls first:
@@ -31,20 +31,20 @@ Provider calls should stay deferred until the defensive controls are stable.
 
 | Tool | Purpose | Risk |
 | --- | --- | --- |
-| `robinhood.health` | Run local health checks | Low |
-| `robinhood.scan_text` | Classify untrusted text | Low |
-| `robinhood.scan_path` | Scan files or directories | Medium |
-| `robinhood.make_packet` | Build a context packet | Low |
-| `robinhood.check_capability` | Validate requested capability and path | Low |
-| `robinhood.models` | List model profiles | Low |
-| `robinhood.budget` | Estimate token budget | Low |
-| `robinhood.pack` | Build compact context under budget | Medium |
-| `robinhood.route` | Recommend model/provider path | Medium |
-| `robinhood.snapshot` | Snapshot context and estimate changed-only savings | Low |
-| `robinhood.reuse` | Estimate reusable/cacheable prompt share | Low |
-| `robinhood.savings` | Estimate token/cost savings | Low |
-| `robinhood.select` | Select useful neighboring context under budget | Medium |
-| `robinhood.broker_dry_run` | Dry-run provider capacity routing | Medium |
+| `seneschal.health` | Run local health checks | Low |
+| `seneschal.scan_text` | Classify untrusted text | Low |
+| `seneschal.scan_path` | Scan files or directories | Medium |
+| `seneschal.make_packet` | Build a context packet | Low |
+| `seneschal.check_capability` | Validate requested capability and path | Low |
+| `seneschal.models` | List model profiles | Low |
+| `seneschal.budget` | Estimate token budget | Low |
+| `seneschal.pack` | Build compact context under budget | Medium |
+| `seneschal.route` | Recommend model/provider path | Medium |
+| `seneschal.snapshot` | Snapshot context and estimate changed-only savings | Low |
+| `seneschal.reuse` | Estimate reusable/cacheable prompt share | Low |
+| `seneschal.savings` | Estimate token/cost savings | Low |
+| `seneschal.select` | Select useful neighboring context under budget | Medium |
+| `seneschal.broker_dry_run` | Dry-run provider capacity routing | Medium |
 
 ## Constraints
 

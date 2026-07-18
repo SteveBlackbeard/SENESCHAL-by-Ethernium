@@ -2,28 +2,28 @@ from pathlib import Path
 
 import pytest
 
-from agentops.capability_broker import CapabilityGrant, check_action
-from agentops.capacity_broker import broker_dry_run
-from agentops.cli import main as cli_main
-from agentops.config import load_config
-from agentops.context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse
-from agentops.context_packer import pack_context
-from agentops.context_packet import ContextPacket
-from agentops.context_select import select_context
-from agentops.frugality_ledger import append_entry, new_entry, read_entries
-from agentops.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, run_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
-from agentops.ollama_adapter import call_ollama
-from agentops.openai_compatible_adapter import call_openai_compatible
-from agentops.prompt_firewall import scan_path, classify_text
-from agentops.provider_health import check_provider_health
-from agentops.provider_profiles import get_profile, load_profiles
-from agentops.provider_state import mark_provider_state, read_provider_states
-from agentops.quality_gate import evaluate_response
-from agentops.request_planner import plan_request
-from agentops.router import classify_task, recommend_route
-from agentops.runner import run_request
-from agentops.savings import estimate_savings
-from agentops.token_budget import budget_for_text, count_tokens, estimate_tokens
+from seneschal.capability_broker import CapabilityGrant, check_action
+from seneschal.capacity_broker import broker_dry_run
+from seneschal.cli import main as cli_main
+from seneschal.config import load_config
+from seneschal.context_cache import create_snapshot, diff_snapshot, estimate_prompt_reuse
+from seneschal.context_packer import pack_context
+from seneschal.context_packet import ContextPacket
+from seneschal.context_select import select_context
+from seneschal.frugality_ledger import append_entry, new_entry, read_entries
+from seneschal.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, run_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from seneschal.ollama_adapter import call_ollama
+from seneschal.openai_compatible_adapter import call_openai_compatible
+from seneschal.prompt_firewall import scan_path, classify_text
+from seneschal.provider_health import check_provider_health
+from seneschal.provider_profiles import get_profile, load_profiles
+from seneschal.provider_state import mark_provider_state, read_provider_states
+from seneschal.quality_gate import evaluate_response
+from seneschal.request_planner import plan_request
+from seneschal.router import classify_task, recommend_route
+from seneschal.runner import run_request
+from seneschal.savings import estimate_savings
+from seneschal.token_budget import budget_for_text, count_tokens, estimate_tokens
 
 
 def test_context_packet_renders_scope():
@@ -204,7 +204,7 @@ def test_budget_reports_measured_tokenizer_for_cloud_profile():
 
 
 def test_summarize_by_model_tracks_failures_and_retries():
-    from agentops.frugality_ledger import new_entry, summarize_by_model
+    from seneschal.frugality_ledger import new_entry, summarize_by_model
 
     entries = [
         new_entry(task_id="a", model="local-small", tokens_estimated=10, retries=0, outcome="pass", reduced="cost"),
@@ -218,7 +218,7 @@ def test_summarize_by_model_tracks_failures_and_retries():
 
 
 def test_router_downranks_unreliable_model_from_ledger():
-    from agentops.router import recommend_route
+    from seneschal.router import recommend_route
 
     # Without history, small-edit local-first picks the cheapest local profile.
     baseline = recommend_route("fix typo in docs", privacy="local-first")
@@ -233,8 +233,8 @@ def test_router_downranks_unreliable_model_from_ledger():
 
 def test_context_packer_respects_budget_and_ignores_generated_dirs(tmp_path: Path):
     (tmp_path / "README.md").write_text("project summary", encoding="utf-8")
-    (tmp_path / "agentops").mkdir()
-    (tmp_path / "agentops" / "core.py").write_text("print('core')\n" * 20, encoding="utf-8")
+    (tmp_path / "seneschal").mkdir()
+    (tmp_path / "seneschal" / "core.py").write_text("print('core')\n" * 20, encoding="utf-8")
     (tmp_path / "dist").mkdir()
     (tmp_path / "dist" / "ignored.py").write_text("print('ignore')", encoding="utf-8")
     pack = pack_context(tmp_path, model_id="local-small", max_tokens=200)
@@ -315,7 +315,7 @@ def test_prompt_reuse_estimates_cacheable_share():
 
 def test_cli_snapshot_and_reuse(tmp_path: Path, capsys):
     (tmp_path / "README.md").write_text("hello", encoding="utf-8")
-    cache = tmp_path / ".robinhood" / "context-cache.json"
+    cache = tmp_path / ".seneschal" / "context-cache.json"
     assert cli_main(["snapshot", "--path", str(tmp_path), "--cache", str(cache)]) == 0
     (tmp_path / "README.md").write_text("hello changed", encoding="utf-8")
     assert (
@@ -416,13 +416,13 @@ def test_mcp_route_tool():
 
 def test_mcp_snapshot_and_reuse_tools(tmp_path: Path):
     (tmp_path / "README.md").write_text("hello", encoding="utf-8")
-    cache = tmp_path / ".robinhood" / "context-cache.json"
+    cache = tmp_path / ".seneschal" / "context-cache.json"
     first = snapshot_tool(str(tmp_path), cache=str(cache))
     second = snapshot_tool(str(tmp_path), cache=str(cache), input_cost_per_million=2.0, runs=10)
     assert first["snapshot"]["files"]
     assert second["diff"]["unchanged_count"] == 1
     assert "savings" in second
-    assert all(".robinhood" not in item["path"] for item in second["snapshot"]["files"])
+    assert all(".seneschal" not in item["path"] for item in second["snapshot"]["files"])
     assert reuse_tool(system_prompt="stable", user_prompt="task")["cacheable_tokens"] > 0
 
 
@@ -437,7 +437,7 @@ def test_mcp_savings_tool():
 
 
 def test_context_select_prioritizes_changed_and_neighbors(tmp_path: Path):
-    package = tmp_path / "agentops"
+    package = tmp_path / "seneschal"
     package.mkdir()
     changed = package / "cli.py"
     neighbor = package / "router.py"
@@ -445,10 +445,10 @@ def test_context_select_prioritizes_changed_and_neighbors(tmp_path: Path):
     changed.write_text("from . import router\nprint('cli')\n", encoding="utf-8")
     neighbor.write_text("def route():\n    return 'ok'\n", encoding="utf-8")
     unrelated.write_text("unrelated notes\n" * 100, encoding="utf-8")
-    selection = select_context(tmp_path, changed_paths=["agentops/cli.py"], max_tokens=300)
+    selection = select_context(tmp_path, changed_paths=["seneschal/cli.py"], max_tokens=300)
     selected = {item.path for item in selection.selected}
-    assert "agentops/cli.py" in selected
-    assert "agentops/router.py" in selected
+    assert "seneschal/cli.py" in selected
+    assert "seneschal/router.py" in selected
     assert selection.estimated_selected_tokens <= 300
 
 
@@ -934,15 +934,15 @@ def test_mcp_run_tool_reports_missing_model_without_network(tmp_path: Path):
 
 
 def test_config_loads_project_defaults(tmp_path: Path):
-    config_path = tmp_path / "robinhood.config.json"
+    config_path = tmp_path / "seneschal.config.json"
     config_path.write_text(
         """
 {
   "providers": "providers.local.json",
-  "state": ".robinhood/provider-state.json",
+  "state": ".seneschal/provider-state.json",
   "privacy": "local-first",
   "model": "llama3.1",
-  "ledger": ".robinhood/usage.jsonl",
+  "ledger": ".seneschal/usage.jsonl",
   "estimated_output_tokens": 2048
 }
 """.strip(),
@@ -955,12 +955,12 @@ def test_config_loads_project_defaults(tmp_path: Path):
 
 
 def test_cli_plan_request_uses_config(tmp_path: Path, capsys):
-    config_path = tmp_path / "robinhood.config.json"
+    config_path = tmp_path / "seneschal.config.json"
     config_path.write_text(
         """
 {
   "providers": "providers.local.json.example",
-  "state": ".robinhood/provider-state.json",
+  "state": ".seneschal/provider-state.json",
   "privacy": "local-first",
   "estimated_output_tokens": 333
 }

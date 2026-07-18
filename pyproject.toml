@@ -3,7 +3,7 @@ requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "robin-hood"
+name = "seneschal"
 version = "0.2.0"
 authors = [
   { name = "SteveBlackbeard" },
@@ -27,9 +27,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Repository = "https://github.com/SteveBlackbeard/ROBIN-HOOD-by-Ethernium"
-Issues = "https://github.com/SteveBlackbeard/ROBIN-HOOD-by-Ethernium/issues"
-Changelog = "https://github.com/SteveBlackbeard/ROBIN-HOOD-by-Ethernium/blob/main/CHANGELOG.md"
+Repository = "https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium"
+Issues = "https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/issues"
+Changelog = "https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 mcp = ["mcp>=1.0.0"]
@@ -37,14 +37,12 @@ measure = ["tiktoken>=0.7"]
 security = ["cryptography>=42"]
 
 [project.scripts]
-agentops = "agentops.cli:main"
-agentops-mcp = "agentops.mcp_server:main"
-robinhood = "agentops.cli:main"
-robinhood-mcp = "agentops.mcp_server:main"
+seneschal = "seneschal.cli:main"
+seneschal-mcp = "seneschal.mcp_server:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["agentops*"]
+include = ["seneschal*"]
 
 [tool.setuptools.package-data]
-agentops = ["provider_profiles.json"]
+seneschal = ["provider_profiles.json"]

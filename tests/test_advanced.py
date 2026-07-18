@@ -7,13 +7,13 @@ import json
 
 import pytest
 
-from agentops.bandit import expected_success, posterior_params, thompson_scores
-from agentops.bm25 import BM25
-from agentops.cascade import run_cascade
-from agentops.context_cache import plan_cache_layout
-from agentops.context_select import select_context
-from agentops.frugality_ledger import new_entry, read_entries, summarize_by_model
-from agentops.router import recommend_route
+from seneschal.bandit import expected_success, posterior_params, thompson_scores
+from seneschal.bm25 import BM25
+from seneschal.cascade import run_cascade
+from seneschal.context_cache import plan_cache_layout
+from seneschal.context_select import select_context
+from seneschal.frugality_ledger import new_entry, read_entries, summarize_by_model
+from seneschal.router import recommend_route
 
 
 # ── Bandit ────────────────────────────────────────────────────────────────────
@@ -213,7 +213,7 @@ def test_health_runtime_passes_without_repo_docs(monkeypatch: pytest.MonkeyPatch
     # Simulate an installed package (no repo checkout): runtime health must pass
     # and the governance doc checks must be skipped — the bug the install audit
     # caught was health failing on missing README/BLUEPRINT from site-packages.
-    import agentops.health_guard as hg
+    import seneschal.health_guard as hg
 
     monkeypatch.setattr(hg, "is_repo_checkout", lambda: False)
     assert hg.check_runtime() == []
@@ -221,8 +221,8 @@ def test_health_runtime_passes_without_repo_docs(monkeypatch: pytest.MonkeyPatch
 
 
 def test_health_runtime_detects_broken_profiles(monkeypatch: pytest.MonkeyPatch):
-    import agentops.health_guard as hg
-    from agentops import provider_profiles
+    import seneschal.health_guard as hg
+    from seneschal import provider_profiles
 
     monkeypatch.setattr(provider_profiles, "load_profiles", lambda *a, **k: [])
     findings = hg.check_runtime()
@@ -237,7 +237,7 @@ def _require_crypto():
 
 def test_signed_grant_roundtrip(tmp_path: Path):
     _require_crypto()
-    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+    from seneschal.signing import generate_keys, load_keys, sign_grant, verify_grant
 
     generate_keys(tmp_path)
     priv, pub = load_keys(tmp_path)
@@ -249,7 +249,7 @@ def test_signed_grant_roundtrip(tmp_path: Path):
 
 def test_capability_escalation_is_rejected(tmp_path: Path):
     _require_crypto()
-    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+    from seneschal.signing import generate_keys, load_keys, sign_grant, verify_grant
 
     generate_keys(tmp_path)
     priv, pub = load_keys(tmp_path)
@@ -263,7 +263,7 @@ def test_capability_escalation_is_rejected(tmp_path: Path):
 
 def test_foreign_key_resign_is_rejected(tmp_path: Path):
     _require_crypto()
-    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+    from seneschal.signing import generate_keys, load_keys, sign_grant, verify_grant
 
     generate_keys(tmp_path / "operator")
     _op_priv, op_pub = load_keys(tmp_path / "operator")
@@ -278,7 +278,7 @@ def test_foreign_key_resign_is_rejected(tmp_path: Path):
 
 def test_grant_fingerprint_pin(tmp_path: Path):
     _require_crypto()
-    from agentops.signing import generate_keys, key_fingerprint, load_keys, sign_grant, verify_grant_fingerprint
+    from seneschal.signing import generate_keys, key_fingerprint, load_keys, sign_grant, verify_grant_fingerprint
 
     generate_keys(tmp_path)
     priv, pub = load_keys(tmp_path)
@@ -293,8 +293,8 @@ def test_grant_fingerprint_pin(tmp_path: Path):
 
 def test_cli_grant_fingerprint_and_task_binding(tmp_path: Path, capsys: pytest.CaptureFixture):
     _require_crypto()
-    from agentops.cli import main as cli_main
-    from agentops.signing import key_fingerprint, load_keys
+    from seneschal.cli import main as cli_main
+    from seneschal.signing import key_fingerprint, load_keys
 
     keys = str(tmp_path / "keys")
     grant_file = str(tmp_path / "grant.json")
@@ -322,7 +322,7 @@ def test_cli_grant_fingerprint_and_task_binding(tmp_path: Path, capsys: pytest.C
 
 def test_expired_grant_is_rejected(tmp_path: Path):
     _require_crypto()
-    from agentops.signing import generate_keys, load_keys, sign_grant, verify_grant
+    from seneschal.signing import generate_keys, load_keys, sign_grant, verify_grant
 
     generate_keys(tmp_path)
     priv, pub = load_keys(tmp_path)
@@ -336,7 +336,7 @@ def test_expired_grant_is_rejected(tmp_path: Path):
 
 def test_cli_sign_and_check_signed_grant(tmp_path: Path, capsys: pytest.CaptureFixture):
     _require_crypto()
-    from agentops.cli import main as cli_main
+    from seneschal.cli import main as cli_main
 
     keys = str(tmp_path / "keys")
     grant_file = str(tmp_path / "grant.json")
@@ -366,7 +366,7 @@ def test_cli_sign_and_check_signed_grant(tmp_path: Path, capsys: pytest.CaptureF
 
 
 def test_cli_unsigned_grant_with_require_signed_fails(tmp_path: Path, capsys: pytest.CaptureFixture):
-    from agentops.cli import main as cli_main
+    from seneschal.cli import main as cli_main
 
     assert cli_main([
         "grant", "--task-id", "RH-1", "--capability", "read",

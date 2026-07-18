@@ -1,89 +1,89 @@
 {
-  "name": "robin-hood-mcp",
+  "name": "seneschal-mcp",
   "status": "implemented-local-controls",
   "transport": ["stdio"],
   "default_network": "disabled",
   "tools": [
     {
-      "name": "robinhood.health",
+      "name": "seneschal.health",
       "implemented": true,
       "risk": "low",
-      "description": "Run robinhood health checks."
+      "description": "Run seneschal health checks."
     },
     {
-      "name": "robinhood.scan_text",
+      "name": "seneschal.scan_text",
       "implemented": true,
       "risk": "low",
       "description": "Classify untrusted text for prompt and secret-like risk."
     },
     {
-      "name": "robinhood.scan_path",
+      "name": "seneschal.scan_path",
       "implemented": true,
       "risk": "medium",
-      "description": "Recursively scan a file or directory using ROBIN HOOD ignore rules."
+      "description": "Recursively scan a file or directory using Seneschal ignore rules."
     },
     {
-      "name": "robinhood.make_packet",
+      "name": "seneschal.make_packet",
       "implemented": true,
       "risk": "low",
       "description": "Render a scoped context packet."
     },
     {
-      "name": "robinhood.check_capability",
+      "name": "seneschal.check_capability",
       "implemented": true,
       "risk": "low",
       "description": "Validate a requested capability and optional path."
     },
     {
-      "name": "robinhood.models",
+      "name": "seneschal.models",
       "implemented": true,
       "risk": "low",
       "description": "List provider-neutral model profiles."
     },
     {
-      "name": "robinhood.budget",
+      "name": "seneschal.budget",
       "implemented": true,
       "risk": "low",
       "description": "Estimate token usage against a selected model profile."
     },
     {
-      "name": "robinhood.pack",
+      "name": "seneschal.pack",
       "implemented": true,
       "risk": "medium",
       "description": "Create a compact context bundle under a token budget."
     },
     {
-      "name": "robinhood.route",
+      "name": "seneschal.route",
       "implemented": true,
       "risk": "medium",
       "description": "Recommend a model/provider path without invoking the model."
     },
     {
-      "name": "robinhood.snapshot",
+      "name": "seneschal.snapshot",
       "implemented": true,
       "risk": "low",
       "description": "Snapshot context and estimate changed-only token savings."
     },
     {
-      "name": "robinhood.reuse",
+      "name": "seneschal.reuse",
       "implemented": true,
       "risk": "low",
       "description": "Estimate stable/cacheable prompt token share."
     },
     {
-      "name": "robinhood.savings",
+      "name": "seneschal.savings",
       "implemented": true,
       "risk": "low",
       "description": "Estimate token and cost savings across repeated runs."
     },
     {
-      "name": "robinhood.select",
+      "name": "seneschal.select",
       "implemented": true,
       "risk": "medium",
       "description": "Select changed files and useful neighboring context under a token budget."
     },
     {
-      "name": "robinhood.broker_dry_run",
+      "name": "seneschal.broker_dry_run",
       "implemented": true,
       "risk": "medium",
       "description": "Recommend provider capacity routing without API calls or secrets."

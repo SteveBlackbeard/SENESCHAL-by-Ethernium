@@ -1,12 +1,12 @@
-# ROBIN HOOD by Ethernium
+# Seneschal by Ethernium
 
-ROBIN HOOD by Ethernium is a local-first control layer for cheaper, safer AI-assisted work.
+Seneschal by Ethernium is a local-first control layer for cheaper, safer AI-assisted work.
 
 It helps decide what context to send, what to keep local, what to block, and whether a task deserves a stronger model. The goal is practical token economy: fewer whole-repo dumps, fewer retries, smaller prompts, safer tool scope, and clearer task packets.
 
 ## Product Objective
 
-ROBIN HOOD's objective is to be the preflight and execution layer for AI work: reduce tokens, choose the cheapest sufficient provider, prefer local compute, block unsafe or wasteful calls, execute only when the plan is acceptable, and record enough evidence to improve the next run.
+Seneschal's objective is to be the preflight and execution layer for AI work: reduce tokens, choose the cheapest sufficient provider, prefer local compute, block unsafe or wasteful calls, execute only when the plan is acceptable, and record enough evidence to improve the next run.
 
 ## What It Does
 
@@ -27,7 +27,7 @@ ROBIN HOOD's objective is to be the preflight and execution layer for AI work: r
 
 ## What It Is Not
 
-ROBIN HOOD is not:
+Seneschal is not:
 
 - a leaked-prompt archive
 - a jailbreak toolkit
@@ -43,7 +43,7 @@ The clean-room rule is simple: study economics and control patterns, then rebuil
 ```powershell
 cd D:\Experimentos\ROBIN-HOOD
 pip install -e .
-robinhood health --strict
+seneschal health --strict
 pytest -q
 ```
 
@@ -52,123 +52,123 @@ For a full operational walkthrough, see `USAGE.md`. For release gates, see `RELE
 Inspect available model profiles:
 
 ```powershell
-robinhood models
+seneschal models
 ```
 
 List provider profiles from a local catalog:
 
 ```powershell
 copy providers.local.json.example providers.local.json
-robinhood providers --providers providers.local.json
+seneschal providers --providers providers.local.json
 ```
 
 Create optional project defaults:
 
 ```powershell
-copy robinhood.config.json.example robinhood.config.json
+copy seneschal.config.json.example seneschal.config.json
 ```
 
 Check provider configuration without spending tokens:
 
 ```powershell
-robinhood provider-health --providers providers.local.json
+seneschal provider-health --providers providers.local.json
 ```
 
 Record local provider state for circuit-breaker routing:
 
 ```powershell
-robinhood provider-mark --provider ollama-local-code --status fail --reason timeout
-robinhood provider-state
+seneschal provider-mark --provider ollama-local-code --status fail --reason timeout
+seneschal provider-state
 ```
 
 Estimate whether a file fits a model profile:
 
 ```powershell
-robinhood budget --file README.md --model local-small
+seneschal budget --file README.md --model local-small
 ```
 
 Pack a project into a smaller context budget:
 
 ```powershell
-robinhood pack --path . --model local-long --max-tokens 12000
+seneschal pack --path . --model local-long --max-tokens 12000
 ```
 
 Render the included files as a text packet:
 
 ```powershell
-robinhood pack --path . --model local-long --max-tokens 12000 --render
+seneschal pack --path . --model local-long --max-tokens 12000 --render
 ```
 
 Recommend a route before spending stronger model budget:
 
 ```powershell
-robinhood route --objective "Security review before release" --privacy cloud-allowed --max-escalation strong
+seneschal route --objective "Security review before release" --privacy cloud-allowed --max-escalation strong
 ```
 
 Create a context cache and measure changed-only savings:
 
 ```powershell
-robinhood snapshot --path .
+seneschal snapshot --path .
 ```
 
 Estimate how much of a prompt can be reused as stable/cacheable context:
 
 ```powershell
-robinhood reuse --system "stable operating rules" --user "specific task"
+seneschal reuse --system "stable operating rules" --user "specific task"
 ```
 
 Convert token savings into money:
 
 ```powershell
-robinhood savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
+seneschal savings --full-tokens 28611 --optimized-tokens 6166 --input-cost-per-million 2 --runs 100
 ```
 
 Or combine snapshot and ROI in one command:
 
 ```powershell
-robinhood snapshot --path . --input-cost-per-million 2 --runs 100
+seneschal snapshot --path . --input-cost-per-million 2 --runs 100
 ```
 
 Select changed files plus useful neighbors under a strict budget:
 
 ```powershell
-robinhood select --path . --changed agentops/cli.py --max-tokens 4000
+seneschal select --path . --changed seneschal/cli.py --max-tokens 4000
 ```
 
 Dry-run provider capacity routing:
 
 ```powershell
-robinhood broker-dry-run --objective "Security review before release" --estimated-input-tokens 12000 --privacy local-first
+seneschal broker-dry-run --objective "Security review before release" --estimated-input-tokens 12000 --privacy local-first
 ```
 
 Use a local provider catalog:
 
 ```powershell
-robinhood broker-dry-run --providers providers.local.json --objective "Analyze repo" --estimated-input-tokens 8000
+seneschal broker-dry-run --providers providers.local.json --objective "Analyze repo" --estimated-input-tokens 8000
 ```
 
 Avoid locally degraded providers:
 
 ```powershell
-robinhood broker-dry-run --providers providers.local.json --state .robinhood/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000
+seneschal broker-dry-run --providers providers.local.json --state .seneschal/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000
 ```
 
 Plan the request before any API call:
 
 ```powershell
-robinhood plan-request --providers providers.local.json --state .robinhood/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000 --estimated-output-tokens 1200
+seneschal plan-request --providers providers.local.json --state .seneschal/provider-state.json --objective "Analyze repo" --estimated-input-tokens 8000 --estimated-output-tokens 1200
 ```
 
 Or use project defaults:
 
 ```powershell
-robinhood plan-request --config robinhood.config.json --objective "Analyze repo" --estimated-input-tokens 8000
+seneschal plan-request --config seneschal.config.json --objective "Analyze repo" --estimated-input-tokens 8000
 ```
 
 Run through the local Ollama adapter after planning:
 
 ```powershell
-robinhood run --providers providers.local.json --objective "Summarize this repo" --path . --model llama3.1
+seneschal run --providers providers.local.json --objective "Summarize this repo" --path . --model llama3.1
 ```
 
 ## CLI
@@ -176,40 +176,40 @@ robinhood run --providers providers.local.json --objective "Summarize this repo"
 Current commands:
 
 ```text
-robinhood health
-robinhood models
-robinhood providers
-robinhood provider-health
-robinhood provider-state
-robinhood provider-mark
-robinhood budget
-robinhood pack
-robinhood route
-robinhood snapshot
-robinhood reuse
-robinhood savings
-robinhood select
-robinhood broker-dry-run
-robinhood plan-request
-robinhood run
-robinhood cascade
-robinhood packet
-robinhood scan
-robinhood grant
-robinhood log
-robinhood report
+seneschal health
+seneschal models
+seneschal providers
+seneschal provider-health
+seneschal provider-state
+seneschal provider-mark
+seneschal budget
+seneschal pack
+seneschal route
+seneschal snapshot
+seneschal reuse
+seneschal savings
+seneschal select
+seneschal broker-dry-run
+seneschal plan-request
+seneschal run
+seneschal cascade
+seneschal packet
+seneschal scan
+seneschal grant
+seneschal log
+seneschal report
 ```
 
 Examples:
 
 ```powershell
-robinhood scan --path adversarial_cases --source web --fail-on-block
-robinhood route --objective "Fix typo in docs" --context "small task"
-robinhood snapshot --path .
-robinhood packet --objective "Fix release docs" --allowed-file README.md --verify "pytest -q"
-robinhood grant --task-id RH-001 --capability read --capability edit --allowed-path ROBIN-HOOD/ --action edit --path ROBIN-HOOD/README.md
-robinhood log --task-id RH-002 --model local-small --tokens-estimated 900 --outcome pass --reduced cost
-robinhood report
+seneschal scan --path adversarial_cases --source web --fail-on-block
+seneschal route --objective "Fix typo in docs" --context "small task"
+seneschal snapshot --path .
+seneschal packet --objective "Fix release docs" --allowed-file README.md --verify "pytest -q"
+seneschal grant --task-id RH-001 --capability read --capability edit --allowed-path ROBIN-HOOD/ --action edit --path ROBIN-HOOD/README.md
+seneschal log --task-id RH-002 --model local-small --tokens-estimated 900 --outcome pass --reduced cost
+seneschal report
 ```
 
 ## Signed Capability Grants
@@ -219,9 +219,9 @@ own permissions. With the `security` extra (`pip install -e ".[security]"`),
 grants become cryptographic guarantees:
 
 ```powershell
-robinhood keygen
-robinhood grant --sign --task-id RH-001 --capability read --allowed-path src/ --expires 2026-12-31T00:00:00+00:00 --out grant.json
-robinhood grant --grant-file grant.json --require-signed --action read --path src/main.py
+seneschal keygen
+seneschal grant --sign --task-id RH-001 --capability read --allowed-path src/ --expires 2026-12-31T00:00:00+00:00 --out grant.json
+seneschal grant --grant-file grant.json --require-signed --action read --path src/main.py
 ```
 
 The broker fails closed on: missing or invalid signatures, grants re-signed by
@@ -234,32 +234,32 @@ pinning the operator's **key fingerprint**, published out of band (shown by
 `keygen`), and a grant is bound to its task so it cannot be replayed elsewhere:
 
 ```powershell
-robinhood grant --grant-file grant.json --expect-fingerprint "SHA256:..." --task-id RH-001 --action read --path src/main.py
+seneschal grant --grant-file grant.json --expect-fingerprint "SHA256:..." --task-id RH-001 --action read --path src/main.py
 ```
 
 ## Frugal Cascade And Learning Router
 
-`robinhood cascade` implements the FrugalGPT pattern: call the cheapest
+`seneschal cascade` implements the FrugalGPT pattern: call the cheapest
 sufficient model, apply the quality gate, and escalate only on failure — every
 hop is recorded in the frugality ledger as evidence:
 
 ```powershell
-robinhood cascade --objective "Summarize this repo" --path . --providers providers.local.json --ledger agentops-usage.jsonl
+seneschal cascade --objective "Summarize this repo" --path . --providers providers.local.json --ledger seneschal-usage.jsonl
 ```
 
-`robinhood route --explore` upgrades routing from static penalties to a
+`seneschal route --explore` upgrades routing from static penalties to a
 Thompson-sampling bandit: each model's Beta posterior is built from ledger
 outcomes, so the router exploits reliable models and keeps exploring
 under-observed ones (`--seed` makes exploration reproducible).
 
-`robinhood select --objective "..."` ranks candidate context files with Okapi
+`seneschal select --objective "..."` ranks candidate context files with Okapi
 BM25 relevance to the task on top of the structural heuristics, and
-`robinhood reuse --layout` emits a provider prompt-caching plan (stable prefix
+`seneschal reuse --layout` emits a provider prompt-caching plan (stable prefix
 first, cacheable ratio, and the money a naive layout leaves on the table).
 
 ## Frugality Core
 
-ROBIN HOOD currently uses explicit provider profiles:
+Seneschal currently uses explicit provider profiles:
 
 ```text
 local-small
@@ -273,23 +273,23 @@ The default tokenizer is an honest fallback estimate. That is deliberate: the to
 
 Private provider catalogs should live in `providers.local.json`. That file is ignored by Git. Use `providers.local.json.example` as a safe template and keep real endpoints, key names, quotas, and enabled providers local.
 
-Project defaults can live in `robinhood.config.json`. That file is ignored by Git. Use `robinhood.config.json.example` as the safe template.
+Project defaults can live in `seneschal.config.json`. That file is ignored by Git. Use `seneschal.config.json.example` as the safe template.
 
-Experimental local models, including abliterated variants, can be represented as disabled provider profiles in `providers.local.json`. ROBIN HOOD treats them as local compute, not as privileged bypass tools. Keep them disabled until you explicitly need them, run `robinhood scan` on external prompts, run `robinhood plan-request` before use, and keep human review on outputs that affect code, security, legal, medical, finance, or public release decisions.
+Experimental local models, including abliterated variants, can be represented as disabled provider profiles in `providers.local.json`. Seneschal treats them as local compute, not as privileged bypass tools. Keep them disabled until you explicitly need them, run `seneschal scan` on external prompts, run `seneschal plan-request` before use, and keep human review on outputs that affect code, security, legal, medical, finance, or public release decisions.
 
-`robinhood provider-health` checks only local configuration. It verifies enabled/disabled state and required environment variables, but does not call remote APIs or run inference. This keeps readiness cheap, deterministic, and safe to run inside Cursor, VS Code, CI, or an MCP client before any model spend happens.
+`seneschal provider-health` checks only local configuration. It verifies enabled/disabled state and required environment variables, but does not call remote APIs or run inference. This keeps readiness cheap, deterministic, and safe to run inside Cursor, VS Code, CI, or an MCP client before any model spend happens.
 
-`robinhood provider-mark` and `robinhood provider-state` implement a small local circuit breaker. If a provider times out, hits quota, rate-limits, or should be disabled, ROBIN HOOD can remember that in `.robinhood/provider-state.json` and the broker can avoid that route before spending more tokens.
+`seneschal provider-mark` and `seneschal provider-state` implement a small local circuit breaker. If a provider times out, hits quota, rate-limits, or should be disabled, Seneschal can remember that in `.seneschal/provider-state.json` and the broker can avoid that route before spending more tokens.
 
-`robinhood plan-request` is the final preflight gate before a real adapter call. It combines broker routing, provider readiness, circuit-breaker state, fallback candidates, and estimated input/output cost. It still does not call APIs; it tells a caller whether the request should proceed.
+`seneschal plan-request` is the final preflight gate before a real adapter call. It combines broker routing, provider readiness, circuit-breaker state, fallback candidates, and estimated input/output cost. It still does not call APIs; it tells a caller whether the request should proceed.
 
-`robinhood run` currently supports Ollama/local and OpenAI-compatible adapters. It still plans first, then calls the selected provider only if there are no blockers. Failed calls and quality failures are written to provider state so later plans can avoid degraded routes.
+`seneschal run` currently supports Ollama/local and OpenAI-compatible adapters. It still plans first, then calls the selected provider only if there are no blockers. Failed calls and quality failures are written to provider state so later plans can avoid degraded routes.
 
 The quality gate is deliberately cheap: empty answers, very short answers, evasions, risky generated text, and low overlap with the objective are flagged before a run is considered successful.
 
 ## Integration
 
-ROBIN HOOD can run from:
+Seneschal can run from:
 
 - terminal
 - VS Code tasks
@@ -301,7 +301,7 @@ Integration scaffolds live in:
 
 ```text
 integrations/vscode/tasks.json
-integrations/cursor/rules/agentops.mdc
+integrations/cursor/rules/seneschal.mdc
 integrations/mcp/server_contract.json
 ```
 
@@ -309,39 +309,39 @@ Optional MCP server:
 
 ```powershell
 pip install -e .[mcp]
-robinhood-mcp
+seneschal-mcp
 ```
 
 MCP tools expose local controls for health, prompt scanning, context packets, capability checks, model profiles, provider health, provider state, token budgets, context packing, context snapshots, prompt reuse estimates, and routing.
-Routing is exposed as a recommendation only; ROBIN HOOD still does not invoke models.
+Routing is exposed as a recommendation only; Seneschal still does not invoke models.
 
 ## Compatibility With Continuity Legacy
 
-ROBIN HOOD is compatible with Continuity Legacy, but does not require it.
+Seneschal is compatible with Continuity Legacy, but does not require it.
 
 The intended relationship is:
 
 - Continuity Legacy governs repository integrity, baselines, release gates, and handoff discipline.
-- ROBIN HOOD governs token economy, context packing, prompt-risk scanning, model selection, and agent operations.
+- Seneschal governs token economy, context packing, prompt-risk scanning, model selection, and agent operations.
 
 They are designed to work beside each other. Neither should be embedded inside the other.
 
 ## Compatibility Note
 
-The internal Python package is still named `agentops` for compatibility with the incubation prototype. The public product name is ROBIN HOOD.
+The internal Python package is still named `seneschal` for compatibility with the incubation prototype. The public product name is Seneschal.
 
 Backward-compatible console aliases remain available:
 
 ```text
-agentops
-agentops-mcp
+seneschal
+seneschal-mcp
 ```
 
 Prefer the public commands:
 
 ```text
-robinhood
-robinhood-mcp
+seneschal
+seneschal-mcp
 ```
 
 ## Status
@@ -353,4 +353,4 @@ runtime_dependencies: none
 optional_dependencies: mcp
 ```
 
-ROBIN HOOD is useful today as a local frugality and safety tool. It is not yet a provider router or model invocation layer.
+Seneschal is useful today as a local frugality and safety tool. It is not yet a provider router or model invocation layer.

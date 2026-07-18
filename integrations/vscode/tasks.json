@@ -2,12 +2,12 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "ROBIN HOOD: Health",
+      "label": "Seneschal: Health",
       "type": "shell",
       "command": "python",
       "args": [
         "-m",
-        "agentops.cli",
+        "seneschal.cli",
         "health",
         "--strict"
       ],
@@ -15,12 +15,12 @@
       "problemMatcher": []
     },
     {
-      "label": "ROBIN HOOD: Scan Path",
+      "label": "Seneschal: Scan Path",
       "type": "shell",
       "command": "python",
       "args": [
         "-m",
-        "agentops.cli",
+        "seneschal.cli",
         "scan",
         "--path",
         "${input:robinHoodScanPath}",
@@ -32,12 +32,12 @@
       "problemMatcher": []
     },
     {
-      "label": "ROBIN HOOD: Pack Context",
+      "label": "Seneschal: Pack Context",
       "type": "shell",
       "command": "python",
       "args": [
         "-m",
-        "agentops.cli",
+        "seneschal.cli",
         "pack",
         "--path",
         "${input:robinHoodPackPath}",
@@ -50,12 +50,12 @@
       "problemMatcher": []
     },
     {
-      "label": "ROBIN HOOD: Route",
+      "label": "Seneschal: Route",
       "type": "shell",
       "command": "python",
       "args": [
         "-m",
-        "agentops.cli",
+        "seneschal.cli",
         "route",
         "--objective",
         "${input:robinHoodRouteObjective}",
@@ -66,7 +66,7 @@
       "problemMatcher": []
     },
     {
-      "label": "ROBIN HOOD: Test",
+      "label": "Seneschal: Test",
       "type": "shell",
       "command": "pytest",
       "args": [
@@ -81,19 +81,19 @@
     {
       "id": "robinHoodScanPath",
       "type": "promptString",
-      "description": "Path to scan with ROBIN HOOD",
+      "description": "Path to scan with Seneschal",
       "default": "adversarial_cases"
     },
     {
       "id": "robinHoodPackPath",
       "type": "promptString",
-      "description": "Path to pack with ROBIN HOOD",
+      "description": "Path to pack with Seneschal",
       "default": "."
     },
     {
       "id": "robinHoodRouteObjective",
       "type": "promptString",
-      "description": "Task objective to route with ROBIN HOOD",
+      "description": "Task objective to route with Seneschal",
       "default": "Fix typo in docs"
     }
   ]

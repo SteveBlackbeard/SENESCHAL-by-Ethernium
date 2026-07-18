@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Installation & usage audit for ROBIN HOOD.
+"""Installation & usage audit for Seneschal.
 
 Builds the package, installs the wheel into a THROWAWAY virtual environment
 (exactly what a user gets from PyPI — not the source tree), and exercises the
@@ -50,7 +50,7 @@ def main() -> int:
         if build.returncode != 0:
             return 1
 
-    wheels = sorted((REPO / "dist").glob("robin_hood-*.whl"))
+    wheels = sorted((REPO / "dist").glob("seneschal-*.whl"))
     check("wheel artifact exists", bool(wheels))
     if not wheels:
         return 1
@@ -70,10 +70,10 @@ def main() -> int:
             return 1
 
         def cli(*a: str) -> subprocess.CompletedProcess:
-            return run([str(py), "-m", "agentops.cli", *a])
+            return run([str(py), "-m", "seneschal.cli", *a])
 
         # Entry-point health (the bug this audit was written to catch).
-        health = run([str(py), "-m", "agentops.health_guard", "--strict"])
+        health = run([str(py), "-m", "seneschal.health_guard", "--strict"])
         check("health --strict passes from installed package", health.returncode == 0,
               health.stdout.strip() + health.stderr.strip())
 
@@ -83,7 +83,7 @@ def main() -> int:
 
         keys = Path(tmp) / "k"
         grant = Path(tmp) / "g.json"
-        check("keygen", run([str(py), "-m", "agentops.cli", "keygen", "--keys", str(keys)]).returncode == 0)
+        check("keygen", run([str(py), "-m", "seneschal.cli", "keygen", "--keys", str(keys)]).returncode == 0)
         sign = cli("grant", "--sign", "--keys", str(keys), "--task-id", "A",
                    "--capability", "read", "--allowed-path", "src/", "--out", str(grant))
         check("grant --sign", sign.returncode == 0)

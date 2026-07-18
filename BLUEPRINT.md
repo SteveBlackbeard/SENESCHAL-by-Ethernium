@@ -1,14 +1,14 @@
-# Low-Credit ROBIN HOOD Blueprint
+# Low-Credit Seneschal Blueprint
 
 ## Purpose
 
-ROBIN HOOD optimizes how AI agents consume paid model credits, context windows, and human attention.
+Seneschal optimizes how AI agents consume paid model credits, context windows, and human attention.
 
 It is a separate tool from Continuity Legacy.
 
 ## Boundary
 
-ROBIN HOOD owns:
+Seneschal owns:
 
 - model routing strategy
 - prompt packet design
@@ -19,7 +19,7 @@ ROBIN HOOD owns:
 - daily agent budget planning
 - provider-neutral operational playbooks
 
-ROBIN HOOD does not own:
+Seneschal does not own:
 
 - Continuity runtime integrity
 - Merkle or DNA hashes
@@ -103,7 +103,7 @@ Before using paid review:
 
 ## Clean-Room Innovation Method
 
-ROBIN HOOD should use deep reverse engineering without copying.
+Seneschal should use deep reverse engineering without copying.
 
 The method:
 
@@ -124,10 +124,10 @@ The rule:
 Possible future files if this becomes a real tool:
 
 ```text
-ROBIN HOOD/router.py
-ROBIN HOOD/usage_log.py
-ROBIN HOOD/context_packet.py
-ROBIN HOOD/provider_profiles.json
-ROBIN HOOD/templates/task_packet.md
-ROBIN HOOD/templates/final_review.md
+Seneschal/router.py
+Seneschal/usage_log.py
+Seneschal/context_packet.py
+Seneschal/provider_profiles.json
+Seneschal/templates/task_packet.md
+Seneschal/templates/final_review.md
 ```

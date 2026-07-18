@@ -1,6 +1,6 @@
-# ROBIN HOOD Threat Model
+# Seneschal Threat Model
 
-ROBIN HOOD is defensive infrastructure for AI-agent workflows.
+Seneschal is defensive infrastructure for AI-agent workflows.
 
 ## Assets
 
@@ -111,4 +111,4 @@ Study known incidents only to extract defensive classes:
 - reasoning attacks show outputs need validation
 - deepfake/content failures show policy must be enforced outside generation
 
-ROBIN HOOD must convert incidents into tests, not into exploit recipes.
+Seneschal must convert incidents into tests, not into exploit recipes.
