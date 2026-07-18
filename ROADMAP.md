@@ -1,5 +1,16 @@
 # Seneschal Roadmap
 
+Status lines below describe **the code, not the intent**. Phases 0 through 4 are
+built and covered by the test suite; a phase is only marked complete when its
+acceptance criteria are exercised by tests that run in CI.
+
+Verify it yourself rather than trusting this file:
+
+```bash
+python -m pytest -q          # 90 tests
+seneschal health --strict    # works from an installed wheel, not just a checkout
+```
+
 ## Phase 0: Incubation
 
 Status: complete.
@@ -63,7 +74,7 @@ Acceptance:
 
 ## Phase 3: Provider-Neutral Scorecard
 
-Status: partially implemented.
+Status: complete.
 
 Build:
 
@@ -95,15 +106,20 @@ Implemented now:
 - frugal route recommendations
 - CLI and MCP surfaces for models, budget, pack, and route
 
-Still planned:
+Completed since this phase was written:
 
-- measured tokenizer plugins
-- task classifier
-- provider adapter dry-runs
+- measured tokenizer plugins — `token_budget.count_tokens` uses tiktoken when a
+  profile declares one (`"tiktoken:cl100k_base"`) and reports `tokenizer_used`
+  so a measured count is never confused with an estimate
+- task classifier — `router.classify_task`
+- provider adapter dry-runs — `capacity_broker.broker_dry_run`, exposed on the
+  CLI and as an MCP tool
 
 ## Phase 3.5: Editor And MCP Integration
 
-Status: documentation scaffold complete, implementation planned.
+Status: complete. The MCP server is implemented (`seneschal/mcp_server.py`,
+19 tools) and runs under Cursor and Claude Desktop; see
+`integrations/mcp/cursor-setup.md`.
 
 Build:
 
@@ -122,7 +138,10 @@ Acceptance:
 
 ## Phase 4: Standalone Release Hardening
 
-Status: current.
+Status: complete, shipped as 0.2.0. Every item below exists in the package:
+`quality_gate.py`, `ollama_adapter.py`, `openai_compatible_adapter.py`,
+`seneschal run`, `config.py`, CI on Linux and Windows across Python 3.10-3.13,
+`CHANGELOG.md`, and `GETTING_STARTED.md`.
 
 Build:
 
@@ -142,6 +161,17 @@ Acceptance:
 - tests pass in its own repo
 - no private Continuity file is required
 - every real model call passes request planning first
+
+## Known Gaps
+
+Built, but without published measurements:
+
+- **Cascade and bandit savings.** Both are implemented and tested against fake
+  transports, so the logic is verified. What is *not* published is a savings
+  figure, because an honest one needs real provider calls accumulated in a
+  ledger over time. Context selection is measured instead — see the table in
+  `README.md` and `scripts/benchmark_savings.py`. A cascade number will be
+  published when it can be reproduced, not before.
 
 ## Deferred
 
