@@ -54,7 +54,11 @@ try {
         Write-Host "       console. Rewrite .pypirc in Notepad."
         Write-Host "  400  That version already exists. Bump the version; PyPI never"
         Write-Host "       allows replacing a released file."
-        throw "upload failed"
+        # Exit rather than throw: the codes above already explain what
+        # happened, and a red PowerShell stack trace on top of them reads as a
+        # second, worse failure.
+        Cleanup
+        exit 1
     }
 
     Write-Host ""
