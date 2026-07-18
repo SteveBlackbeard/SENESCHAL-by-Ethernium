@@ -1,0 +1,72 @@
+name: Publish to PyPI
+
+# Trusted Publishing (OIDC): PyPI verifies this workflow's identity directly,
+# so there is no API token anywhere — not in secrets, not on a laptop, not in
+# a .pypirc that has to be deleted afterwards. There is nothing to leak.
+#
+# One-time setup on PyPI, before the first run:
+#   https://pypi.org/manage/account/publishing/
+#   Add a *pending* publisher (the form for a project that does not exist yet):
+#     PyPI project name:  seneschal
+#     Owner:              SteveBlackbeard
+#     Repository name:    SENESCHAL-by-Ethernium
+#     Workflow name:      publish.yml
+#     Environment name:   pypi
+#
+# Then create a GitHub environment named `pypi` under
+# Settings -> Environments. Adding a required reviewer there means a release
+# cannot publish itself without a human approving it.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tooling
+        run: python -m pip install --upgrade pip build twine
+
+      - name: Build wheel and sdist
+        run: python -m build
+
+      - name: Validate metadata
+        run: python -m twine check dist/*
+
+      - name: Run the test suite against what will ship
+        run: |
+          pip install dist/*.whl
+          pip install pytest
+          python -m pytest -q
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      # Required for OIDC. This is the whole authentication mechanism —
+      # no secret is read anywhere in this file.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
