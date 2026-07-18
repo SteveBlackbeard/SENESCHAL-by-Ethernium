@@ -980,3 +980,26 @@ def test_cli_plan_request_uses_config(tmp_path: Path, capsys):
     ) == 0
     captured = capsys.readouterr()
     assert '"estimated_output_tokens": 333' in captured.out
+
+
+def test_health_guard_runs_as_a_plain_script():
+    """`python seneschal/health_guard.py` must not report a healthy tree broken.
+
+    Regression: the guard imported provider_profiles relatively. Run as a
+    script there is no parent package, so the import raised and the guard
+    reported "provider profiles failed to load" on a perfectly good checkout.
+
+    CI invoked it exactly that way, so CI was red from the rename commit
+    onward while the package itself was fine. Nothing tested this entry point,
+    so nothing caught it.
+    """
+    import subprocess
+    import sys
+
+    script = Path(__file__).parent.parent / "seneschal" / "health_guard.py"
+    result = subprocess.run(
+        [sys.executable, str(script), "--strict"],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "failed to load" not in result.stdout

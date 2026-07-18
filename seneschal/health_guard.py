@@ -54,7 +54,16 @@ def check_runtime() -> list[Finding]:
     imports, the bundled provider profiles load, and the core surface is wired."""
     findings: list[Finding] = []
     try:
-        from .provider_profiles import load_profiles
+        try:
+            from .provider_profiles import load_profiles
+        except ImportError:
+            # Run as a plain script (`python seneschal/health_guard.py`) there
+            # is no parent package, so the relative import fails and the guard
+            # declares a perfectly good checkout broken. Put the repository
+            # root on the path — as a script, sys.path[0] is this file's own
+            # directory, not the root — and import absolutely.
+            sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+            from seneschal.provider_profiles import load_profiles
 
         if not load_profiles():
             findings.append(Finding("error", "no provider profiles are available"))

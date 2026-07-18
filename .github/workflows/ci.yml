@@ -21,8 +21,11 @@ jobs:
         run: python -m pip install --upgrade pip build pytest
       - name: Install package with measured tokenizer and signing
         run: python -m pip install -e ".[measure,security]"
+      # Invoke the console script, not the file. `python seneschal/health_guard.py`
+      # runs with no parent package, so the guard's relative imports fail and it
+      # reports a healthy tree as broken. It is also not how anyone runs it.
       - name: Health
-        run: python seneschal/health_guard.py --strict
+        run: seneschal health --strict
       - name: Tests
         run: pytest -q
       - name: Build
