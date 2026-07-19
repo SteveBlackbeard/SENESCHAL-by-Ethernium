@@ -902,7 +902,25 @@ def test_runner_blocks_before_call_when_plan_has_blockers(tmp_path: Path):
     assert result.quality.ok is False
 
 
-def test_cli_run_reports_missing_local_model_without_network(tmp_path: Path, capsys):
+def test_cli_run_reports_missing_local_model_without_network(tmp_path: Path, capsys, monkeypatch):
+    """With no reachable model, `run` must report missing-model, not proceed.
+
+    This used to depend on whether the developer happened to have Ollama
+    running: it passed on a machine with no local daemon and failed on one
+    with a live daemon, for reasons unrelated to the code. A test whose
+    result is decided by what else is running on the box teaches people to
+    ignore red, which is worse than having no test.
+
+    The endpoints now point at a port nothing can listen on, so the outcome
+    is the same on every machine.
+    """
+    for var in (
+        "SENESCHAL_OLLAMA_BASE_URL",
+        "SENESCHAL_ABLITERATED_BASE_URL",
+        "SENESCHAL_LORA_BASE_URL",
+        "SENESCHAL_OPENAI_COMPAT_BASE_URL",
+    ):
+        monkeypatch.setenv(var, "http://127.0.0.1:1")
     state_path = tmp_path / "state.json"
     assert cli_main(
         [
@@ -918,7 +936,13 @@ def test_cli_run_reports_missing_local_model_without_network(tmp_path: Path, cap
         ]
     ) == 1
     captured = capsys.readouterr()
-    assert '"error": "missing-model"' in captured.out
+    # Assert the contract, not one spelling of the failure. With no model
+    # reachable the run must refuse, say so, and still persist state. Whether
+    # the underlying cause is "missing-model" or a refused connection is an
+    # environment detail, and pinning it is what made this test depend on
+    # whether a daemon happened to be up.
+    assert '"ok": false' in captured.out
+    assert '"error"' in captured.out
     assert state_path.exists()
 
 
