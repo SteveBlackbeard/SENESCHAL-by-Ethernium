@@ -3,6 +3,33 @@
 All notable changes to Seneschal are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.1] - 2026-07-18
+
+### Fixed
+- **CI had been red since the rename, and the broken thing was the check
+  itself.** The health step ran `python seneschal/health_guard.py`, which
+  executes with no parent package, so the guard's relative import of
+  `provider_profiles` raised and it declared a perfectly healthy tree broken.
+  CI now invokes the console script — what a user actually runs — and the guard
+  also stands on its own, because running a file directly is an obvious thing
+  to try and should not produce a false alarm. A test now executes that entry
+  point in a subprocess. Nothing covered it before, which is how a guard whose
+  entire job is detecting breakage sat broken for months, announcing that
+  something was wrong with itself.
+
+### Added
+- `scripts/publish.ps1`: builds, validates, uploads, and deletes `.pypirc` in a
+  `finally` block, so a token never survives a failed run. Release steps written
+  as prose get pasted into a shell whole, explanatory sentences and all; a file
+  you run has no such failure mode.
+
+### Note
+- 0.2.0 was the first release published through Trusted Publishing. PyPI's
+  attestation records that the wheel was built by this repository's
+  `publish.yml`, so anyone can verify where the artifact came from without
+  trusting the author — which is the claim this project makes about everything
+  else it reports.
+
 ## [0.2.0] - 2026-07-16
 
 ### Added — frugal engine
