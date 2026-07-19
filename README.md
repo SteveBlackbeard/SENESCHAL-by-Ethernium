@@ -5,10 +5,12 @@
 # Seneschal: Local-First Control Layer for AI Work
 
 [![CI](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/actions/workflows/ci.yml/badge.svg)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/badge/pypi-0.2.0-blueviolet)](https://pypi.org/project/seneschal/)
+[![PyPI](https://img.shields.io/pypi/v/seneschal?label=pypi&color=blueviolet)](https://pypi.org/project/seneschal/)
+[![Downloads](https://img.shields.io/pypi/dm/seneschal?color=blueviolet)](https://pypi.org/project/seneschal/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![Dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/pyproject.toml)
+[![Attested build](https://img.shields.io/badge/build-attested%20(PyPI%20OIDC)-0a7bbb)](https://pypi.org/project/seneschal/#files)
 
 #### Languages
 [![EN](https://img.shields.io/badge/EN-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/README.md) [![ES](https://img.shields.io/badge/ES-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_es.md) [![FR](https://img.shields.io/badge/FR-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_fr.md) [![DE](https://img.shields.io/badge/DE-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_de.md) [![IT](https://img.shields.io/badge/IT-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_it.md) [![PT](https://img.shields.io/badge/PT-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_pt.md)
