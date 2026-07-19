@@ -8,7 +8,7 @@ version = "0.2.1"
 authors = [
   { name = "SteveBlackbeard" },
 ]
-description = "Provider-neutral, local-first operations layer for token frugality and safer AI-agent work."
+description = "Picks which files to send a model instead of pasting the repository: 69,412 tokens down to 8,236, measured. Scans untrusted input for prompt injection and enforces Ed25519-signed capability grants. Zero runtime dependencies."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
