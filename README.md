@@ -15,6 +15,23 @@
 #### Languages
 [![EN](https://img.shields.io/badge/EN-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/README.md) [![ES](https://img.shields.io/badge/ES-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_es.md) [![FR](https://img.shields.io/badge/FR-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_fr.md) [![DE](https://img.shields.io/badge/DE-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_de.md) [![IT](https://img.shields.io/badge/IT-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_it.md) [![PT](https://img.shields.io/badge/PT-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_pt.md) [![JA](https://img.shields.io/badge/JA-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_ja.md) [![ZH](https://img.shields.io/badge/ZH-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_zh.md) [![KO](https://img.shields.io/badge/KO-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_ko.md) [![RU](https://img.shields.io/badge/RU-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_ru.md) [![AR](https://img.shields.io/badge/AR-white)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/OTHER_LANGUAGES/README_ar.md)
 
+You paste the whole repository into the model, because you do not know which
+files matter. It costs a fortune, the answer is worse for the noise, and you do
+it again tomorrow.
+
+Seneschal picks the files instead. **69,412 tokens down to 8,236 — measured, not
+estimated.** It also scans what you feed a model for prompt injection, and
+enforces what an agent may touch with grants it cannot forge.
+
+Zero runtime dependencies. Nothing leaves your machine.
+
+```bash
+pip install seneschal
+seneschal select --path . --objective "fix the login flow" --max-tokens 8000
+```
+
+---
+
 Seneschal by Ethernium is a local-first control layer for cheaper, safer AI-assisted work.
 
 It helps decide what context to send, what to keep local, what to block, and whether a task deserves a stronger model. The goal is practical token economy: fewer whole-repo dumps, fewer retries, smaller prompts, safer tool scope, and clearer task packets.
