@@ -3,6 +3,29 @@
 All notable changes to Seneschal are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.2] - 2026-07-19
+
+### Fixed — what an agent found using the tool
+- **The manifest contradicted itself.** `TOOL_MANIFEST.json` listed 17 of 22
+  modules as both planned and implemented. It is a governance artifact whose own
+  health gate checked only that the JSON parsed, never that it was coherent — the
+  exact drift the tool exists to prevent, inside the tool. The 17 are removed
+  from planned; two tests now enforce that planned and implemented stay disjoint
+  and that a planned module is not already a file on disk.
+- **Loopback is not an external link.** `scan` flagged any `http(s)://` as
+  "external link present", so a reference to `http://127.0.0.1` — where a
+  local-first server lives — tripped it. Loopback and the RFC1918 ranges are now
+  excluded; only genuinely off-machine hosts are flagged.
+- Renamed the default state and ledger paths from `.robinhood/` to `.seneschal/`;
+  the rename reached the code months ago and never reached the config.
+- Made a CLI test deterministic: it pinned one spelling of a failure and so
+  passed or failed according to whether Ollama happened to be running.
+
+### Note
+- The audit's report that `trust` was a constant `low` was checked and is not a
+  bug: `trust` derives from `source` and defaults to low because `scan` defaults
+  `--source` to external — the correct safe default for a security tool.
+
 ## [0.2.1] - 2026-07-18
 
 ### Fixed
