@@ -243,6 +243,30 @@ def select_tool(
     ).to_dict()
 
 
+def audit_tool(
+    path: str,
+    *,
+    objective: str,
+    max_tokens: int = 8000,
+    source: str = "external",
+    changed_paths: list[str] | None = None,
+) -> dict[str, Any]:
+    """One verdict for an agent: scan for safety, select context, and route.
+
+    This is the composite an agent wants from MCP — a single proceed/block
+    decision instead of three tool calls it has to stitch together itself.
+    """
+    from .audit import audit_path
+
+    return audit_path(
+        Path(path),
+        objective=objective,
+        max_tokens=max_tokens,
+        source=source,
+        changed_paths=changed_paths or [],
+    ).to_dict()
+
+
 def broker_dry_run_tool(
     objective: str,
     *,
@@ -344,6 +368,7 @@ def build_mcp_server() -> Any:
     server.tool(name="seneschal.reuse")(reuse_tool)
     server.tool(name="seneschal.savings")(savings_tool)
     server.tool(name="seneschal.select")(select_tool)
+    server.tool(name="seneschal.audit")(audit_tool)
     server.tool(name="seneschal.broker_dry_run")(broker_dry_run_tool)
     server.tool(name="seneschal.plan_request")(plan_request_tool)
     server.tool(name="seneschal.run")(run_tool)
@@ -365,6 +390,7 @@ def build_mcp_server() -> Any:
     server.tool(name="seneschal.reuse")(reuse_tool)
     server.tool(name="seneschal.savings")(savings_tool)
     server.tool(name="seneschal.select")(select_tool)
+    server.tool(name="seneschal.audit")(audit_tool)
     server.tool(name="seneschal.broker_dry_run")(broker_dry_run_tool)
     server.tool(name="seneschal.plan_request")(plan_request_tool)
     server.tool(name="seneschal.run")(run_tool)
