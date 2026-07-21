@@ -1053,3 +1053,33 @@ def test_manifest_planned_modules_do_not_exist_yet():
     src = Path(__file__).parent.parent / "seneschal"
     shipped = [name for name in manifest.get("planned_modules", []) if (src / f"{name}.py").exists()]
     assert not shipped, f"listed as planned but already shipped: {shipped}"
+
+
+def test_loopback_and_private_urls_are_not_external():
+    """A local-first tool must not flag its own localhost server as external.
+
+    scan flagged any http(s):// as 'external link present', so a file
+    referencing http://127.0.0.1 — where a local-only server lives — tripped
+    the finding. For an exfiltration-aware scanner, loopback and RFC1918 are
+    not external, and a false positive there trains people to ignore it.
+    """
+    from seneschal.prompt_firewall import classify_text
+    for local in ("http://127.0.0.1:8080/", "http://localhost:3000", "http://10.0.0.5", "http://192.168.1.1"):
+        risk = classify_text(f"server at {local}", source="internal")
+        assert "external link present" not in risk.findings, local
+    for external in ("https://evil.com/x", "http://172.32.0.1"):
+        risk = classify_text(f"link {external}", source="internal")
+        assert "external link present" in risk.findings, external
+
+
+def test_trust_derives_from_source_not_constant():
+    """trust is not a constant; it follows the declared source.
+
+    An audit reported trust as always 'low'. It is not — it defaults to low
+    because scan's --source defaults to 'external', which is the correct safe
+    default for a security tool. Untrusted-until-declared must not regress into
+    auto-trusting local input.
+    """
+    from seneschal.prompt_firewall import classify_text
+    assert classify_text("x", source="external").trust == "low"
+    assert classify_text("x", source="internal").trust == "medium"

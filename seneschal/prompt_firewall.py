@@ -7,6 +7,27 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
+# A URL is only worth flagging if it points off-machine. Loopback and the
+# RFC1918 private ranges are where a local-first tool's own servers live;
+# flagging http://127.0.0.1 as "external" is a false positive that teaches
+# users to ignore the finding, which is worse than not having it.
+_URL_HOST = re.compile(r"https?://([^/:\s]+)", re.IGNORECASE)
+_LOCAL_HOSTS = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+
+
+def _has_external_link(text: str) -> bool:
+    for host in _URL_HOST.findall(text):
+        h = host.lower()
+        if h in _LOCAL_HOSTS:
+            continue
+        if h.startswith("127.") or h.startswith("10.") or h.startswith("192.168."):
+            continue
+        if h.startswith("172.") and h.split(".")[1:2] and h.split(".")[1].isdigit() and 16 <= int(h.split(".")[1]) <= 31:
+            continue
+        return True
+    return False
+
+
 INJECTION_MARKERS = (
     "ignore previous instructions",
     "ignore all previous",
@@ -98,7 +119,7 @@ def classify_text(text: str, *, source: str = "external") -> PromptRisk:
     for label, pattern in SECRET_PATTERNS:
         if pattern.search(text):
             findings.append(f"possible secret material: {label}")
-    if "http://" in lowered or "https://" in lowered:
+    if _has_external_link(text):
         findings.append("external link present")
 
     trust = "low" if source in {"external", "web", "pdf", "ocr", "generated"} else "medium"
