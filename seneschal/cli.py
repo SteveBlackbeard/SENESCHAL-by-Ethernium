@@ -436,6 +436,22 @@ def cmd_select(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_audit(args: argparse.Namespace) -> int:
+    from .audit import audit_path
+
+    verdict = audit_path(
+        Path(args.path),
+        objective=args.objective,
+        max_tokens=args.max_tokens,
+        source=args.source,
+        changed_paths=args.changed or [],
+        providers_path=Path(args.providers) if args.providers else None,
+    )
+    print(json.dumps(verdict.to_dict(), indent=2, sort_keys=True))
+    # Exit 1 when blocked so a pipeline can gate on it, like scan --fail-on-block.
+    return 0 if verdict.proceed else 1
+
+
 def cmd_cascade(args: argparse.Namespace) -> int:
     from .cascade import run_cascade
 
@@ -676,6 +692,15 @@ def build_parser() -> argparse.ArgumentParser:
     select.add_argument("--min-score", type=int, default=30)
     select.add_argument("--objective", help="Rank candidates by BM25 relevance to this objective.")
     select.set_defaults(func=cmd_select)
+
+    audit = subparsers.add_parser("audit", help="One verdict: scan for safety, select context under budget, and route — proceed or block.")
+    audit.add_argument("--path", default=".")
+    audit.add_argument("--objective", required=True, help="What the model is being asked to do.")
+    audit.add_argument("--max-tokens", type=int, default=8000)
+    audit.add_argument("--source", default="external", help="Trust level of the input (external assumes least trust).")
+    audit.add_argument("--changed", action="append", help="A changed path to anchor context selection (repeatable).")
+    audit.add_argument("--providers", help="Path to a providers file; without it, the bundled profiles are used.")
+    audit.set_defaults(func=cmd_audit)
 
     broker = subparsers.add_parser("broker-dry-run", help="Dry-run provider capacity routing without API calls.")
     broker.add_argument("--objective", required=True)

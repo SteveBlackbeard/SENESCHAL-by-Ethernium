@@ -45,6 +45,20 @@ seneschal route --objective "fix a typo in the README"
 
 Returns the cheapest sufficient model path, with the reasoning it used.
 
+## 4b. One command, one verdict
+
+If you only run one thing before calling a model, run this. `audit` composes the
+three above — scan for safety, select context under budget, pick a route — into a
+single proceed/block verdict, and exits non-zero when the input is unsafe:
+
+```bash
+seneschal audit --path . --objective "fix the login flow" --max-tokens 8000
+```
+
+`"proceed": false` with exit code 1 means the input failed the safety scan and
+nothing was routed. `"proceed": true` gives you the selected context and the
+model to use, in one JSON object an agent can act on.
+
 ## 5. Sign a capability grant (optional extra)
 
 An unsigned grant is a JSON file any process can edit — including the agent it
