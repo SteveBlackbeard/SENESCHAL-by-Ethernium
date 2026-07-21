@@ -4,7 +4,10 @@
   "extractable": true,
   "relationship_to_continuity": "none",
   "purpose": "Provider-neutral AI agent token frugality, context, and routing optimization.",
-  "usage_modes": ["standalone", "with-continuity-legacy"],
+  "usage_modes": [
+    "standalone",
+    "with-continuity-legacy"
+  ],
   "governance": {
     "rulebook": "GOVERNANCE.md",
     "maturity": "prototype",
@@ -44,27 +47,10 @@
   ],
   "planned_modules": [
     "adversarial_corpus",
-    "usage_log",
-    "provider_profiles",
-    "project_config",
-    "templates",
-    "token_budget",
-    "context_packer",
-    "context_cache",
-    "savings",
-    "context_select",
-    "capacity_broker",
-    "external_provider_catalog",
-    "provider_health",
-    "provider_state",
-    "request_planner",
-    "ollama_adapter",
-    "openai_compatible_adapter",
-    "run_pipeline",
-    "quality_gate",
-    "vscode_integration",
     "cursor_integration",
-    "mcp_server"
+    "templates",
+    "usage_log",
+    "vscode_integration"
   ],
   "implemented_modules": [
     "health_guard",
@@ -96,7 +82,11 @@
     "quality_gate"
   ],
   "acceptance_metrics": {
-    "must_reduce_one_of": ["cost", "risk", "drift"],
+    "must_reduce_one_of": [
+      "cost",
+      "risk",
+      "drift"
+    ],
     "default_storage": "jsonl",
     "default_runtime": "local_first",
     "no_dashboard_before": "prototype"

@@ -1027,3 +1027,29 @@ def test_health_guard_runs_as_a_plain_script():
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert "failed to load" not in result.stdout
+
+
+def test_manifest_planned_and_implemented_are_disjoint():
+    """A module cannot be both planned and implemented.
+
+    TOOL_MANIFEST.json is a governance artifact, and its own health gate
+    checked only that the JSON parsed — not that it made sense. 17 of 22
+    'planned' modules were also listed as 'implemented', which is precisely
+    the drift this tool exists to prevent, occurring inside the tool. Nothing
+    read the document, so nothing noticed. Found by an agent, not a reader.
+    """
+    import json
+    manifest = json.loads((Path(__file__).parent.parent / "TOOL_MANIFEST.json").read_text(encoding="utf-8"))
+    planned = set(manifest.get("planned_modules", []))
+    implemented = set(manifest.get("implemented_modules", []))
+    overlap = planned & implemented
+    assert not overlap, f"modules claimed as both planned and implemented: {sorted(overlap)}"
+
+
+def test_manifest_planned_modules_do_not_exist_yet():
+    """A genuinely planned module must not already be a file on disk."""
+    import json
+    manifest = json.loads((Path(__file__).parent.parent / "TOOL_MANIFEST.json").read_text(encoding="utf-8"))
+    src = Path(__file__).parent.parent / "seneschal"
+    shipped = [name for name in manifest.get("planned_modules", []) if (src / f"{name}.py").exists()]
+    assert not shipped, f"listed as planned but already shipped: {shipped}"
