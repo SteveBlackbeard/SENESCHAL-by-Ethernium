@@ -1,0 +1,444 @@
+﻿{
+    "schema":  "ethernium.personal.file-manifest/1",
+    "repository":  "ETHERNIUM-PERSONAL-SENESCHAL",
+    "version":  "0.2.2",
+    "generated_at":  "2026-07-22T01:27:33.1873086Z",
+    "file_count":  87,
+    "files":  [
+                  {
+                      "path":  ".github/workflows/ci.yml",
+                      "bytes":  1035,
+                      "sha256":  "a8ef6f6a2d4e9f84a7f66cb1c65fda8778f358260fc6a45e47d8607ec50b3039"
+                  },
+                  {
+                      "path":  ".gitignore",
+                      "bytes":  306,
+                      "sha256":  "39a39a8a9754f7871d92eafba62db2d3edbf6b3f16603c08d211e8f973354ccc"
+                  },
+                  {
+                      "path":  "adversarial_cases/hidden_unicode.txt",
+                      "bytes":  224,
+                      "sha256":  "7698789267393d73997a72e811b7db514854bb26b13ef0134004553bf29cfc5c"
+                  },
+                  {
+                      "path":  "adversarial_cases/indirect_prompt_injection.txt",
+                      "bytes":  258,
+                      "sha256":  "f6fc4cf6ab26d1f224e4b58e5d616df2cc40f0ed18da8f1cadd54e0d7681c274"
+                  },
+                  {
+                      "path":  "adversarial_cases/README.md",
+                      "bytes":  551,
+                      "sha256":  "de66afdab01578fa043b7d183655411bb46fdd0d2feaa786eac93c796936154b"
+                  },
+                  {
+                      "path":  "adversarial_cases/tool_hijack.txt",
+                      "bytes":  310,
+                      "sha256":  "1d1f1489b3a863f64e263863dd5c3ecc4461c1e2c07114617f50c5220fb87180"
+                  },
+                  {
+                      "path":  "banners/ethernium_header.png",
+                      "bytes":  149212,
+                      "sha256":  "0fe72edd8d42f7d08860f4ef4aec265c11209b635a0043be940189a1c057f179"
+                  },
+                  {
+                      "path":  "BLUEPRINT.md",
+                      "bytes":  2597,
+                      "sha256":  "14090a2e2542418863ceeea12edce85fa38d8bb34af076975850d3bb9b7a6487"
+                  },
+                  {
+                      "path":  "CHANGELOG.md",
+                      "bytes":  5048,
+                      "sha256":  "c0744cfa2bd0ee6da40fe2a0821931d37df32c6976aa4e9848162bed60777c7b"
+                  },
+                  {
+                      "path":  "CONTINUITY_USAGE.md",
+                      "bytes":  2145,
+                      "sha256":  "1931dbfd7e5e4c1246e3d628fb0714b2da04e191a2d4fd8940bd9fc76d72c7b1"
+                  },
+                  {
+                      "path":  "docs/releases/v0.2.1.md",
+                      "bytes":  3660,
+                      "sha256":  "f58e808bcd54a93e58a86e8b1421375b0e7e9619f578b97b7db456db04b3a288"
+                  },
+                  {
+                      "path":  "docs/releases/v0.2.2.md",
+                      "bytes":  2304,
+                      "sha256":  "57e58b93c0106bcc270dc07d9d44a7a52b82753c99a9ff4953dc1924a46d0e39"
+                  },
+                  {
+                      "path":  "docs/upstream-workflows/publish.yml",
+                      "bytes":  2034,
+                      "sha256":  "21f2d0b2a729f4ac7551e093a515487e2910c6e9441d9da7e5bdb2d14088b440"
+                  },
+                  {
+                      "path":  "EXTRACTION_CONTRACT.md",
+                      "bytes":  1688,
+                      "sha256":  "9f1d18a8fc35a5ae88a973d982e63bb413de8006f52a9ca57a2a127430db93ef"
+                  },
+                  {
+                      "path":  "FRUGALITY.md",
+                      "bytes":  7923,
+                      "sha256":  "d3032bf1a3b840776924af3fd0925a26d3eb4fd0531b39fc23eee1d4434840dd"
+                  },
+                  {
+                      "path":  "GETTING_STARTED.md",
+                      "bytes":  3183,
+                      "sha256":  "346f94cda896c6f40c4a926f6935dd3a9a27aa2214b587175df63bf4887542b7"
+                  },
+                  {
+                      "path":  "GOVERNANCE.md",
+                      "bytes":  2000,
+                      "sha256":  "3f0d158470ae251bb6568b1f50edcb5fc140ea3d7cb9d5ee41729b6b398c902e"
+                  },
+                  {
+                      "path":  "INTEGRATIONS.md",
+                      "bytes":  2859,
+                      "sha256":  "343a991be2289087907e8f5db376f73cb95270e98d8c0084e048179d38fa011c"
+                  },
+                  {
+                      "path":  "integrations/cursor/rules/seneschal.mdc",
+                      "bytes":  1078,
+                      "sha256":  "fbf545194ad7772625ce76e42b932ad1bc316268392108c58acc249f6e5db7f1"
+                  },
+                  {
+                      "path":  "integrations/mcp/cursor-setup.md",
+                      "bytes":  2175,
+                      "sha256":  "c2edccc019c2f67d3b0c4d4a30d852fae57a71687f571d2698a88dd30e9e226f"
+                  },
+                  {
+                      "path":  "integrations/mcp/README.md",
+                      "bytes":  1922,
+                      "sha256":  "db8b4cddddccff6f953442c255c2c4ed848b5b51267eb521694a14060fa9a148"
+                  },
+                  {
+                      "path":  "integrations/mcp/server_contract.json",
+                      "bytes":  2879,
+                      "sha256":  "830738c0e40695497e2f5fbffa323e745960069c67c26fcb29fb543d8e8f2593"
+                  },
+                  {
+                      "path":  "integrations/vscode/tasks.json",
+                      "bytes":  2168,
+                      "sha256":  "8f522ce71bea2f60c33db7baeaf9d60eadc59e67ded4248b4622b084c698f47a"
+                  },
+                  {
+                      "path":  "LICENSE",
+                      "bytes":  1084,
+                      "sha256":  "92717f8af59c70089453879c0a7e363b7c491a15ae54d30634590f00db82f19c"
+                  },
+                  {
+                      "path":  "MITIGATION_MATRIX.md",
+                      "bytes":  3204,
+                      "sha256":  "d8d79d2c5e156195c5533018dcdd23b8c4cf611e5d46c3c23c6f50cd8ca4f881"
+                  },
+                  {
+                      "path":  "OPTIMIZATION_MODEL.md",
+                      "bytes":  2929,
+                      "sha256":  "e6fad6a4c15c97fed49fe1dc0de2d12799f9f34baa702c631016562e045d5886"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_ar.md",
+                      "bytes":  3353,
+                      "sha256":  "84e373f4465d0a60e81d5d7cc289e83bf96e6168052ab7e63eb1e01e7fbc5147"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_de.md",
+                      "bytes":  2634,
+                      "sha256":  "e06f2b9549abafa868d2350166b449e5e5b2493d62f457cb2f34caebbc9bef2b"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_es.md",
+                      "bytes":  2542,
+                      "sha256":  "067261dde9be651096a4ef1bea22e56a3d6557f080d1899a051e14ff6c2203b5"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_fr.md",
+                      "bytes":  2641,
+                      "sha256":  "c1f00566aeef68d00e1109f17add7a7fd57b057707ce75a6d8ff11af379a60cc"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_it.md",
+                      "bytes":  2585,
+                      "sha256":  "413cec5d6e34eff75344548fd4dbc0f1f3a7300ce3894a78c0227b18b380a690"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_ja.md",
+                      "bytes":  3240,
+                      "sha256":  "e1409efd1a6f4876eafaac570f893b2e4cb49a0e295c04b5e8fb01d1f764fa8b"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_ko.md",
+                      "bytes":  2916,
+                      "sha256":  "de2b5a38ebab5ff1f613bf5593c4e29e3b504fd54b5f535c45aad54c8ab9f00f"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_pt.md",
+                      "bytes":  2599,
+                      "sha256":  "77aa501946b23c73ae2554af94f30da9da95db6182a5617943c3caebcf2ccff6"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_ru.md",
+                      "bytes":  3975,
+                      "sha256":  "9192143aa968944af3fe784ac2654c6c0ade52d21093c6aec4dc3b705192d96f"
+                  },
+                  {
+                      "path":  "OTHER_LANGUAGES/README_zh.md",
+                      "bytes":  2291,
+                      "sha256":  "d412e474cc153c231d24591c00b08f5e3ff98417470898f5d4a113dbc94d08c2"
+                  },
+                  {
+                      "path":  "PENDING.md",
+                      "bytes":  4901,
+                      "sha256":  "41e92007900a29b832e9ce298b754ec928ec295c86ebb226ce8d3e9f468dbbc0"
+                  },
+                  {
+                      "path":  "PERSONAL_LINE.md",
+                      "bytes":  346,
+                      "sha256":  "081efd2312060b1a5ca026e41c7413d93bf19402752ada365d6025303ac4c6d3"
+                  },
+                  {
+                      "path":  "PRIOR_ART.md",
+                      "bytes":  2443,
+                      "sha256":  "88a67fb531557cd12fe4c31ad4383bc1c50077d034674f3a6bf74c15c970b51c"
+                  },
+                  {
+                      "path":  "providers.local.json.example",
+                      "bytes":  2504,
+                      "sha256":  "29edb7e7605e5b94adafb5c3cf01a14072481abde985d0bef3ff667e9627255f"
+                  },
+                  {
+                      "path":  "pyproject.toml",
+                      "bytes":  1636,
+                      "sha256":  "3fce75f0ae7d530fb08548b770f47bbda13a623269ec7b65c0de438c2309e880"
+                  },
+                  {
+                      "path":  "README.md",
+                      "bytes":  17655,
+                      "sha256":  "7c6746fe8d0a3f6c5ec4965613178236894c0ca5957642831474f2d9f3db1b10"
+                  },
+                  {
+                      "path":  "RELEASE.md",
+                      "bytes":  1502,
+                      "sha256":  "43f75f70d1468f97d951054dbd8ac7f78cbf69dcde13d87eea1a7e604fe3b102"
+                  },
+                  {
+                      "path":  "ROADMAP.md",
+                      "bytes":  4942,
+                      "sha256":  "252b6373197c3059a94febfdb1d3993e14a2617620fc5a4830a63aae9f51c8dd"
+                  },
+                  {
+                      "path":  "RULEBOOK.md",
+                      "bytes":  1707,
+                      "sha256":  "a99e2a5280b921affc83df13532fde4463d895217e8212b203ae5ea0f8630531"
+                  },
+                  {
+                      "path":  "scripts/benchmark_savings.py",
+                      "bytes":  4100,
+                      "sha256":  "499b7202b912b7285df8904190ad936ffa6ecadf7b2a98d44d43160ad535259c"
+                  },
+                  {
+                      "path":  "scripts/install_audit.py",
+                      "bytes":  5072,
+                      "sha256":  "17e03ddf478cca64fc7bf46896f2ce88cc241bac24fd5f23f9b5139006c9050c"
+                  },
+                  {
+                      "path":  "scripts/publish.ps1",
+                      "bytes":  2553,
+                      "sha256":  "dd4c108b1437429c32331e28e76e5abaaab65b901a86846340c70efe80725bd5"
+                  },
+                  {
+                      "path":  "SECURITY.md",
+                      "bytes":  2356,
+                      "sha256":  "7dab9ac936e1646a8b9d96c9a558b286463d4a98fc1227477e3cfa5168b31c40"
+                  },
+                  {
+                      "path":  "seneschal.config.json.example",
+                      "bytes":  247,
+                      "sha256":  "0b19d2b3e56da40535bc32dd934289e63c11a5a621575b82d249d859a263169c"
+                  },
+                  {
+                      "path":  "seneschal/__init__.py",
+                      "bytes":  333,
+                      "sha256":  "f1220bdbce58c39b0fbbe519cc6b41b0ca0a51f3f29013a9997c7fae86f7d353"
+                  },
+                  {
+                      "path":  "seneschal/audit.py",
+                      "bytes":  3537,
+                      "sha256":  "7f6bc27123b7e76a93e5e2cb8e78cbfd8d2f87fdaad6171b7667b804aa25e722"
+                  },
+                  {
+                      "path":  "seneschal/bandit.py",
+                      "bytes":  1914,
+                      "sha256":  "3e97688f2ee02d4b81283f4c9a0eac0accac577e7a8c9c48748af1696b7bf905"
+                  },
+                  {
+                      "path":  "seneschal/bm25.py",
+                      "bytes":  2196,
+                      "sha256":  "84449a9ee2d60fc4e9896ffe5c36ca37890b5e949cd1c3945cf751e38a925904"
+                  },
+                  {
+                      "path":  "seneschal/capability_broker.py",
+                      "bytes":  2380,
+                      "sha256":  "958e342a5b72adc7eb1a238c70e6af950b4f72eecdfe6c5b48b883aad3523519"
+                  },
+                  {
+                      "path":  "seneschal/capacity_broker.py",
+                      "bytes":  6219,
+                      "sha256":  "262f31819306e615dfc2d3232274ae2a08ddf8b0d938bba6b2c68422a76154b3"
+                  },
+                  {
+                      "path":  "seneschal/cascade.py",
+                      "bytes":  6261,
+                      "sha256":  "d93e8883a3deb199f69661b70d662f627ec91fdddfca1d72eef5f2b0ccd36994"
+                  },
+                  {
+                      "path":  "seneschal/cli.py",
+                      "bytes":  35632,
+                      "sha256":  "da83cf1c5bd041db9629d1a9abcd45f676959ff3d6a7f7822a676110d670e44f"
+                  },
+                  {
+                      "path":  "seneschal/config.py",
+                      "bytes":  1705,
+                      "sha256":  "026ec6c7bf7f965cb6e2757fd16338a50fc91999fd38afb1fdc25b13bd803498"
+                  },
+                  {
+                      "path":  "seneschal/context_cache.py",
+                      "bytes":  6551,
+                      "sha256":  "f20ef7d28ffe580458c1b5be2f626bb5965db3ee426001a641ce5115cb9fab01"
+                  },
+                  {
+                      "path":  "seneschal/context_packer.py",
+                      "bytes":  5700,
+                      "sha256":  "ac0895b17da18547ed2fddc9b757897d9cb68ad7b69eb102f135749725c2af11"
+                  },
+                  {
+                      "path":  "seneschal/context_packet.py",
+                      "bytes":  1372,
+                      "sha256":  "f141d29b14758dd59a75a28430356cc30f21c4b4e46145c96470bef7ef2edf3a"
+                  },
+                  {
+                      "path":  "seneschal/context_select.py",
+                      "bytes":  6329,
+                      "sha256":  "6fcce6573248c4d32d9202aceb1d6d388d4c707651d483e2f5350fdcda9e3ba1"
+                  },
+                  {
+                      "path":  "seneschal/frugality_ledger.py",
+                      "bytes":  3207,
+                      "sha256":  "ad88df51625baa893d0e8cb695e27125f34b7087d9de1c6ad44830ea74500027"
+                  },
+                  {
+                      "path":  "seneschal/health_guard.py",
+                      "bytes":  5335,
+                      "sha256":  "56270621b1e6a756f56622808da2ede1a9ed6395b4932e56ad2187f6365fe4a6"
+                  },
+                  {
+                      "path":  "seneschal/mcp_server.py",
+                      "bytes":  14527,
+                      "sha256":  "db29f526deb14949e3f4e71715ae3c6d34998fd4cb0b67826ed4205292fd5cc3"
+                  },
+                  {
+                      "path":  "seneschal/ollama_adapter.py",
+                      "bytes":  2651,
+                      "sha256":  "a244682bd13f413b4c0c51d721725bbcbac608a3caf1f8a738b1c83e4bfe59b1"
+                  },
+                  {
+                      "path":  "seneschal/openai_compatible_adapter.py",
+                      "bytes":  2940,
+                      "sha256":  "575e861b3dc3d81517b8d39b5799bb2c763645b7a3ed1254c29f6111091f324c"
+                  },
+                  {
+                      "path":  "seneschal/prompt_firewall.py",
+                      "bytes":  5360,
+                      "sha256":  "2d165170987dbb26b642019a2fe9881c446c4e93cfa8374336c36f0751f9f197"
+                  },
+                  {
+                      "path":  "seneschal/provider_health.py",
+                      "bytes":  3048,
+                      "sha256":  "241962e76fa46e00446fe51b8141f35c9e3a25d1ff46b2574da3936339e1b470"
+                  },
+                  {
+                      "path":  "seneschal/provider_profiles.json",
+                      "bytes":  1734,
+                      "sha256":  "6533745985db1b61cbcb7fb4eb83e9906f6a101870fd8d89f383f4dc5d0986a1"
+                  },
+                  {
+                      "path":  "seneschal/provider_profiles.py",
+                      "bytes":  3400,
+                      "sha256":  "b55dba8c4c4e287560f37427c9ec22be2b65c69235b26cc10a235c74e1ae0b56"
+                  },
+                  {
+                      "path":  "seneschal/provider_state.py",
+                      "bytes":  2782,
+                      "sha256":  "3707f5f8cbf75f473c088348fe60d921b00fbb08c67ce309b479750fc2878e5e"
+                  },
+                  {
+                      "path":  "seneschal/quality_gate.py",
+                      "bytes":  1516,
+                      "sha256":  "67f25a87316dcb327e43a11f9d49a59f59e98e5e9308dd469ff94aad0efae8b9"
+                  },
+                  {
+                      "path":  "seneschal/request_planner.py",
+                      "bytes":  4111,
+                      "sha256":  "a2ae55ae482edfd14405b0334e71c8d8608d51c4694ba1c9219d58d2e6086310"
+                  },
+                  {
+                      "path":  "seneschal/router.py",
+                      "bytes":  9567,
+                      "sha256":  "389f1c0e3ffac2fc1c963d9eebdeddcdf37a2ced1c0037eefc6f73e9c8291ba2"
+                  },
+                  {
+                      "path":  "seneschal/runner.py",
+                      "bytes":  5119,
+                      "sha256":  "d8e5d3eacfe054ba8cfa65e53f5ae905f4772d01c2acf35082b72f0b1851b0d7"
+                  },
+                  {
+                      "path":  "seneschal/savings.py",
+                      "bytes":  2068,
+                      "sha256":  "6d62bf6f150ae21a92ddd2fb295a7647290d9173a2c9b33064e4a4eff38f74cf"
+                  },
+                  {
+                      "path":  "seneschal/signing.py",
+                      "bytes":  5613,
+                      "sha256":  "0a4e6cd74cf7cdb6132b4ac74b5352f7169c4a65866b7493124c80a094278e18"
+                  },
+                  {
+                      "path":  "seneschal/token_budget.py",
+                      "bytes":  4075,
+                      "sha256":  "90ae7bbd5eb4da3e3e095bd7e3b8ccf0026ecbd6d3c4d6464ea45af176bacf97"
+                  },
+                  {
+                      "path":  "STANDALONE_USAGE.md",
+                      "bytes":  3038,
+                      "sha256":  "e656a2d53dca6ece0908eaa48ec426c12920f603c94989986d518ac6991df49d"
+                  },
+                  {
+                      "path":  "tests/conftest.py",
+                      "bytes":  181,
+                      "sha256":  "b27497bb2044366f021a57d94950439658ae00be58f7502d60ad69dee7f21ef2"
+                  },
+                  {
+                      "path":  "tests/test_advanced.py",
+                      "bytes":  19583,
+                      "sha256":  "853095627a51c27016cc55cf9583bc1ca2834f83033b774e9f0ae2a0bf4328b5"
+                  },
+                  {
+                      "path":  "tests/test_seneschal.py",
+                      "bytes":  42562,
+                      "sha256":  "1cd8efd062a47566c57d1f06ec715624830b5f8fc823813fc10a84cd23b5705d"
+                  },
+                  {
+                      "path":  "THREAT_MODEL.md",
+                      "bytes":  2883,
+                      "sha256":  "ba4f058b561e571928140b51f7d3f33e02c036336d5fa0a5a89970546ada4419"
+                  },
+                  {
+                      "path":  "TOOL_MANIFEST.json",
+                      "bytes":  2175,
+                      "sha256":  "2f5dfc75db880134a9c972d57441142cf5673e3c0a91e18da9aed346f484a9c3"
+                  },
+                  {
+                      "path":  "USAGE.md",
+                      "bytes":  1669,
+                      "sha256":  "9755a6c4e7a5b3021eaad339b980f9d50f418de75a7e1296897a9b5fcbb840fc"
+                  }
+              ]
+}

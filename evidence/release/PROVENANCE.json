@@ -1,0 +1,26 @@
+﻿{
+    "schema":  "ethernium.personal.provenance/1",
+    "repository":  "ETHERNIUM-PERSONAL-SENESCHAL",
+    "component":  "seneschal",
+    "role":  "context_cost_risk_preflight",
+    "version":  "0.2.2",
+    "history_policy":  "sanitized_genesis",
+    "source":  {
+                   "repository":  "SENESCHAL-by-Ethernium",
+                   "commit":  "7832c6f",
+                   "snapshot_included_uncommitted_work":  false,
+                   "originals_mutated":  false
+               },
+    "sanitation":  {
+                       "runtime_state_excluded":  true,
+                       "secrets_excluded":  true,
+                       "absolute_machine_dependencies_removed":  true,
+                       "font_forge_in_scope":  false
+                   },
+    "verification":  {
+                         "status":  "passed",
+                         "command":  "pytest -q; python -m seneschal.cli health --strict",
+                         "note":  "90 passed, 9 skipped; strict health OK."
+                     },
+    "generated_at":  "2026-07-22T01:27:33.1873086Z"
+}

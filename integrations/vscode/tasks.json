@@ -1,0 +1,100 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Seneschal: Health",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "seneschal.cli",
+        "health",
+        "--strict"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Seneschal: Scan Path",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "seneschal.cli",
+        "scan",
+        "--path",
+        "${input:robinHoodScanPath}",
+        "--source",
+        "repo",
+        "--fail-on-block"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Seneschal: Pack Context",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "seneschal.cli",
+        "pack",
+        "--path",
+        "${input:robinHoodPackPath}",
+        "--model",
+        "local-long",
+        "--max-tokens",
+        "12000"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Seneschal: Route",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "seneschal.cli",
+        "route",
+        "--objective",
+        "${input:robinHoodRouteObjective}",
+        "--privacy",
+        "local-first"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Seneschal: Test",
+      "type": "shell",
+      "command": "pytest",
+      "args": [
+        "tests",
+        "-q"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "robinHoodScanPath",
+      "type": "promptString",
+      "description": "Path to scan with Seneschal",
+      "default": "adversarial_cases"
+    },
+    {
+      "id": "robinHoodPackPath",
+      "type": "promptString",
+      "description": "Path to pack with Seneschal",
+      "default": "."
+    },
+    {
+      "id": "robinHoodRouteObjective",
+      "type": "promptString",
+      "description": "Task objective to route with Seneschal",
+      "default": "Fix typo in docs"
+    }
+  ]
+}
