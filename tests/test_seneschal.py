@@ -1137,3 +1137,23 @@ def test_manifest_implemented_mirrors_the_actual_modules():
     on_disk = {f.stem for f in src.glob("*.py") if f.stem not in ("__init__", "__main__")}
     listed = set(manifest.get("implemented_modules", []))
     assert listed == on_disk, f"manifest drift: missing {on_disk - listed}, phantom {listed - on_disk}"
+
+
+def test_readme_is_not_double_counted_in_scoring():
+    """README must not get both the HIGH_VALUE_NAMES boost and the readme prefix.
+
+    Found by running `select` on a real 'fix the exit logic' task: README.md
+    scored the maximum and ranked above the source files, because it collected
+    +40 (HIGH_VALUE_NAMES) and +15 (readme prefix) = +55 of pure structure.
+    A code task should let BM25 decide, not have a README top it structurally.
+    """
+    from pathlib import Path
+    from seneschal.context_packer import _score_file
+    root = Path(".")
+    readme = _score_file(root / "README.md", root)
+    # roadmap is NOT in HIGH_VALUE_NAMES, so it keeps the prefix nudge.
+    roadmap = _score_file(root / "ROADMAP.md", root)
+    # README: base 10 + HIGH_VALUE_NAMES 40 = 50, no second readme boost.
+    assert readme == 50, f"README double-counted: {readme}"
+    # ROADMAP: base 10 + prefix 15 = 25 (not in HIGH_VALUE_NAMES).
+    assert roadmap == 25, f"ROADMAP score unexpected: {roadmap}"

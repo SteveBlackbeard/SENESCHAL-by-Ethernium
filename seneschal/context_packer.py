@@ -150,7 +150,12 @@ def _score_file(path: Path, root: Path) -> int:
         score += 8
     if parts & LOW_VALUE_PARTS:
         score -= 40
-    if path.name.lower().startswith(("readme", "roadmap", "pending")):
+    # roadmap/pending get a small structural nudge — but NOT readme, which is
+    # already in HIGH_VALUE_NAMES (+40). Boosting it again here double-counted
+    # it to +55 of pure structure, enough to top the ranking even for a code
+    # task, where BM25 should decide. Found by running `select` on a real
+    # "fix the exit logic" task and watching README.md rank #1 over the source.
+    if path.name not in HIGH_VALUE_NAMES and path.name.lower().startswith(("readme", "roadmap", "pending")):
         score += 15
     return score
 
