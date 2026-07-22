@@ -41,6 +41,16 @@ Seneschal is a preflight and control layer, not a sandbox. Honestly:
    There is no certificate authority — a deliberate scope choice.
 4. **Provider calls are the provider's trust boundary.** Seneschal scans and
    budgets, but does not certify a remote model's behavior.
+5. **`scan` is for untrusted input, not for auditing trusted source.** The
+   classifier is pattern-based, and no pattern can tell an attack string that is
+   *data* (a detection rule, a test fixture, security documentation) from one
+   that is an *instruction*. Point `scan`/`audit` at your own repository and it
+   will flag files that legitimately contain attack patterns — including
+   Seneschal's own `prompt_firewall.py`, whose rule definitions are the very
+   strings it looks for. Found by running `seneschal audit` on this repository.
+   Use `--source internal` to lower the posture, and expect false positives on
+   security-related code; this is a known limitation of pattern scanning, not a
+   bug we pretend to have solved.
 
 ## Cryptography
 
