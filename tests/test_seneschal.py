@@ -11,7 +11,7 @@ from seneschal.context_packer import pack_context
 from seneschal.context_packet import ContextPacket
 from seneschal.context_select import select_context
 from seneschal.frugality_ledger import append_entry, new_entry, read_entries
-from seneschal.mcp_server import broker_dry_run_tool, budget_tool, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, run_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
+from seneschal.mcp_server import broker_dry_run_tool, budget_tool, build_mcp_server, check_capability_tool, make_packet_tool, pack_tool, plan_request_tool, provider_health_tool, provider_mark_tool, provider_state_tool, reuse_tool, route_tool, run_tool, savings_tool, scan_text_tool, select_tool, snapshot_tool
 from seneschal.ollama_adapter import call_ollama
 from seneschal.openai_compatible_adapter import call_openai_compatible
 from seneschal.prompt_firewall import scan_path, classify_text
@@ -37,6 +37,13 @@ def test_context_packet_renders_scope():
     assert "Fix release checklist." in rendered
     assert "RELEASE.md" in rendered
     assert "No runtime changes." in rendered
+
+
+def test_mcp_server_registers_each_tool_once(caplog):
+    server = build_mcp_server()
+
+    assert server is not None
+    assert not any("Tool already exists" in record.message for record in caplog.records)
 
 
 def test_frugality_ledger_roundtrip(tmp_path: Path):

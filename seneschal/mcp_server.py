@@ -373,27 +373,6 @@ def build_mcp_server() -> Any:
     server.tool(name="seneschal.plan_request")(plan_request_tool)
     server.tool(name="seneschal.run")(run_tool)
 
-    # Backward-compatible aliases from the agent-ops incubation phase.
-    server.tool(name="seneschal.health")(health_tool)
-    server.tool(name="seneschal.scan_text")(scan_text_tool)
-    server.tool(name="seneschal.scan_path")(scan_path_tool)
-    server.tool(name="seneschal.make_packet")(make_packet_tool)
-    server.tool(name="seneschal.check_capability")(check_capability_tool)
-    server.tool(name="seneschal.models")(models_tool)
-    server.tool(name="seneschal.provider_health")(provider_health_tool)
-    server.tool(name="seneschal.provider_state")(provider_state_tool)
-    server.tool(name="seneschal.provider_mark")(provider_mark_tool)
-    server.tool(name="seneschal.budget")(budget_tool)
-    server.tool(name="seneschal.pack")(pack_tool)
-    server.tool(name="seneschal.route")(route_tool)
-    server.tool(name="seneschal.snapshot")(snapshot_tool)
-    server.tool(name="seneschal.reuse")(reuse_tool)
-    server.tool(name="seneschal.savings")(savings_tool)
-    server.tool(name="seneschal.select")(select_tool)
-    server.tool(name="seneschal.audit")(audit_tool)
-    server.tool(name="seneschal.broker_dry_run")(broker_dry_run_tool)
-    server.tool(name="seneschal.plan_request")(plan_request_tool)
-    server.tool(name="seneschal.run")(run_tool)
     return server
 
 
