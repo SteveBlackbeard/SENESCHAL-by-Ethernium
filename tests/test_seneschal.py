@@ -40,6 +40,10 @@ def test_context_packet_renders_scope():
 
 
 def test_mcp_server_registers_each_tool_once(caplog):
+    pytest.importorskip(
+        "mcp.server.fastmcp",
+        reason="MCP registration requires the optional 'mcp' extra",
+    )
     server = build_mcp_server()
 
     assert server is not None
