@@ -7,7 +7,7 @@
 [![CI](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/actions/workflows/ci.yml/badge.svg)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/seneschal?label=pypi&color=blueviolet)](https://pypi.org/project/seneschal/)
 [![Downloads](https://img.shields.io/pypi/dm/seneschal?color=blueviolet)](https://pypi.org/project/seneschal/)
-[![License](https://img.shields.io/badge/license-MIT-green)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-green)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium#license)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/release/python-3100/)
 [![Dependencies](https://img.shields.io/badge/runtime%20deps-0-brightgreen)](https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium/blob/main/pyproject.toml)
 [![Attested build](https://img.shields.io/badge/build-attested%20(PyPI%20OIDC)-0a7bbb)](https://pypi.org/project/seneschal/#files)
@@ -442,3 +442,7 @@ optional_dependencies: mcp
 ```
 
 Seneschal is useful today as a local frugality and safety tool. It is not yet a provider router or model invocation layer.
+
+## License
+
+Licensed under either of [MIT](LICENSE-MIT) or [Apache License 2.0](LICENSE-APACHE) at your option. Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in this work shall be dual licensed as above, without any additional terms or conditions.

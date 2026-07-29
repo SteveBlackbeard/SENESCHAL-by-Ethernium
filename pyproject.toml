@@ -11,7 +11,7 @@ authors = [
 description = "Picks which files to send a model instead of pasting the repository: 69,412 tokens down to 8,236, measured. Scans untrusted input for prompt injection and enforces Ed25519-signed capability grants. Zero runtime dependencies."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "MIT"
+license = "MIT OR Apache-2.0"
 keywords = ["ai", "agents", "prompt-injection", "llmops", "security", "frugality"]
 classifiers = [
   "Development Status :: 3 - Alpha",
