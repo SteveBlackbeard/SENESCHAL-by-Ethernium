@@ -1157,3 +1157,22 @@ def test_readme_is_not_double_counted_in_scoring():
     assert readme == 50, f"README double-counted: {readme}"
     # ROADMAP: base 10 + prefix 15 = 25 (not in HIGH_VALUE_NAMES).
     assert roadmap == 25, f"ROADMAP score unexpected: {roadmap}"
+
+
+def test_mcp_contract_matches_registered_tools():
+    """The MCP contract must list exactly the tools the server registers.
+
+    integrations/mcp/server_contract.json is a governance document, and it had
+    drifted 6 tools behind the code (seneschal.audit among them) because nothing
+    read it. A governance doc no test reads is a wish, not a control (rule 15).
+    """
+    import json
+    import re
+    src = (Path(__file__).parent.parent / "seneschal" / "mcp_server.py").read_text(encoding="utf-8")
+    registered = set(re.findall(r'server\.tool\(name="([^"]+)"', src))
+    contract = json.loads((Path(__file__).parent.parent / "integrations" / "mcp" / "server_contract.json").read_text(encoding="utf-8"))
+    listed = {t["name"] for t in contract["tools"]}
+    missing = registered - listed
+    extra = listed - registered
+    assert not missing, f"registered but not in contract: {sorted(missing)}"
+    assert not extra, f"in contract but not registered: {sorted(extra)}"
