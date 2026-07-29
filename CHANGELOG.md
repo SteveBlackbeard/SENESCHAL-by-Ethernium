@@ -3,6 +3,26 @@
 All notable changes to Seneschal are documented here. This project follows
 [Semantic Versioning](https://semver.org/).
 
+## [0.2.3] - 2026-07-29
+
+### Fixed — what dogfooding a live local stack found
+- **Routing failed open on disabled providers.** The request planner only blocked
+  a selected provider when it was *enabled but not ready*, so a disabled profile
+  reached the caller with `should_call=true` and then died at call time. It now
+  fails closed on a disabled selection, and the broker's no-candidate fallback no
+  longer resurrects a disabled profile when an enabled one exists. Two regressions
+  cover both.
+
+### Added
+- **Cascade is measured, not asserted.** The README's "cascade savings: not
+  measured here" is replaced with a real measurement against a two-tier local
+  model stack (`scripts/benchmark_cascade.py`): first-tier sufficiency, with the
+  escalation path exercised. Honest caveats included — the quality gate is a
+  heuristic, and a harder task mix will escalate.
+
+### Changed
+- Dual-licensed **MIT OR Apache-2.0** (was MIT). Additive; the MIT option is kept.
+
 ## [0.2.2] - 2026-07-19
 
 ### Fixed — what an agent found using the tool
