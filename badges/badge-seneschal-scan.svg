@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" width="280" height="48">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&amp;family=Fira+Code:wght@700&amp;display=swap');
+      
+      .btn-text {
+        font-family: 'Nebula', 'Orbitron', monospace;
+        font-weight: 900;
+        font-size: 13.5px;
+        fill: #FFFFFF !important;
+        stroke: #000000;
+        stroke-width: 2px;
+        paint-order: stroke fill;
+        letter-spacing: 2px;
+        filter: drop-shadow(0 0 8px #00FF9DE6);
+      }
+
+      .glow-border {
+        animation: borderGlow 4s ease-in-out infinite alternate;
+      }
+
+      @keyframes borderGlow {
+        0% { stroke: #00FF9D; filter: drop-shadow(0 0 4px #00FF9D); }
+        50% { stroke: #00C853; filter: drop-shadow(0 0 6px #00C853); }
+        100% { stroke: #00FF9D; filter: drop-shadow(0 0 4px #00FF9D); }
+      }
+
+      .sheen-move {
+        animation: moveSheen 3.5s ease-in-out infinite alternate;
+      }
+
+      @keyframes moveSheen {
+        0% { transform: translateX(-200px); }
+        100% { transform: translateX(140px); }
+      }
+
+      .pulse-dot {
+        animation: pulse 1.8s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { fill: #00FF9D; opacity: 1; filter: drop-shadow(0 0 6px #00FF9D); }
+        50% { fill: #00FF9D; opacity: 0.3; filter: drop-shadow(0 0 2px #00FF9D); }
+        100% { fill: #00FF9D; opacity: 1; filter: drop-shadow(0 0 6px #00FF9D); }
+      }
+    </style>
+
+    <clipPath id="badge-seneschal-scan-corner-clip">
+      <rect width="280" height="48" rx="12" />
+    </clipPath>
+
+    <linearGradient id="badge-seneschal-scan-obsidian" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020306" />
+      <stop offset="30%" stop-color="#070B14" />
+      <stop offset="70%" stop-color="#0A0F1E" />
+      <stop offset="100%" stop-color="#010204" />
+    </linearGradient>
+
+    <linearGradient id="badge-seneschal-scan-bevel-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00FF9D" />
+      <stop offset="50%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#00C853" />
+    </linearGradient>
+
+    <linearGradient id="badge-seneschal-scan-moving-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.38" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#badge-seneschal-scan-corner-clip)">
+    <!-- Base obsidian background -->
+    <rect width="280" height="48" rx="12" fill="url(#badge-seneschal-scan-obsidian)" stroke="#000000" stroke-width="3"/>
+
+    <!-- Moving Sheen -->
+    <g class="sheen-move">
+      <polygon points="50,0 160,0 80,48 -30,48" fill="url(#badge-seneschal-scan-moving-sheen)" />
+    </g>
+
+    <!-- Tri-stroke Engraved Inset -->
+    <rect x="3" y="3" width="274" height="42" rx="10" fill="none" stroke="url(#badge-seneschal-scan-bevel-glow)" stroke-width="1.5" />
+    <rect x="5" y="5" width="270" height="38" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.4" />
+
+    <!-- Corner Accents -->
+    <path d="M 12 12 L 28 12 M 12 12 L 12 28" class="glow-border" stroke-width="2" fill="none" />
+    <path d="M 268 12 L 252 12 M 268 12 L 268 28" class="glow-border" stroke-width="2" fill="none" />
+    <path d="M 12 36 L 28 36 M 12 36 L 12 20" class="glow-border" stroke-width="2" fill="none" />
+    <path d="M 268 36 L 252 36 M 268 36 L 268 20" class="glow-border" stroke-width="2" fill="none" />
+
+    <!-- Status dot -->
+    <circle cx="32" cy="24" r="3.5" class="pulse-dot" />
+
+    <!-- Text -->
+    <text x="146" y="29" text-anchor="middle" class="btn-text" fill="#FFFFFF" stroke="#000000" stroke-width="2" paint-order="stroke fill">INJECTION SCANNER</text>
+  </g>
+</svg>

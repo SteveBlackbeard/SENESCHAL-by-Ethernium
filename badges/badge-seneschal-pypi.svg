@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 36" width="140" height="36">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@800;900&amp;family=Fira+Code:wght@700&amp;display=swap');
+      
+      .btn-text {
+        font-family: 'Nebula', 'Orbitron', monospace;
+        font-weight: 900;
+        font-size: 13.5px;
+        fill: #FFFFFF !important;
+        stroke: #000000;
+        stroke-width: 2px;
+        paint-order: stroke fill;
+        letter-spacing: 2px;
+        filter: drop-shadow(0 0 8px #00FF9DE6);
+      }
+
+      .glow-border {
+        animation: borderGlow 4s ease-in-out infinite alternate;
+      }
+
+      @keyframes borderGlow {
+        0% { stroke: #00FF9D; filter: drop-shadow(0 0 4px #00FF9D); }
+        50% { stroke: #00C853; filter: drop-shadow(0 0 6px #00C853); }
+        100% { stroke: #00FF9D; filter: drop-shadow(0 0 4px #00FF9D); }
+      }
+
+      .sheen-move {
+        animation: moveSheen 3.5s ease-in-out infinite alternate;
+      }
+
+      @keyframes moveSheen {
+        0% { transform: translateX(-200px); }
+        100% { transform: translateX(70px); }
+      }
+
+      .pulse-dot {
+        animation: pulse 1.8s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { fill: #00FF9D; opacity: 1; filter: drop-shadow(0 0 6px #00FF9D); }
+        50% { fill: #00FF9D; opacity: 0.3; filter: drop-shadow(0 0 2px #00FF9D); }
+        100% { fill: #00FF9D; opacity: 1; filter: drop-shadow(0 0 6px #00FF9D); }
+      }
+    </style>
+
+    <clipPath id="badge-seneschal-pypi-corner-clip">
+      <rect width="140" height="36" rx="12" />
+    </clipPath>
+
+    <linearGradient id="badge-seneschal-pypi-obsidian" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020306" />
+      <stop offset="30%" stop-color="#070B14" />
+      <stop offset="70%" stop-color="#0A0F1E" />
+      <stop offset="100%" stop-color="#010204" />
+    </linearGradient>
+
+    <linearGradient id="badge-seneschal-pypi-bevel-glow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00FF9D" />
+      <stop offset="50%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#00C853" />
+    </linearGradient>
+
+    <linearGradient id="badge-seneschal-pypi-moving-sheen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.38" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <g clip-path="url(#badge-seneschal-pypi-corner-clip)">
+    <!-- Base obsidian background -->
+    <rect width="140" height="36" rx="12" fill="url(#badge-seneschal-pypi-obsidian)" stroke="#000000" stroke-width="3"/>
+
+    <!-- Moving Sheen -->
+    <g class="sheen-move">
+      <polygon points="50,0 160,0 80,36 -30,36" fill="url(#badge-seneschal-pypi-moving-sheen)" />
+    </g>
+
+    <!-- Tri-stroke Engraved Inset -->
+    <rect x="3" y="3" width="134" height="30" rx="10" fill="none" stroke="url(#badge-seneschal-pypi-bevel-glow)" stroke-width="1.5" />
+    <rect x="5" y="5" width="130" height="26" rx="8" fill="none" stroke="#FFFFFF" stroke-width="1" opacity="0.4" />
+
+    <!-- Corner Accents -->
+    <path d="M 12 12 L 28 12 M 12 12 L 12 28" class="glow-border" stroke-width="2" fill="none" />
+    <path d="M 128 12 L 112 12 M 128 12 L 128 28" class="glow-border" stroke-width="2" fill="none" />
+    <path d="M 12 24 L 28 24 M 12 24 L 12 8" class="glow-border" stroke-width="2" fill="none" />
+    <path d="M 128 24 L 112 24 M 128 24 L 128 8" class="glow-border" stroke-width="2" fill="none" />
+
+    <!-- Status dot -->
+    <circle cx="32" cy="18" r="3.5" class="pulse-dot" />
+
+    <!-- Text -->
+    <text x="76" y="23" text-anchor="middle" class="btn-text" fill="#FFFFFF" stroke="#000000" stroke-width="2" paint-order="stroke fill">PyPI Package</text>
+  </g>
+</svg>
