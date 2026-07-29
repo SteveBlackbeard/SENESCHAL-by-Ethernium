@@ -87,7 +87,12 @@ def broker_dry_run(
         scored.append((score, profile, cost, reasons))
 
     if not scored:
-        fallback = max(candidates, key=lambda item: item.context_window)
+        # When nothing passes the constraints, still return a decision so the
+        # caller can reason about it — but prefer an *enabled* profile. Handing
+        # back a disabled provider here is what let should_call slip through to a
+        # dead call; the planner also blocks it now, so this is defence in depth.
+        enabled_candidates = [item for item in candidates if item.enabled]
+        fallback = max(enabled_candidates or candidates, key=lambda item: item.context_window)
         return BrokerDecision(
             objective=objective,
             task_class=selected_task,

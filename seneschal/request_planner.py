@@ -78,7 +78,13 @@ def plan_request(
     blockers: list[str] = []
     warnings: list[str] = []
 
-    if selected_health and selected_health.get("enabled") and not selected_health.get("ready"):
+    # Fail-closed: a disabled provider must never be greenlit. The old gate only
+    # fired for enabled-but-not-ready, so a disabled fallback (see broker's
+    # no-candidate path) slipped through with should_call=True and then failed at
+    # call time. Block disabled first, then not-ready.
+    if selected_health and not selected_health.get("enabled"):
+        blockers.append("selected-provider-disabled")
+    elif selected_health and not selected_health.get("ready"):
         blockers.append("selected-provider-not-ready")
     if max_cost is not None and estimated_total_cost > max_cost:
         blockers.append("estimated-total-cost-over-max")

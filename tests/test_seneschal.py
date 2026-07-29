@@ -799,6 +799,94 @@ def test_request_planner_blocks_unready_enabled_cloud(tmp_path: Path):
     assert plan.estimated_total_cost == 0.016
 
 
+def test_request_planner_blocks_disabled_fallback(tmp_path: Path):
+    # Regression: a disabled local profile at zero cost used to reach the caller
+    # with should_call=True (no cost blocker to save it), then fail at call time.
+    # The planner must fail closed on a disabled selection.
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "local-disabled",
+      "provider": "ollama",
+      "context_window": 32000,
+      "input_cost_per_million": 0,
+      "output_cost_per_million": 0,
+      "privacy": "local",
+      "latency": "fast",
+      "strengths": ["cheap"],
+      "endpoint_env": "SENESCHAL_OLLAMA_BASE_URL",
+      "model_env": "SENESCHAL_OLLAMA_MODEL",
+      "enabled": false
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    plan = plan_request(
+        "hola",
+        estimated_input_tokens=50,
+        estimated_output_tokens=100,
+        privacy="local-only",
+        providers_path=providers,
+    )
+    assert plan.should_call is False
+    assert "selected-provider-disabled" in plan.blockers
+
+
+def test_broker_fallback_prefers_enabled_profile(tmp_path: Path):
+    # When nothing passes the constraints, the no-candidate fallback must not
+    # resurrect a disabled profile if an enabled one exists.
+    providers = tmp_path / "providers.local.json"
+    providers.write_text(
+        """
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "big-disabled",
+      "provider": "openai-compatible",
+      "context_window": 200000,
+      "input_cost_per_million": 1,
+      "output_cost_per_million": 2,
+      "privacy": "cloud",
+      "latency": "slow",
+      "strengths": ["reasoning"],
+      "endpoint_env": "X", "api_key_env": "Y",
+      "enabled": false
+    },
+    {
+      "id": "small-enabled",
+      "provider": "openai-compatible",
+      "context_window": 8000,
+      "input_cost_per_million": 1,
+      "output_cost_per_million": 2,
+      "privacy": "cloud",
+      "latency": "fast",
+      "strengths": ["cheap"],
+      "endpoint_env": "X", "api_key_env": "Y",
+      "enabled": true
+    }
+  ]
+}
+""".strip(),
+        encoding="utf-8",
+    )
+    # max_cost=0 rejects both on cost, forcing the no-candidate fallback path.
+    decision = broker_dry_run(
+        "hola",
+        estimated_input_tokens=50,
+        privacy="cloud-allowed",
+        max_cost=0.0,
+        providers_path=providers,
+    )
+    assert decision.selected_model == "small-enabled"
+
+
 def test_cli_plan_request_reports_preflight(capsys):
     assert cli_main(
         [
