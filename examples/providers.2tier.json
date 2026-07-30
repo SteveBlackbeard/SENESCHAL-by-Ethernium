@@ -1,0 +1,33 @@
+{
+  "version": "0.1.0",
+  "profiles": [
+    {
+      "id": "ollama-small-cheap",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "fast",
+      "strengths": ["cheap", "code", "private"],
+      "tokenizer": "estimate",
+      "endpoint_env": "SENESCHAL_OLLAMA_BASE_URL",
+      "model_env": "SEN_M_SMALL",
+      "enabled": true
+    },
+    {
+      "id": "ollama-strong",
+      "provider": "ollama",
+      "context_window": 32768,
+      "input_cost_per_million": 0.0,
+      "output_cost_per_million": 0.0,
+      "privacy": "local",
+      "latency": "slow",
+      "strengths": ["reasoning", "code", "review", "release"],
+      "tokenizer": "estimate",
+      "endpoint_env": "SENESCHAL_OLLAMA_BASE_URL",
+      "model_env": "SEN_M_BIG",
+      "enabled": true
+    }
+  ]
+}

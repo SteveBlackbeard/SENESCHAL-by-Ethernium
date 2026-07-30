@@ -1,0 +1,136 @@
+{
+  "name": "seneschal-mcp",
+  "status": "implemented-local-controls",
+  "transport": [
+    "stdio"
+  ],
+  "default_network": "disabled",
+  "tools": [
+    {
+      "name": "seneschal.audit",
+      "implemented": true,
+      "risk": "low",
+      "description": "One verdict: scan for safety, select context under budget, and route. Read-only; blocks on unsafe input."
+    },
+    {
+      "name": "seneschal.broker_dry_run",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Recommend provider capacity routing without API calls or secrets."
+    },
+    {
+      "name": "seneschal.budget",
+      "implemented": true,
+      "risk": "low",
+      "description": "Estimate token usage against a selected model profile."
+    },
+    {
+      "name": "seneschal.check_capability",
+      "implemented": true,
+      "risk": "low",
+      "description": "Validate a requested capability and optional path."
+    },
+    {
+      "name": "seneschal.health",
+      "implemented": true,
+      "risk": "low",
+      "description": "Run seneschal health checks."
+    },
+    {
+      "name": "seneschal.make_packet",
+      "implemented": true,
+      "risk": "low",
+      "description": "Render a scoped context packet."
+    },
+    {
+      "name": "seneschal.models",
+      "implemented": true,
+      "risk": "low",
+      "description": "List provider-neutral model profiles."
+    },
+    {
+      "name": "seneschal.pack",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Create a compact context bundle under a token budget."
+    },
+    {
+      "name": "seneschal.plan_request",
+      "implemented": true,
+      "risk": "low",
+      "description": "Plan a request: classify the task and recommend whether and how to call a model."
+    },
+    {
+      "name": "seneschal.provider_health",
+      "implemented": true,
+      "risk": "low",
+      "description": "Check the reachability and readiness of configured providers."
+    },
+    {
+      "name": "seneschal.provider_mark",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Record a provider's observed state (writes provider-state, no model call)."
+    },
+    {
+      "name": "seneschal.provider_state",
+      "implemented": true,
+      "risk": "low",
+      "description": "Read the recorded state of providers."
+    },
+    {
+      "name": "seneschal.reuse",
+      "implemented": true,
+      "risk": "low",
+      "description": "Estimate stable/cacheable prompt token share."
+    },
+    {
+      "name": "seneschal.route",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Recommend a model/provider path without invoking the model."
+    },
+    {
+      "name": "seneschal.run",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Execute a request against the cheapest sufficient provider, gated by the request plan."
+    },
+    {
+      "name": "seneschal.savings",
+      "implemented": true,
+      "risk": "low",
+      "description": "Estimate token and cost savings across repeated runs."
+    },
+    {
+      "name": "seneschal.scan_path",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Recursively scan a file or directory using Seneschal ignore rules."
+    },
+    {
+      "name": "seneschal.scan_text",
+      "implemented": true,
+      "risk": "low",
+      "description": "Classify untrusted text for prompt and secret-like risk."
+    },
+    {
+      "name": "seneschal.select",
+      "implemented": true,
+      "risk": "medium",
+      "description": "Select changed files and useful neighboring context under a token budget."
+    },
+    {
+      "name": "seneschal.snapshot",
+      "implemented": true,
+      "risk": "low",
+      "description": "Snapshot context and estimate changed-only token savings."
+    }
+  ],
+  "forbidden": [
+    "store provider secrets",
+    "copy leaked prompts",
+    "invoke models before scan and budget controls are explicitly enabled",
+    "depend on Continuity Legacy runtime"
+  ]
+}

@@ -1,0 +1,14 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.egg-info/
+build/
+dist/
+*.pyc
+agentops-usage.jsonl
+.seneschal/
+# ruta heredada del nombre anterior; se ignora por si queda alguna
+.robinhood/
+providers.local.json
+seneschal.config.json
+robinhood.config.json
