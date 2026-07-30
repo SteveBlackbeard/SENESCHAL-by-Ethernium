@@ -425,6 +425,7 @@ The intended relationship is:
 
 - Continuity Legacy governs repository integrity, baselines, release gates, and handoff discipline.
 - Seneschal governs token economy, context packing, prompt-risk scanning, model selection, and agent operations.
+- [CONEKTA](https://github.com/SteveBlackbeard/CONEKTA-by-Ethernium) is the optional dashboard — a local-first cockpit that renders the state of both, read-only. Seneschal is not a dashboard (see above); CONEKTA is.
 
 They are designed to work beside each other. Neither should be embedded inside the other.
 
