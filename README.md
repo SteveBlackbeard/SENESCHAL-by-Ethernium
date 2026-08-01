@@ -143,13 +143,16 @@ The clean-room rule is simple: study economics and control patterns, then rebuil
 ## Quick Start
 
 ```powershell
-cd D:\Experimentos\ROBIN-HOOD
+git clone https://github.com/SteveBlackbeard/SENESCHAL-by-Ethernium.git seneschal
+Set-Location seneschal
 pip install -e .
 seneschal health --strict
 pytest -q
 ```
 
-For a full operational walkthrough, see `USAGE.md`. For release gates, see `RELEASE.md`.
+For a full operational walkthrough, see `USAGE.md`. For release gates, see
+`RELEASE.md`; for supported boundaries and deployment expectations, see
+[`docs/PRODUCTION_READINESS.md`](./docs/PRODUCTION_READINESS.md).
 
 Inspect available model profiles:
 
