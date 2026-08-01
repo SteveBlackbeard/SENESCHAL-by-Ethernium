@@ -5,10 +5,12 @@ This folder defines the MCP surface for Seneschal local controls.
 The current codebase includes an optional local MCP server:
 
 ```powershell
-cd D:\Experimentos\ROBIN-HOOD
-pip install -e .[mcp]
+python -m pip install -e ".[mcp]"
 seneschal-mcp
 ```
+
+Run these commands from the Seneschal repository root. No sibling repository
+or machine-specific path is required.
 
 MCP should expose local controls first:
 
