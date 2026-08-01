@@ -6,18 +6,9 @@ It does not require Continuity Legacy, Conekta, PyPI publishing, or a dashboard.
 
 ## Minimal Local Setup
 
-From the future standalone repository root:
+From a Seneschal checkout:
 
 ```powershell
-$env:PYTHONPATH="."
-python -m seneschal.cli health --strict
-pytest tests -q
-```
-
-From the extracted local repository:
-
-```powershell
-cd D:\Experimentos\ROBIN-HOOD
 $env:PYTHONPATH="."
 python -m seneschal.cli health --strict
 pytest tests -q
@@ -26,7 +17,6 @@ pytest tests -q
 After local editable install:
 
 ```powershell
-cd D:\Experimentos\ROBIN-HOOD
 pip install -e .
 seneschal health --strict
 seneschal scan --file adversarial_cases\indirect_prompt_injection.txt --source web --fail-on-block
